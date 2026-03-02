@@ -1,0 +1,64 @@
+\documentclass{csnotes}
+
+% ==============================================================================
+% DOCUMENT SPECIFIC CUSTOMIZATIONS
+% ==============================================================================
+
+% --------------------------- START CUSTOMIZATIONS -----------------------------
+
+% You can add any custom packages or commands specific to this document here
+\setabstracttitle{Scopo del documento}
+
+\newcommand{\whitepage}{
+  \newpage
+  \thispagestyle{empty}
+  \mbox{}
+  \newpage
+}
+
+% ---------------------------- END CUSTOMIZATIONS ------------------------------
+
+\title{Automated Software Verification}
+\author{Riccardo Elena}
+\date{\today}
+
+\university{Università degli Studi Federico II di Napoli}
+\department{Dipartimento d'Ingegneria Elettrica e Tecnologie dell'Informazione}
+\course{Corso di Laurea Magistrale in Computer Science}
+\subject{Automated Software Verification}
+\academicyear{Anno Accademico 2024/2025}
+
+% ==============================================================================
+% BIBLIOGRAPHY
+% ==============================================================================
+% Specify the .bib file with your bibliographic references
+% Uncomment the following line when you have created the bibliography.bib file
+% \addbibresource{bibliography.bib}
+
+% ==============================================================================
+% INIZIO DOCUMENTO
+% ==============================================================================
+
+\begin{document}
+
+\pagenumbering{gobble}
+
+\maketitlepage{}
+\whitepage{}
+
+\input{_chapters/0_intro.tex}
+\whitepage{}
+
+\newgeometry{top=2cm}
+\tableofcontents
+\restoregeometry{}
+
+\whitepage{}
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\whitepage{}
+\makebackcover{}
+
+\end{document}
