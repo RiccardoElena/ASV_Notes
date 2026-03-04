@@ -1,0 +1,134 @@
+# Automated Software Verification - Appunti del Corso
+
+Questo repository contiene appunti e materiali di studio relativi al corso di **Automated Software Verification** tenuto dai Prof. M. Benerecetti e F. Mogavero presso l'Università degli Studi Federico II di Napoli nell'Anno Accademico 2025/2026.
+
+## Contenuti del Corso
+
+Il corso affronta gli aspetti teorici e pratici della verifica automatica del software, con particolare focus su tecniche formali e algoritmi per garantire la correttezza e l'affidabilità dei sistemi software. Gli argomenti trattati includono:
+
+- Modellazione formale di sistemi computazionali
+- Logica temporale e logiche per la specifica delle proprietà
+- Teoria dei modelli e automi
+- Tecniche di model checking
+- Strumenti di verifica formale (NuSMV, SPIN)
+- Relazione di soddisfacimento e verifica di proprietà
+
+## Disclaimer
+
+**Questi appunti sono destinati a supportare gli studenti nel loro percorso di apprendimento e a fornire una risorsa di riferimento per gli argomenti discussi durante il corso, ma non sostituiscono in alcun modo il materiale ufficiale e le lezioni dei docenti.**
+
+Questo documento è prodotto da studenti, per studenti, e potrebbe contenere errori o imprecisioni. Feedback e correzioni sono ben accetti e incentivati, e possono essere inviati tramite pull request o issue in questa repository.
+
+## Compilazione del Documento
+
+Per compilare questo documento è necessario utilizzare il template LaTeX presente nella repository [https://github.com/RiccardoElena/UniNotes_Template].
+
+### Dipendenze
+
+Il documento LaTeX richiede:
+
+- Il file di classe `csnotes.cls`
+- La cartella `_files` contenente stili e risorse grafiche
+
+### Setup dell'Ambiente di Compilazione
+
+#### Opzione 1: Symlink (Consigliata per sviluppo)
+
+Su sistemi Unix/Linux/macOS:
+
+```bash
+# 1. Clonare la repository del template
+git clone [https://github.com/RiccardoElena/UniNotes_Template] template-notes
+
+# 2. Navigare nella directory degli appunti ASV
+cd /path/to/ASV_Notes
+
+# 3. Creare i symlink
+ln -s ../template-notes/csnotes.cls csnotes.cls
+ln -s ../template-notes/_files _files
+```
+
+Su Windows (PowerShell con privilegi amministrativi):
+
+```powershell
+# 1. Clonare la repository del template
+git clone [https://github.com/RiccardoElena/UniNotes_Template] template-notes
+
+# 2. Navigare nella directory degli appunti ASV
+cd \path\to\ASV_Notes
+
+# 3. Creare i symlink
+New-Item -ItemType SymbolicLink -Path "csnotes.cls" -Target "..\template-notes\csnotes.cls"
+New-Item -ItemType SymbolicLink -Path "_files" -Target "..\template-notes\_files"
+```
+
+#### Opzione 2: Copia Diretta
+
+Alternativamente, è possibile copiare direttamente i file necessari:
+
+```bash
+# 1. Clonare la repository del template
+git clone [https://github.com/RiccardoElena/UniNotes_Template] template-notes
+
+# 2. Copiare i file nella directory degli appunti
+cp template-notes/csnotes.cls /path/to/ASV_Notes/
+cp -r template-notes/_files /path/to/ASV_Notes/
+```
+
+**Nota**: Con questo metodo sarà necessario aggiornare manualmente i file in caso di modifiche al template.
+
+### Compilazione
+
+Una volta configurato l'ambiente, compilare il documento principale:
+
+```bash
+pdflatex main.tex
+bibtex main
+pdflatex main.tex
+pdflatex main.tex
+```
+
+Oppure utilizzare `latexmk` per la compilazione automatica:
+
+```bash
+latexmk -pdf main.tex
+```
+
+## Struttura della Repository
+
+```bash
+ASV_Notes/
+├── main.tex           # File principale
+├── csnotes.cls        # Classe LaTeX (symlink)
+├── _files/            # Risorse grafiche e stili (symlink)
+├── _chapters/         # Capitoli del documento
+│   ├── 0_intro.tex
+│   ├── 1_introduction.tex
+│   └── ...
+└── _build/            # File di build (ignorati da git)
+```
+
+## Contribuire
+
+Contributi, correzioni e miglioramenti sono benvenuti. Per contribuire:
+
+1. Fare fork della repository
+2. Creare un branch per le modifiche (`git checkout -b feature/miglioramento`)
+3. Committare le modifiche (`git commit -am 'Descrizione modifiche'`)
+4. Push del branch (`git push origin feature/miglioramento`)
+5. Aprire una Pull Request
+
+Per segnalare errori o problemi, aprire una issue dettagliando il problema riscontrato.
+
+## Autori
+
+- [Riccardo Elena](https://github.com/RiccardoElena)
+- [Vincenzo Mennillo](https://github.com/ViMen23)
+
+## Licenza
+
+Questo materiale è fornito a scopo didattico ed è rilasciato sotto licenza MIT. Consultare il file [LICENSE](LICENSE) per i dettagli completi.
+
+---
+
+**Nota Bene**: Gli appunti sono in continuo aggiornamento durante lo svolgimento del corso.

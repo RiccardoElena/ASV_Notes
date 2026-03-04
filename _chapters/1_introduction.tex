@@ -1,0 +1,81 @@
+\chapter{Introduzione}
+
+Nell'ambito della produzione software, una delle fasi fondamentali è quella di verifica e validazione, che mira a garantire che il software sviluppato soddisfi i requisiti specificati e funzioni correttamente.
+
+Nella maggior parte dei casi, nell'ambito dell'ingegneria del software, le modalità di verifica applicate sono principalmente di natura empirica.
+Queste modalità empiriche includono attività come il testing, in cui un prototipo, o comunque un artefatto software, viene eseguito con su casi di test specifici per verificare se il comportamento del software è conforme alle aspettative.
+Per la maggior parte dei software, queste modalità sono più che sufficienti, e rappresentano un compromesso efficace tra costi e benefici.
+
+Tuttavia, esistono contesti in cui è necessario adottare modalità di verifica più rigorose, che vanno oltre il semplice testing empirico.
+In particolare, quando si tratta di software critico, come ad esempio software utilizzato in ambiti come l'aviazione, la medicina, o i sistemi di controllo industriale, è fondamentale garantire un alto livello di affidabilità e sicurezza.
+
+Altra problematica che porta il testing empirico, è la necessità di avere un artefatto software già sviluppato, o comunque in uno stadio di sviluppo sufficientemente avanzato, per poter essere testato.
+Diversi studi hanno però dimostrato come il costo di correzione di errori aumenti in maniera considerevole man mano che il software si avvicina o raggiunge la fase di messa in opera, e dunque sarebbe auspicabile poter identificare e correggere errori il prima possibile, idealmente già durante la fase di progettazione o sviluppo, prima ancora che il software sia eseguibile.
+
+\TODO{Insert chart}
+
+Un metodo alternativo al testing che risolve quest'ultimo problema è quello della simulazione, in cui un modello del software viene eseguito in un ambiente simulato per verificare il suo comportamento.
+Sebbene questa pratica possa avvicinare la curva della scoperta degli errori a quella di produzione degli stessi, questa introduce ancora più inceretezza rispetto al testing empirico, in quanto il modello simulato potrebbe non essere completamente fedele al software reale, avendo quindi un'affidabilità ancora più bassa.
+In oltre, se il costo di correzzione degli errori diminuisce, la simulazione stessa può introdurre costi aggiuntivi, in quanto richiede la creazione e manutenzione di un ambiente di simulazione, che può essere complesso e costoso da implementare.
+
+Un ultimo importante scoglio contro cui si scontrano testing empirico e simulazione è quello della concorrenza e dei sistemi distribuiti. In questi contesti, infatti, il numero di possibili interleaving di eventi e stati del sistema cresce esponenzialmente, rendendo praticamente impossibile testare tutte le possibili combinazioni di eventi e stati.
+Inoltre, la natura non deterministica di questi sistemi rende difficile prevedere e riprodurre i comportamenti del software, aumentando ulteriormente la complessità del testing e della simulazione.
+
+In questo contesto, in cui il testing empirico e la simulazione presentano limitazioni significative, si inserisce la verifica formale, che rappresenta un approccio rigoroso e sistematico per garantire la correttezza del software.
+In particolare, prendendo spunto dalla logica matematica, la teoria dei linguaggi e l'algoritmica dei grafi, la verifica formale si pone l'obiettivo di garantire l'affidabilità del software attraverso dimostrazioni formali della correttezza, basate su modelli matematici del software e specifiche formali dei requisiti.
+
+Andiamo quindi ad analizzare più nel dettaglio le qualità del software che la verifica formale mira a garantire, e i metodi utilizzati per raggiungere questo obiettivo. Tali qualità sono spesso definite in termini qualitativi.
+
+\TODO{migliorare con le slide}
+\begin{definition}{Availability}
+  L'\keyword{availability} la probabilità che un sistema sia funzionante e in grado di fornire i suoi servizi nel tempo
+\end{definition}
+
+\begin{definition}{Reliability}
+  La \keyword{reliability} è la probabilità che un sistema fornisca correttamente i servizi richiesti.
+\end{definition}
+
+\begin{definition}{Safety e Security}
+  La \keyword{safety} è la proprietà di un sistema di non causare danni a persone, ambiente o altre risorse, mentre la \keyword{security} è la proprietà di un sistema di proteggere i dati e le risorse da accessi non autorizzati o attacchi malevoli.
+\end{definition}
+
+La verifica formale si concentra principalmente sul garantire la reliability, e di conseguenza security e safety viste come proprietà \qi{correttezza} di requisiti di sicurezza.
+
+Non sempre è necessario garantire che tutte le qualità sopra elencate siano soddisfatte al massimo delle loro potenzialità per ogni software, ma è importante valutare attentamente le esigenze specifiche del contesto in cui il software sarà utilizzato, e adottare le pratiche di verifica più appropriate per garantire un livello adeguato di affidabilità e sicurezza.
+Un sistema di controllo di una centrale nucleare, ad esempio, richiederà un livello di safety elevato, mentre un applicazione che tratta dati senisibili andrà sviluppata con un focus particolare sulla security.
+
+I sistemi software in cui è necessario garantire valori altissimi per queste proprietà sono spesso definiti come \keyword{software critici}. Tali sistemi sono, in ordinde decrescendente di criticità:
+\begin{description}
+  \item[Safety-Critical:] sistemi in cui il cui fallimento può causare danni a persone, ambiente o altre risorse. Esempi includono sistemi di controllo di centrali nucleari, sistemi di controllo del traffico aereo, e dispositivi medici.
+  \item[Mission-Critical:] sistemi in cui il cui fallimento può compromettere il successo di una missione o un obiettivo specifico. Esempi includono sistemi di controllo di satelliti, veicoli spaziali, e sistemi militari.
+  \item[Business-Critical:] sistemi in cui il cui fallimento può causare perdite finanziarie significative o danni alla reputazione di un'organizzazione. Esempi includono sistemi di gestione finanziaria, sistemi di e-commerce, e sistemi di gestione dei dati.
+\end{description}
+
+Per garantire formalmente la correttezza di questi sistemi, la verifica formale trattata in questo corso si baserà principalemente sulla dimostrazione di proprietà di correttezza di un modello formale del software, rispetto a specifiche formali dei requisiti.
+\begin{note}
+  La verifica formale non si pone l'obiettivo di creare il software perfetto, poiché è impossibile.
+  Le dimostrazioni di correttezza garantiscono che il modello del software soddisfi tutte le specifiche, ma la fase di modellazione stessa introduce inevitabilmente un certo grado di approssimazione, e quindi incertezza, rispetto al software reale.
+
+  La differenza con le metodologie empiriche è che, se quest'ultime hanno una componente intrinseca di incertezza, la verifica formale assottiglia e isola al massimo questa incertezza, confinandola alla fase di modellazione, e garantendo che, una volta creato il modello, su questo si abbia certezza matematica delle sue proprietà.
+\end{note}
+
+\section{Struttura del Corso}
+
+Il corso si articolerà su due filoni principali che, pur procedendo in parallelo, sono strettamente interconnessi.
+
+Il \textbf{primo filone} riguarda la modellazione formale dei sistemi computazionali, ovvero la rappresentazione matematica di un sistema, delle sue possibili esecuzioni e delle sue transizioni di stato.
+Questo richiede l'utilizzo di tecniche provenienti dalla teoria dei linguaggi formali e dall'algoritmica dei grafi.
+Una computazione può essere vista infatti come una sequenza di azioni o eventi, analogamente a come una parola è una sequenza di simboli in un linguaggio formale.
+Quando un sistema presenta scelte non deterministiche o interazioni con l'ambiente esterno, le possibili esecuzioni formano una struttura ad albero, dove ogni ramo rappresenta un possibile percorso di esecuzione.
+Modelli come gli automi a stati finiti e le loro estensioni forniscono una rappresentazione matematica precisa di questi sistemi.
+
+Il \textbf{secondo filone} concerne le logiche per la specifica delle proprietà, ovvero linguaggi formali per esprimere i requisiti da verificare.
+Si tratta di linguaggi logici specializzati, più espressivi della logica proposizionale ma meno del primo ordine, capaci di descrivere proprietà temporali e comportamentali dei sistemi.
+Queste logiche permettono di formalizzare affermazioni come \qi{il sistema raggiunge sempre uno stato sicuro} o \qi{una certa risorsa non viene mai acceduta da due processi contemporaneamente}.
+
+Il \textbf{ponte concettuale} tra questi due filoni è rappresentato dalla \keyword{relazione di soddisfacimento}: dato un modello \(M\) (la rappresentazione formale del sistema) e una formula \(\varphi\) (la proprietà espressa in logica), l'obiettivo è determinare se \(M \models \varphi\), ovvero se il modello soddisfa la proprietà.
+Questa relazione, già nota dalla logica, diventa lo strumento fondamentale per la verifica: il modello rappresenta il \qi{mondo} di cui si vuole parlare, in questo caso il software che intendo verificare, mentre il linguaggio logico fornisce il modo di esprimere le proprietà da verificare su questo mondo.
+La verifica formale consiste quindi nella dimostrazione matematica che tutte le possibili esecuzioni del sistema rispettano le proprietà specificate.
+
+Nell'ambito pratico della verifica formale, vengono utilizzati strumenti automatici come i \keyword{model checker} (NuSMV, SPIN) che automatizzano il processo di verifica esplorando sistematicamente lo spazio degli stati del modello per verificare la validità delle proprietà specificate.
+

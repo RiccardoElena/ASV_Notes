@@ -38,5 +38,6 @@
 build/
 *.sh
 
-# others
-raw
+# linked files
+_files
+csnotes.cls
