@@ -39,5 +39,5 @@ build/
 *.sh
 
 # linked files
-_files
+_files/_images/logo.pdf
 csnotes.cls
