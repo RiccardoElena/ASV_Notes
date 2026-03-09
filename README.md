@@ -28,7 +28,7 @@ Per compilare questo documento è necessario utilizzare il template LaTeX presen
 Il documento LaTeX richiede:
 
 - Il file di classe `csnotes.cls`
-- La cartella `_files` contenente stili e risorse grafiche
+- Il file `_files/_images/logo.pdf` da inserire in un path relativo all'interno della directory degli appunti
 
 ### Setup dell'Ambiente di Compilazione
 
@@ -45,7 +45,8 @@ cd /path/to/ASV_Notes
 
 # 3. Creare i symlink
 ln -s ../template-notes/csnotes.cls csnotes.cls
-ln -s ../template-notes/_files _files
+mkdir -p _files/_images
+ln -s ../template-notes/_files/_images/logo.pdf _files/_images/logo.pdf
 ```
 
 Su Windows (PowerShell con privilegi amministrativi):
@@ -59,7 +60,8 @@ cd \path\to\ASV_Notes
 
 # 3. Creare i symlink
 New-Item -ItemType SymbolicLink -Path "csnotes.cls" -Target "..\template-notes\csnotes.cls"
-New-Item -ItemType SymbolicLink -Path "_files" -Target "..\template-notes\_files"
+mkdir -p _files\_images
+New-Item -ItemType SymbolicLink -Path "_files\_images\logo.pdf" -Target "..\template-notes\_files\_images\logo.pdf"
 ```
 
 #### Opzione 2: Copia Diretta
@@ -100,7 +102,10 @@ latexmk -pdf main.tex
 ASV_Notes/
 ├── main.tex           # File principale
 ├── csnotes.cls        # Classe LaTeX (symlink)
-├── _files/            # Risorse grafiche e stili (symlink)
+├── _files/            # Risorse grafiche
+│   ├── _images/          # Immagini utilizzate nel documento
+│   │   └── logo.pdf          # symlink
+│   └── ...                # Altri file di risorse
 ├── _chapters/         # Capitoli del documento
 │   ├── 0_intro.tex
 │   ├── 1_introduction.tex
