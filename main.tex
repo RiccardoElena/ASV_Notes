@@ -6,6 +6,18 @@
 
 % --------------------------- START CUSTOMIZATIONS -----------------------------
 
+\NewDocumentCommand{\ti}{m}{\text{\textit{#1}}}
+
+\newcommand{\expr}{\ti{exp}}
+\newcommand{\Expr}{\ti{Expr}}
+\newcommand{\Act}{\ti{Act}}
+\newcommand{\Cond}{\ti{Cond}}
+\newcommand{\Eval}{\ti{Eval}}
+\newcommand{\Val}{\ti{Val}}
+\newcommand{\Var}{\ti{Var}}
+\newcommand{\Loc}{\ti{Loc}}
+\newcommand{\Eff}{\ti{Effect}}
+
 % ---------------------------- END CUSTOMIZATIONS ------------------------------
 
 \title{Automated Software Verification}
@@ -49,6 +61,7 @@
 \setcounter{page}{1}
 
 \input{_chapters/1_introduction.tex}
+\input{_chapters/2_systems_modelling.tex}
 \input{_chapters/draft.tex}
 
 \whitepage{}

@@ -1,0 +1,221 @@
+\chapter{Modellazione di sistemi}
+
+In questo capitolo, ci concentreremo sulla modellazione di sistemi software, che rappresenta un passo fondamentale per la verifica formale.
+
+Come anticipato nel capitolo precedente, la verifica formale si base sul \keyword{model checking}, il quale ovviamente necessita di un modello formale del software da verificare.
+Utilizzare questa tecnica di verifica formale, ovviamente, cambia completamente il processo di sviluppo software rispetto a quello visto nella \Cref{fig:testing_cycle}, portandolo a qualcosa di più simile a quello in \Cref{fig:formal_verification_cycle}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{_images/formal_verification_cycle}
+  \caption{Ciclo di sviluppo software con verifica formale}\label{fig:formal_verification_cycle}
+\end{figure}
+
+Come illustrato in \Cref{fig:formal_verification_cycle}, il processo si articola in due fasi parallele che convergono nel Model Checking.
+
+\paragraph{Formalizzazione dei Requisiti:}
+Partendo dai requisiti del sistema, intesi come le proprietà che devono essere soddisfatte, attraverso un processo di \keyword{formalizzazione} si producono \keyword{specifiche di proprietà} (property specification) espresse come formule in un linguaggio logico formale.
+
+Questo passaggio è tutt'altro che banale: i requisiti sono tipicamente espressi in linguaggio naturale o semi-formale, mentre i metodi formali richiedono necessariamente linguaggi formali. La scelta del linguaggio dipende dal tipo di requisiti e dalle proprietà che si vogliono esprimere.
+
+\paragraph{Modellazione del Sistema:}
+Parallelamente, dalla descrizione del sistema, spesso espressa tramite i linguaggi di progettazione dell'ingegneria del software, attraverso un processo di \keyword{modellazione} (modeling) si costruisce un \keyword{modello formale del sistema} (system model).
+
+\paragraph{Coerenza tra Modello e Specifiche:}
+È fondamentale che il modello del sistema sia \keyword{coerente} con la semantica del linguaggio di specifica delle proprietà. Questo significa che il modello deve contenere sufficiente \qi{ricchezza matematica} per poter interpretare le formule: deve fornire abbastanza oggetti matematici per dare significato ai simboli logici utilizzati nelle specifiche.
+
+Il modello può essere più ricco di quanto strettamente necessario per interpretare le formule, ma non può essere meno ricco, altrimenti la verifica non sarebbe possibile.
+
+\paragraph{Model Checking e Analisi dei Risultati:}
+Una volta completate le fasi di formalizzazione e modellazione, il \keyword{Model Checking} verifica se il modello del sistema soddisfa le proprietà specificate (\(\mathcal{M} \models \varphi\)). Il processo può produrre due esiti:
+\begin{itemize}
+  \item \textbf{Satisfied}: la proprietà è soddisfatta dal modello;
+  \item \textbf{Violated}: la proprietà è violata, e viene prodotto un \keyword{controesempio} (counterexample) che identifica una traccia di esecuzione che viola la proprietà.
+\end{itemize}
+
+Il controesempio può essere analizzato tramite simulazione per identificare la causa dell'errore, che può risiedere nel sistema stesso o nella sua modellazione.
+
+Questo problema ovviamente è legato alla ineliminabile (in linea di principio) discordanza o \q{gap} tra l'astrazione eil sistema.
+Il modello potrebbe contenere delle esecuzioni in più di quelle che sono concrete.
+
+Non è detto che però non sia una cosa desiderabile che ci sia questo gap, o quantomeno potrebbe essere impossibile di fatto evitarlo per questioni computazionali.
+Questo poiché, avere un modello che ammetta più comportamenti di quelli concreti, non porta a una maggiore complicazione della descrizione, anzi, tipicamente porta una riduzione della complessità della descrizione.
+Infatti, meno informazione sono inserite nel modello, più comportamenti sono ammessi, ma maggiore è l'informazione, più vincoli da controllare stanno venendo inseriti nell'insieme delle computazioni.
+Ciò che è fondamentale è quindi fare in modo che il modello contenga certamente tutti i comportamenti del sistema concreto, ma potenzialmente anche di più.
+
+In un certo senso è possibile trarre un'analogia intuitiva col concetto di astrazione: il modello è come
+un'astrazione più o meno lontana dalla realtà, dalla verità. Quindi più l'astrazione
+è lontana dalla realtà, più comportamenti ammette e più semplice è la sua
+descrizione.
+
+Ovviamente, questa necessità di bilancaire livello di dettaglio e complessità computazoinale del problema ha fatto nascere delle tecniche di \textit{abstraction refinement}.
+Queste partono da una descrizione astratta e, in base ai testimoni spuri che naturalmente vengono prodotti, richiedono dei raffinamenti mirati ad escludere quelle computazioni spurie.
+
+\section{Modellazione}
+
+Per poter costruire modelli di sistemi software, è necessatio in primo luogo definire un linguaggio per la descrizione di tali modelli.
+
+Un linguaggi di modellazione di base è quello dei \keyword{transition system}.
+
+\begin{definition}{Sistemi a Transizioni}
+  Un \keyword{sistema a transizioni} o \keyword{transition system} è una terna \((S,S_0,R)\) dove:
+  \begin{itemize}
+    \item \(S\) è un insieme di stati;
+    \item \(S_0 \subseteq S\) è un insieme di stati iniziali;
+    \item \(R \subseteq S \times S\) è una endo-relazione di transizione totale a sinistra (o seriale), ovvero tale che:
+          \[\forall s \in S ,\exists s' \in S : (s,s') \in R\]
+  \end{itemize}
+  In poche parole non esistono stati senza transizioni uscenti, o stati terminali.
+\end{definition}
+La scelta di non ammettere stati terminali è motivata dal fatto che, in questo modo, è possibile modellare anche sistemi che non terminano mai, come ad esempio sistemi operativi o server.
+La terminazione è ancora modellabile anche in questi modelli come proprietà del sistema.
+
+È importante notare che \((S,R)\) definiscono un grafo orientato, quindi è ben definito il concetto di cammino o percorso, e dunque di raggiungibilità.
+
+\begin{note}
+  Una notazione alternativa per la relazione di transizione è quella di rappresentarla con una freccia, ovvero \(s \xrightarrow{} s'\) per indicare che \((s,s')\in R\).
+\end{note}
+
+\subsection{Sistemi a Transizioni e Automi}
+
+\subsection{Sistemi Chiusi e Sistemi Aperti}
+
+Il modello dei sistemi a transizioni rappresenta la struttura più elementare e generale per la modellazione di sistemi computazionali. È possibile osservare come questo modello sia strettamente correlato al concetto di automa, costituendone essenzialmente il nucleo centrale.
+
+\paragraph{Relazione con gli Automi a Stati Finiti:}
+Un automa a stati finiti classico per linguaggi regolari possiede tipicamente due componenti aggiuntive rispetto a un sistema a transizioni:
+\begin{itemize}
+  \item un \keyword{alfabeto} di simboli che etichettano le transizioni;
+  \item una \keyword{condizione di accettazione}, ovvero un insieme di stati finali che determinano l'accettazione di una stringa.
+\end{itemize}
+
+Un sistema a transizioni può essere visto come un automa in cui l'intero insieme \(S\) è accettante e in cui esiste un unico simbolo (implicito) nell'alfabeto. 
+
+Se si introducesse esplicitamente un alfabeto, la relazione di transizione \(R\) dovrebbe diventare una relazione ternaria \(R \subseteq S \times \Sigma \times S\), dove \(\Sigma\) rappresenta l'alfabeto. Tuttavia, quando l'alfabeto contiene un unico simbolo, la presenza di tale simbolo non modifica l'insieme delle coppie di stati raggiungibili, rendendo quindi superflua la sua esplicitazione. La situazione sarebbe differente con più simboli: da uno stato \(s\) con un simbolo \(\sigma_1\) si potrebbe raggiungere uno stato \(s'\), mentre con un simbolo \(\sigma_2\) tale transizione potrebbe non essere ammessa.
+
+\paragraph{Generalità del Modello:}
+I sistemi a transizioni costituiscono un modello sufficientemente generale per rappresentare sistemi computazionali. Gli automi tradizionali, come studiati nella teoria dei linguaggi formali, sono primariamente \keyword{riconoscitori di linguaggi}, progettati per accettare o rifiutare stringhe.
+I sistemi computazionali, analogamente alle macchine di Turing, hanno uno scopo più ampio: non solo riconoscere, ma anche \keyword{calcolare}.
+
+In una macchina di Turing, l'alfabeto non rappresenta necessariamente simboli letti dall'esterno: il sistema riceve un input iniziale e poi evolve autonomamente operando sul proprio nastro.
+Similmente, in un sistema a transizioni non è necessario il concetto di stimolo o segnale esterno. Negli automi, invece, l'alfabeto rappresenta intuitivamente stimoli esterni che guidano l'evoluzione del sistema.
+
+I sistemi computazionali possono inoltre essere classificati in base alla loro interazione con l'ambiente esterno.
+
+\begin{definition}{Sistemi Chiusi}
+  I \keyword{sistemi chiusi} sono sistemi in cui eventuali input sono codificati all'interno degli stati iniziali e il sistema evolve autonomamente in base alla propria logica interna, senza ricevere stimoli esterni durante l'esecuzione.
+\end{definition}
+
+\begin{definition}{Sistemi Aperti}
+  I \keyword{sistemi aperti} sono sistemi che interagiscono continuamente con l'ambiente esterno, combinando decisioni interne (basate sul proprio stato) con stimoli esterni forniti dall'ambiente durante l'esecuzione.
+\end{definition}
+
+\paragraph{Non-Determinismo e Scelte:}
+Nei sistemi aperti emergono due tipologie distinte di scelte:
+\begin{itemize}
+  \item \textbf{Scelte interne}: rappresentano il \keyword{non-determinismo} classico, dove il sistema può evolvere in modi diversi a partire dallo stesso stato, indipendentemente da stimoli esterni;
+  \item \textbf{Scelte esterne}: rappresentano la selezione degli stimoli forniti dall'ambiente al sistema.
+\end{itemize}
+
+Nel contesto degli automi non deterministici, dato un certo simbolo esterno, l'automa può evolvere in stati diversi: il sistema sceglie internamente come reagire allo stimolo. Quando la scelta del simbolo stesso non dipende dal sistema, ma dall'ambiente, entrambe le tipologie di scelte devono essere considerate.
+
+Per modellare sistemi aperti è necessario quindi prevedere sia le scelte interne del sistema (come evolve da un dato stato), sia le scelte esterne dell'ambiente (quali stimoli fornisce). Questo porta a una interpretazione in termini di \keyword{teoria dei giochi}: un sistema aperto può essere visto come un gioco tra due giocatori avversari, dove il sistema compie le proprie scelte interne e l'ambiente (visto come avversario) sceglie quali stimoli fornire.
+
+\begin{note}
+  In questo corso ci concentreremo esclusivamente su \keyword{sistemi chiusi}, che possono essere interpretati come giochi a un singolo giocatore, in cui il sistema è l'unico responsabile della risoluzione del proprio non-determinismo. I sistemi aperti, pur essendo un argomento di grande interesse teorico e intimamente legato alla teoria dei giochi, non saranno trattati per vincoli di tempo.
+\end{note}
+
+\section{Computazioni e Percorsi}
+
+All'interno di un sistema a transizioni è possibile definire formalmente il concetto di computazione.
+
+Come detto precedentemente ogni sistema a transizioni definisce un grafo orientato, i cui percorsi rappresentano esattamente le possibili evoluzioni del sistema, ovvero le sue computazioni.
+
+\begin{definition}{Percorso Finito}
+  Un \keyword{percorso finito} da uno stato \(s\) è una sequenza di stati \(s_1, s_2, \ldots, s_n\) tale che \(s = s_1\) e \(s_i \xrightarrow{} s_{i+1}\) per ogni \(i = 1, \ldots, n-1\).
+\end{definition}
+
+Poiché la relazione di transizione \(R\) è totale (seriale), ogni percorso massimale è necessariamente infinito. Questo porta naturalmente a distinguere due tipologie di computazioni:
+\begin{itemize}
+  \item \textbf{Computazioni finite}: corrispondono a percorsi finiti non massimali;
+  \item \textbf{Computazioni infinite}: corrispondono a percorsi infiniti massimali.
+\end{itemize}
+
+\subsection{Sistemi a Transizioni Etichettati}
+
+Il modello base dei sistemi a transizioni può essere esteso introducendo un insieme finito di \keyword{azioni} che etichettano le transizioni, analogamente agli automi a stati finiti.
+
+\begin{definition}{Labeled Transition System}
+  Un \keyword{sistema a transizioni etichettato} (Labeled Transition System, LTS) è una quadrupla \(TS=(S, Act, S_0, R)\) dove:
+  \begin{itemize}
+    \item \(S\) è un insieme di stati;
+    \item \(Act\) è un insieme finito di azioni;
+    \item \(S_0 \subseteq S\) è un insieme di stati iniziali;
+    \item \(R \subseteq S \times Act \times S\) è una relazione di transizione ternaria.
+  \end{itemize}
+  La relazione \(R\) indica quale stato può essere raggiunto a partire da un altro stato eseguendo una determinata azione \(a \in Act\). Si scrive \(s \xrightarrow{a} s'\) per indicare che \((s,a,s') \in R\).
+\end{definition}
+
+\begin{example}{Vending Machine}
+  Consideriamo un esempio concreto di sistema a transizioni etichettato: una macchina distributrice automatica modellata dal LTS in figura.
+
+\end{example}
+\subsection{Esempio: Vending Machine}
+
+
+
+Questo sistema, sebbene nella realtà debba interagire con l'ambiente esterno, verrà modellato come un sistema chiuso interpretando tutte le azioni come interne. Le azioni del sistema includono:
+\begin{itemize}
+  \item \textit{coin}: inserimento di una moneta;
+  \item \textit{tea}, \textit{coffee}: selezione della bevanda;
+  \item \textit{c-serve}, \textit{t-serve}: erogazione rispettivamente di caffè e tè;
+  \item \textit{coin-return}: restituzione della moneta.
+\end{itemize}
+
+Il comportamento del sistema è il seguente: dallo stato iniziale, dopo l'azione di inserimento della moneta (\textit{coin}), in base alla presenza o assenza della bevanda richiesta, il sistema può scegliere di erogarla o di transire a uno stato di errore dal quale viene eseguito un recovery restituendo la moneta all'utente (\textit{coin-return}).
+
+\paragraph{Non-Determinismo e Astrazione:}
+Il modello presenta un non-determinismo apparente: la macchina sembra poter decidere autonomamente se la bevanda è disponibile o meno. Questo non-determinismo è una conseguenza del livello di astrazione scelto, in cui non è stata specificata l'informazione necessaria per discriminare tra le diverse azioni possibili.
+
+In un'implementazione concreta, si utilizzerebbero contatori per tracciare le quantità disponibili di caffè e tè. La descrizione attuale, essendo non deterministica, ammette computazioni spurie. Per eliminare tale non-determinismo, sarebbe necessario arricchire il modello con l'informazione sulla disponibilità delle bevande, introducendo una \keyword{memoria} esplicita nel sistema.
+
+Negli automi a stati finiti, la memoria è codificata negli stati stessi. Per rappresentare esplicitamente le quantità di caffè e tè disponibili, sarebbe necessario moltiplicare il numero di stati per tutte le possibili combinazioni dei valori dei due contatori, portando a un'esplosione combinatoria della dimensione del modello.
+
+Questo esempio illustra un principio fondamentale della modellazione: se le proprietà da verificare non dipendono da determinati aspetti del sistema, tali aspetti possono essere eliminati tramite \keyword{astrazione}, riducendo significativamente la complessità computazionale dell'analisi.
+
+\subsection{Stati di Deadlock}
+
+Nella definizione generale dei sistemi a transizioni, potrebbero esistere stati senza transizioni uscenti, denominati \keyword{stati di deadlock}, in cui la relazione \(R\) non è totale. Nei sistemi concorrenti, gli stati di deadlock possono emergere naturalmente e rappresentare situazioni problematiche del sistema.
+
+Per semplicità, in questo corso assumeremo generalmente che la relazione di transizione sia totale, evitando così complessità addizionali nella semantica del modello.
+
+\section{Strutture di Kripke e Proposizioni Atomiche}
+
+Per poter verificare proprietà sui sistemi a transizioni, è necessario arricchire il modello con informazioni che permettano di esprimere e valutare tali proprietà.
+
+\subsection{Proposizioni Atomiche}
+
+Invece di introdurre variabili esplicite nel sistema di base, si definisce un insieme di \keyword{proposizioni atomiche} (\(AP\)) che rappresentano affermazioni elementari sullo stato del sistema. Ad esempio, una proposizione atomica potrebbe essere \qi{il valore di \(x\) è 5}, denotata come \(x=5\).
+
+Per ogni proposizione atomica è necessario specificare in quali stati essa è vera e in quali è falsa. Questo porta all'introduzione di una \keyword{funzione di etichettamento} \(L\) che associa ad ogni stato \(s\) l'insieme delle proposizioni atomiche vere in quello stato:
+\[L: S \rightarrow 2^{AP}\]
+
+\subsection{Strutture di Kripke}
+
+Quando si arricchisce un sistema a transizioni con la funzione di etichettamento \(L\), si ottiene un oggetto che in letteratura prende il nome di \keyword{Struttura di Kripke} (Kripke Structure).
+
+\begin{definition}{Struttura di Kripke}
+  Una \keyword{Struttura di Kripke} è una quadrupla \(M=(S, S_0, R, L)\) dove:
+  \begin{itemize}
+    \item \((S, S_0, R)\) è un sistema a transizioni;
+    \item \(L: S \rightarrow 2^{AP}\) è una funzione di etichettamento che associa ad ogni stato l'insieme delle proposizioni atomiche vere in quello stato.
+  \end{itemize}
+\end{definition}
+
+Le strutture di Kripke devono il loro nome a Saul Kripke, logico che ha definito la semantica delle logiche modali. Le logiche temporali utilizzate in questo corso sono infatti logiche modali, e le strutture di Kripke rappresentano il ponte tra i sistemi a transizioni e i modelli logici.
+
+Le proposizioni atomiche e la funzione di etichettamento \(L\) convertono un sistema a transizioni in un \keyword{modello logico}. Rispetto a questo modello è possibile interpretare e verificare formule espresse in linguaggi logici formali, come verrà discusso nei capitoli successivi.
+
+\begin{note}
+  Nei capitoli seguenti verranno introdotti linguaggi per descrivere sistemi \keyword{data-dependent}, ovvero sistemi dipendenti dai dati (come i Program Graph su insiemi di variabili). Sarà mostrato come tali linguaggi possono essere compilati in sistemi a transizioni, come specificare proprietà di questi oggetti e come risolvere il problema della soddisfazione (model checking).
+\end{note}

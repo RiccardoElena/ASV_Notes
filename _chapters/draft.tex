@@ -35,8 +35,8 @@ Discorso su sistemi aperti e chiusi, e su sistemi deterministici e non determini
 
 Una computazione è modellata da una sequenza (o percorso) di stati \(s_0,s_1,\dots\). Il percorso massimale è ovviamente sempre infinito essendo la relazione seriale.
 
-Il modello dei sistemi a transizioni possono essere estesi con i sistemi a transizioni etichettati, dove dato un insieme di etichette \(Act = \set{a,b,c,\dots}\) si definisce una relazione di transizione etichettata \(R \subseteq S\times Act \times S\).
-L'insieme \(Act\) può essere interpretato in diversi modi, sia come stimoli esterni al sistema, sia come azioni o eventi interni al sistema, sia come etichette che identificano le transizioni.
+Il modello dei sistemi a transizioni possono essere estesi con i sistemi a transizioni etichettati, dove dato un insieme di etichette \(\Act = \set{a,b,c,\dots}\) si definisce una relazione di transizione etichettata \(R \subseteq S\times \Act \times S\).
+L'insieme \(\Act\) può essere interpretato in diversi modi, sia come stimoli esterni al sistema, sia come azioni o eventi interni al sistema, sia come etichette che identificano le transizioni.
 
 \begin{example}{Vending Machine}
   TODO aggiungi immagine
@@ -47,3 +47,326 @@ L'insieme \(Act\) può essere interpretato in diversi modi, sia come stimoli est
 Il modello precedente va ancora arrichito per poter parlare di proprietà del modello. In particolare dato un insieme finito di proposizioni atomiche \(AP\) che rappresentano le proprietà elementari del sistema, si definisce una struttura di Kripke come una quaternione \((S,S_0,R,L)\) dove \((S,S_0,R)\) è un sistema a transizioni e \(L : S \to 2^{AP}\) è una funzione in che mappa ogni stato al sottinsieme di proposizioni atomiche che sono vere in quello stato.
 
 Con le strutture di Kripke il sistema a transizioni diventa un modello di logica.
+
+\chapter{Lezione 09/03}
+
+\section{Linguaggi}
+
+\todo{valuta se mettere infarinatura}
+
+\todo{automa da fabrizio}
+
+Questo automa possiamo vederlo come un generatore di sequenze, che corrispondono tanto a computazioni del sistema quanto a percorsi del grafo orientato sottostante.
+
+Potremmo però essere anche interessati ai comportamenti infinitari del sistema, e dunque a sequenze infinite di stati.
+
+Un altro aspetto di cui vorremmo paralre però è la complessità topologica. In particolare potremmo pensare di costruire un grafo con una diversa topologia che generi le stesse sequenze (detti trace-equivalent).
+
+Una volta capito che un sistema a transizioni genera sequenze o computazioni, dobbiamo capire come valutare se tali sequenze vanno bene o meno.
+
+\begin{definition}{Proprietà Universali}
+  Una \keyword{proprietà universale}, o \keyword{invariante}, è una proprietà che deve essere soddisfatta in ogni stato della computazione.
+\end{definition}
+
+\begin{example}{}
+  Esempi di proprietà universali sono:
+  \begin{itemize}
+    \item Non è possibile raggiungere un deadlock
+    \item In ogni istante almeno un processo è attivo
+    \item In ogni sezione critica è presente al più un processo
+    \item Una pre-post condizione, come \(\set{P} \text{ command } \set{Q}\), dove \textit{command} è un istruzione del programma, e \(P\) e \(Q\) sono due proprietà che devono essere soddisfatte rispettivamente prima e dopo l'esecuzione di \textit{command}.
+  \end{itemize}
+
+  Generalmente queste proprietà servono a modellare proprietà di errore che non devono mai verificarsi.
+\end{example}
+
+\begin{definition}{Proprietà Esistenziali}
+  Una \keyword{proprietà esistenziale} è una proprietà che deve essere soddisfatta in almeno uno stato della computazione.
+\end{definition}
+
+\begin{example}{}
+  Esempi di proprietà esistenziali sono:
+  \begin{itemize}
+    \item Il programma prima o poi termina
+    \item Se un treno entra in un tunnel prima o poi uscirà
+    \item Ogni lavoro di stampain attesa verrà completato
+    \item Ogni messaggio inviato verrà ricevuto
+  \end{itemize}
+
+  Generalmente queste proprietà servono a modellare proprietà che si vorrebbe che si verificassero.
+\end{example}
+
+\begin{definition}{Proprietà di Fairness e di Precedenza}
+  Una proprietà di \keyword{fairness} (o di \keyword{equità}) che esprimono che diversi utenti del sistema verranno serviti.
+  Una proprietà di \keyword{precedenza} è una proprietà che deve essere soddisfatta in un certo ordine.
+\end{definition}
+
+\begin{example}{}
+  \begin{itemize}
+    \item Weak fairness: Ogni richiesta continua prima o poi viene servita
+    \item Strong fairness: Ogni richiesta ripetutua (infinitamente spesso) verrà prima o poi servita
+    \item Precedenza: Se non esiste un processo attivo a priorità più \(n\), posso attivare un provcesso a priorità \(n - 1\)
+  \end{itemize}
+\end{example}
+
+\begin{note}
+  Le proprietà di fairness possono essere viste come una forma più debole di proprietà esistenziali.
+\end{note}
+
+\begin{definition}{Espressioni Regolari}
+  Un \keyword{espressione regolare} su un alfabeto \(\Sigma\) è una parola formata dalla seguente grammatica:
+\[\alpha ::= \emptyset \mid \varepsilon \mid a \in \Sigma \mid \alpha \cdot \alpha \mid \alpha + \alpha \mid \alpha^* \]
+\end{definition}
+\begin{example}{}
+  Dato \(\Sigma = \set{a,b,c}\) alfabeto, un'espressione regolare è
+  \[\alpha = \varepsilon a (a+b)\cdot c^* \]
+\end{example}
+
+\begin{definition}{Linguaggio Regolare}
+  Un \keyword{linguaggio regolare} su un alfabeto \(\Sigma\) è un insieme \(A \subseteq \Sigma^*\) che rispetta le seguenti regole di formazione:
+  \begin{itemize}
+    \item \(\emptyset\) è un linguaggio regolare
+    \item \(\set{\varepsilon}\) è un linguaggio regolare
+    \item \(\set{a}\) è un linguaggio regolare per ogni \(a \in \Sigma\)
+    \item Se \(A\) e \(B\) sono linguaggi regolari, allora \(A \cdot B = \set{w_1 \cdot w_2}{w_1 \in A, w_2 \in B}\), \(A \cup B\) e \(A^* = \set{{(w)}^i}[w \in A, i \in \N]\) sono linguaggi regolari.
+  \end{itemize}
+\end{definition}
+
+I linguaggi regolari danno semantica alle espressioni regolari, che rappresentano la sintassi. In particolare, è possibile farlo costruendo una funzione \(\mathcal{L} : [\alpha] \to 2^{\Sigma^*}\) definita come:\footnote{\([\alpha]\) rappresenta tutte le parole generate da una grammatica regolare, mentre \(2^{\Sigma^*}\) rappresenta l'insieme di tutti i sott'insiemi di \(\Sigma^*\).}
+
+\[L(\emptyset) = \emptyset\]
+\[L(\varepsilon) = \set{\varepsilon}\]
+\[L(a) = \set{a}\]
+\[L(\alpha \cdot \beta) = L(\alpha) \cdot L(\beta)\]
+\[L(\alpha + \beta) = L(\alpha) \cup L(\beta)\]
+\[L(\alpha^*) = {L(\alpha)}^*\]
+
+\begin{example}{}
+  L'espressione regolare precedente ha come semantica il seguente insieme di parole:
+  \[\set{\varepsilon aac^i,\varepsilon abc^i}[i\in \N]\]
+\end{example}
+
+Le espressioni regolari ci permettono di esprimere diverse delle proprietà che abbiamo visto prima.
+Ad esempio, detto \(H\) l'insieme degli stati terminali, modellare la proprietà proprietà di terminazione come
+\[\alpha = \Sigma^* \cdot H\]
+Per esprimere invece la non raggiungibilità di uno stato negativo \(B\) possiamo usare
+\[\alpha = {(\Sigma \setminus B)}^* \]
+
+Per proprietà di fairness e precedenza tali linguaggi non sono sufficienti, poiché si limitano a parole a lunghezza finita.
+Dobbiamo dunque estendere il concetto di linguaggio regolare a linguaggio \(\omega\)-regolare, dove \(\omega\) è il primo ordinale limite.
+
+In primo luogo, è necessario estendere \(\Sigma^*\) a \(\Sigma^\omega\). Già questa modifica ci fa passare da un insieme numerabile a un insieme non numerabile, poiché \(\Sigma^\omega\) è equipotente ai reali.
+\begin{definition}{Linguaggio \(\omega\)-Regolare}
+  Un \keyword{linguaggio \(\omega\)-regolare} su un alfabeto \(\Sigma\) è un insieme \(A \subseteq \Sigma^\omega\) che rispetta le seguenti regole di formazione:
+  \begin{itemize}
+    \item \(\emptyset\) è un linguaggio \(\omega\)-regolare
+    \item Se \(A\) e \(B\) sono linguaggi \(\omega\)-regolari, allora \(A \cup B\) è un linguaggio \(\omega\)-regolare
+    \item Se \(A\) è regolare, \(A^\omega \) è \(\omega\)-regolare
+    \item Se \(A\) è regolare e \(B\) è \(\omega\)-regolare, allora \(A \cdot B = \set{w_1 \cdot w_2}{w_1 \in A, w_2 \in B}\) è un linguaggio \(\omega\)-regolare
+  \end{itemize}
+\end{definition}
+
+\begin{definition}{Espressioni \(\omega\)-regolari}
+  Un \keyword{espressione \(\omega\)-regolare} su un alfabeto \(\Sigma\) è una parola formata dalla seguente grammatica:
+  \[\lambda ::= \emptyset \mid \alpha^\omega \mid \alpha \cdot \lambda \mid \lambda + \lambda\]
+dove \(\alpha\) è un'espressione regolare. 
+\end{definition}
+
+\begin{definition}{Semantica delle espressioni \(\omega\)-regolari}
+  La semantica delle espressioni \(\omega\)-regolari è definita da una funzione \(L : [\lambda] \to 2^{\Sigma^\omega}\) definita come:
+  \[L(\emptyset) = \emptyset\]
+  \[L(\alpha^\omega) = {L(\alpha)}^\omega\]
+  \[L(\alpha \cdot \lambda) = L(\alpha) \cdot L(\lambda)\]
+  \[L(\lambda_1 + \lambda_2) = L(\lambda_1) \cup L(\lambda_2)\]
+\end{definition}
+
+Immaginiamo di voler dire la seguente cosa:
+Ho un andamento temporale di eventi, e ho un insime \(\set{e_1,\ldots,e_k}\) di eventi che voglio che prima o poi accadano, ma non è rilevante l'ordine in cui accadono.
+Usando espressioni regolari sarà necessaria un'espressione regolare di lunghezza \(k\)!.
+Vedremo che esistono invece linguaggi dallo stesso potere espressivo, ma esponenzialmente più succinti. 
+
+\chapter{Lezione 11/03}
+
+In una struttura di Kripke, la funzione L associa a ogni stato un modello proposizionale che rappresenta le proprietà atomiche vere in quello stato.
+Possiamo quindi definire un concetto di soddisfacibilità locale, ovvero in uno stato.
+
+
+Dobbiamo comunque avere dei sistemi per mappare i sistemi in grafi. Per sistemi complessi sarà necessario decomporre il sistema in buildibg block più semplici.
+I building block \q{atomici} sono i Program Graph, che sono definiti da un insieme di variabili \(\Var = \set{v_1,\ldots,v_k}\) con dominio \(D = \bigcup_{1,\ldots,k} D_i\), con \(D_i\) dominio di \(v_i\).
+
+In particolare un Program Graph è una sestupla \((\Loc,\Act,\Eff,\hookrightarrow , \Loc_0, g_0)\) dove:
+\begin{itemize}
+  \item \(\Loc\) è un insieme di locazioni o stati di controllo, (dominio del program counter)
+  \item \(\Act\) l'insieme delle azioni che modificano lo stato del programma
+  \item \(\Eff : \Act\times \Eval(\Var) \to \Eval(\Var)\) è una funzione
+  \item \(\hookrightarrow \subseteq \Loc \times \Cond(\Var) \times \Act \times \Loc\) è la relazione di transizione
+  \item \(\Loc_0 \subseteq \Loc\) è l'insieme delle locazioni iniziali
+  \item \(g_0 \in \Eval(\Var)\) è una condizione che le variaibili devono soddisfare all'inizio dell'esecuzione
+\end{itemize}
+La relazione di transizione \(\hookrightarrow\) è una relazione che collega due locazioni tramite una condizione sulle variabili, (in un certo senso collegando \q{temporalmente} locazioni o righe del programma),detta anche guardia ovvero la verifica di una certa proprietà sulle variabili, e un'azione.
+La guardia mi dice se è possibile eseguire la transizione, e l'azione mi dice come modificare le variabili quando eseguo la transizione.
+
+La funzione \(\Eff\) invece descrive la semantica delle azioni: prende in input un'azione e deve associare una trasformazione del valore delle variabili prima e dopo l'azione. In altre parole collega \q{temporalmente} stati delle variabili.
+Per fare ciò è necessario introdurre un concetto di valutazione delle variabili, e per farlo usiamo \(\Eval\), un insieme di funzioni che mappano ogni variabile al suo valore, rendendo \(\Eval\) l'insieme di tutte le possibili configurazioni delle variabili.
+
+\(\Act\) e \(\Cond\) sono definite sulla base del concetto di espressioni \(\Expr(\Var\cup D)\). Questa dipende dai domini delle variabili, se prendiamo ad esempio le espressioni aritmetiche abbiamo \(v+1\).
+Le condizioni sono dunque valutazioni tra espressioni del tipo \(\expr_1 \cdot \expr_2\), con \(\cdot\) dipendende dal dominio (per aritmetica \(=, \neq, <, > ecc\)), eventualmente anche con operatori logici.
+Le azioni su \(\Var\) è l'insieme degli assegnamenti, ovvero espressioni del tipo \(v := \expr\).
+
+\todo{Esempio vending machine.}
+
+Possiamo notare che i grafi sottostanti a questo e all'esempio precedente sono isomorfi, ma i due ogetti sono diversissimi, poiché il secondo sta descrivendo un LTS con stati infiniti (essendo il dominio delle variabili infinito).
+È possibile però \q{compilare} un ogetto del genere in una Kripke Structure, ma è necessaria la funzione \(\Eff\) per definire la semantica delle azioni.
+Questa compilazione di fatto \q{da semantica} a questa struttura.
+
+Per lo spazio degli stati questo equivale ad \(\Eval(\Var)\) (variabili esplicite) e \(\Loc\) (variabili implicite, ovvero il program counter).
+
+Formalmente una valutazione in \(\Eval\) è una funzione \(\eta: \Var \to D\), ognuna di questa può essere rappresentata con una tupla lunga col numero di variabile, che accoppiata con una locazione \(l\) rappresenta uno stato del sistema, e dunque un nodo del grafo orientato sottostante.
+
+Quindi nella Kripke Structure sottostante, \(S = \Loc \times \Eval(\Var)\).
+
+Col concentto di \(\Eval(\Var)\) definito possiamo parlare meglio di \(\Eff\). Data \(\eta \in \Eval(\Var)\) e un azione della forma \(a \overset{\text{def}}{=} v := \expr\), con \(\expr \in \Var \cup D\) allora l'effetto dell'azione è
+\[\Eff(a,\eta)=\eta[v\leftarrow \expr]\]
+con
+\[\eta[v\leftarrow \expr] = \eta'\]
+dove
+\[\eta' (x)= \begin{cases}
+  \expr & \text{se } x = v\\
+  \eta(x) & \text{altrimenti}
+\end{cases}\]
+
+Questa definizione non è ben definita perché ci vuole un concectto di valutazione dell'espressione \(\expr\) in \(\Eval(\Var)\). In altre parole un \(\Val(\expr, \eta) \in D\), da definire per induzione strutturale sulla struttura delle espressioni.
+I casi base sono costanti e le variabili (valutate con \(\eta\)). Il resto dipende dalla semantica degli operatori.
+
+Quindi per essere precisi la definizione di \(\Eff\) è la seguente:
+\[\Eff(a,\eta)=\eta[v\leftarrow \Val(\expr, \eta)]\]
+con
+\[\eta[v\leftarrow \Val(\expr,\eta)] = \eta'\]
+dove
+\[\eta' (x)= \begin{cases}
+  \Val(\expr,\eta) & \text{se } x = v\\
+  \eta(x) & \text{altrimenti}
+\end{cases}\]
+
+Per definire ora la funzione di transizione dovremmo definire quali stati sono collegati da una transizione basandoci su \(\hookrightarrow\) e \(\Eff\).
+
+In particolare definiamo la relazione di transizione \(\xrightarrow{} \subseteq S \times \Act \times S\) tale che:
+\begin{itemize}
+  \item Se \(l \xhookrightarrow{g:a} l' \) è nel \(PG\) e \(\eta \models g\) allora \(\angle{l,\eta} \xrightarrow{a} \angle{l',\eta'}\) è nella relazione di transizione, con \(\eta' = \Eff(a,\eta)\).
+\end{itemize}
+
+Gli stati iniziali sono definiti come \(S_0 = \set{\angle{l, \eta}[l \in \Loc_0 \land \eta \models g_0]}\)
+
+Infine per l'etichettatura, definiamo con \(AP = \Loc \cup \Cond(\Var)\) e \(L : S \to 2^{AP}\) tale che \(L(\angle{l,\eta}) = \set{l} \cup \set{g \in \Cond(\Var)}{\eta \models g}\).
+
+Fatto ciò, abbiamo definito il linguaggio per definire i componenti, ma questo è poco più di un programma sequenziale. Un po' di più perché da possibilità di scelte non deterministiche.
+Per sistemi complessi è però molto difficile specificarli per intero.
+
+Dunque l'approccio più comunque è quello di specificali tramite composizione di componenti più semplici, che interagiscono in modo sequenziale o concorrente.
+La concorrenza è modellabile in tantissimi modi diversi. Esempi da trascrizione.
+
+La composizione parallela sincrona è facile da definire. Dati \(TS_1, \ldots, TS_n\) sistemi a transizione tali che \(TS_i = (S_i, S_{0i}, A_i, R_i)\) con \(S_i\) disgiunti, allora la composizione parallela sincrona è il sistema a transizioni \(TS = (S,S_0,R,L)\) con:
+\begin{itemize}
+  \item \(S = S_1 \times \ldots \times S_n\)
+  \item \(S_0 = S_{01} \times \ldots \times S_{0n}\)
+  \item \(A = A_1 \cup \ldots \cup A_n\)
+  \item \(R \subseteq S \times A \times S\) è taòe che, dati \(\angle{s_1, \ldots, s_n}, \angle{s_1', \ldots, s_n'} \in S\) e \(\angle{a_1,\ldots, a_n} \in A\) contiene \(\angle{s_1,\ldots,s_n}\xrightarrow{\angle{a_1,\ldots,a_n}}\angle{s_1',\ldots,s_n'}\) se \(s_i \xrightarrow{a_i} s_i', \forall i \in \set{1,\ldots,n}\).
+\end{itemize}
+
+\chapter{Lezione 16/03}
+
+Il problema delle espressioni regolari è che non hanno esplicitamente una congiunzione o intersezione.
+Se avessi l'intersezione potrei scrivere \(\bigwedge_{i=0}^n F p_i\) come \(\bigcap_{i=1}^n \Sigma* p_i \Sigma^*\).
+
+Non avendolo però è necessario scrivere un'espressione regolare per ogni ordine.
+
+Questo è perché nei linguaggi regolari non c'è il complemento, e dunque non c'è l'intersezione, questo perché di base non è necessario.
+Ciò comporta però che descrivere una proprietà che non è presente sia complicato.
+
+Quindi vogliamo un linguaggio che si avvicini di più all'idea informale di proprietà, poiché è già difficile e inevitabilmente inesatto il processo di formalizzazione di un idea.
+Se il linguaggio è più vicino all'idea informale, allora sarà più facile formalizzare correttamente l'idea informale, e dunque sarà più facile verificare che il sistema soddisfa la proprietà desiderata.
+
+Passiamo quindi a un linguaggio logico. Inizialmente con il prim'ordine, per poi passare alla logica temporale, che cerca di nascondere all'interno di operatori logici dei pattern ricorrenti in logica del prim'ordine.
+
+Quali sono gli ogetti che ci interessano? L'universo, o ogetti del discorso, sono le parole \(w: [0,n)\to \Sigma\) oppure \(w: \N \to \Sigma\).
+
+Immaginiamo di voler esprimere la proprietà \qi{Prima o poi il sistema ha stampato ed è in attesa del nuovo input}.
+Essendo una congiunzione di proprietà, il che però deve far si che gli elementi dell'alfabeto non sia da considerarsi come atomiche.
+Dobbiamo considerare \(\Sigma = 2^{AP}\), con \(AP\) l'insieme delle proposizioni atomiche.
+
+\todo{Espandi esepio con \(p\) e \(i\) print e idle}
+
+Dunque i nostri modelli saranno essenzialmente \(w:\N \to 2^{AP}\), ovvero a ogni istante temporale associamo l'insieme di proposizioni atomiche vere in quel momento.
+
+Vediamo dunque col prim'ordine possiamo esprimere queste proprietà.
+Dobbiamo quindi avere \(w \models \phi\).
+
+Per il prim'ordine avremo una grammatica di questo tipo, con \(p \in AP\):
+\[\phi ::= p(x) \mid \neg \phi \mid \phi \land \phi \mid \phi \lor \phi\mid \forall x \phi \mid \exists x \phi\]
+ 
+Normalmente una grammatica di questo tipo porterebbe a un problema indecidibile, ma se ci concentriamo su sole stringhe come modelli allora torna decidibile.
+
+Vediamo dunque la semantica del prim'ordine. La definiremo in maniera composizionale, ovvero definendo la semantica di una proposizione atomica e come gli operatori logici modificano la semantica delle proposizioni atomiche.
+In particolare ci serve un assegnamento \(\chi : \Var \to N\) che ci dice ogni variabile a quale istante temporale si riferisce.
+\(w,\chi \models p(x)\) se \(p \in w(\chi(x))\). Con \(w(\chi(x))\) si intende l'elemento di \(w\) in posizione \(\chi(x)\), ovvero l'insieme di proposizioni atomiche vere in quel momento, e \(p \in w(\chi(x))\) significa che \(p\) è una di queste proposizioni atomiche vere in quel momento.
+
+Prendiamo ad esempio la parola \(w = \emptyset \set{i} \set{i} \set{i} \emptyset \set{i,p}\). Allora con \(\chi = \set{x \to 3}\) avremo \(w,\chi \not\models p(x)\) poiché \(p \not\in w(3)\), mentre con \(\chi' = \set{x \to 5}\) si ha \(w,\chi' \models p(x)\) poiché \(p \in w(5)\).
+
+Continuando la semantica, avremo che:
+\(w,\chi \models \neg \phi\) se\(w,\chi \not\models \phi\).
+\(w,\chi \models \phi_1 \land \phi_2\) se \(w,\chi \models \phi_1\) e \(w,\chi \models \phi_2\).
+\(w,\chi \models \phi_1 \lor \phi_2\) se \(w,\chi \models \phi_1\) o \(w,\chi \models \phi_2\).
+Questo chiude la semantica della parte proposizionale.
+
+Ora per dare la semantica agli operatori quantificatori, diremo:
+\(w,\chi \models \forall x.\phi\) se per ogni \(n \in \N\), \(w,\chi[x \to n] \models \phi\). Ovvero sostituendo a \(x\) ogni possibile istante temporale, la formula \(\phi\) è soddisfatta.
+\(w,\chi \models \exists x.\phi\) se esiste \(n \in \N\) tale che \(w,\chi[x \to n] \models \phi\). Ovvero sostituendo a \(x\) almeno un istante temporale, la formula \(\phi\) è soddisfatta.
+
+Vediamo come modellare una proprietà sul futuro. Tipo \(\exists x. i(x) \land p_2(x)\). Ad esempio questo può essere inteso come \qi{Prima o poi il sistema ha stampato ed è in attesa del nuovo input}.
+Se invece voglio dire che non ha mai due processi in una sezione critica, allora posso scrivere \(\forall x. \neg (p_1(x) \land p_2(x))\).
+
+Se invece voglio dire che infinitamente spesso valga la proprietà \(i\). Qui ho una difficoltà, perché mi serve poter esprimere una relazioni tra istanti temporali.
+Ci serve quindi poter esprimere il concetto di \qi{dopo}, è necessario introdurre una relazione d'ordine tra istanti temporali.
+Sintatticamente inroduciamo il simbolo \(\preceq\), la cui semantica è:
+\(w,\chi \models x\preceq y\) se \(\chi(x) \leq \chi(y)\). In questo caso sono stati nettamente separati i simboli \(\preceq\) e \(\leq\) per evidenziare che il primo è un simbolo del linguaggio ogetto, mentre l'altro è l'ordine usuale dei numeri naturali.
+Nella pratica useremo \(\leq\) anche nel linguaggio ogetto poiché sarà chiaro dal contesto se si tratta di un simbolo del linguaggio o dell'ordine usuale dei numeri naturali.
+
+Per esprimere quindi che una proprietà \(i\) si verifica infinitamente spesso, possiamo scrivere \(\forall x. \exists y. x \leq y \land i(y)\).
+Se voglio esprimere che arriva un punto dopo il quale sarò sempre in idle posso scrivere \(\exists x. \forall y. x \leq y \to i(y)\).
+
+In generale però possiamo osservare che quando parliamo di proprietà temporali ci troviamo sempre in uno di questi due casi:
+\begin{itemize}
+  \item \qi{Prima o poi} \(p\) è vero, ovvero \(\exists y. x \leq y \land p(y)\)
+  \item \qi{Dopo un certo punto} \(p\) è sempre vero, ovvero \(\exists x. \forall y. x \leq y \to p(y)\)
+\end{itemize}
+
+Ma allora possiamo costruire un linguaggio che abbia sintatticamente due operatori che esprimono esattamente questi due pattern ricorrenti come semantica.
+
+\section{Linear Temporal Logic}
+
+Introdotta da Pnueli nel 1979. In questa logica lasciamo implicito l'istante in cui si verifica una proprietà, ci penserà la semantica degli operatori a gestire questo aspetto.
+La grammatica è la seguente, con \(p \in AP\):
+\[\phi ::= p \mid \neg \phi \mid \phi \land \phi \mid \phi \lor \phi \mid F\phi \mid G\phi\]
+Dove \(F\) è l'operatore \q{prima o poi} (o \q{eventually}, \q{future}) e \(G\) è l'operatore \q{dopo un certo punto} (o \q{always}, \q{globally}).
+
+Ovviamente anche ora parleremo di proprietà della parole, ma ora a differenza del prim'ordine non useremo più un assegnamento. Invece, per la semantica, utilizzeremo un indice \(i\) che rappresenta l'istante temporale in cui stiamo valutando la formula, e di conseguenza da cui iniziamo a guardare nel futuro.
+
+La semantica è la seguente:
+\(w,i \models p\) se \(p \in w(i)\).
+La semantica degli operatori proposizionali è identica.
+Venendo ai nuovi operatori invece abbiamo:
+\(w,i\models F\phi\) se \(\exists j \geq i \st w, j \models \phi\), ovvero se \(\exists j: j \geq i \land w,j\models\phi\).
+\(w,i\models G\phi\) se \(\forall j \geq i , w, j \models \phi\), ovvero se \(\forall j: j \geq i \to w,j\models\phi\).
+Con questa sintassi però non è possibile esprimere proprietà che mi descrivono \q{il passato}, come \(\exists x \st p_1(x) \land \forall y, y\leq \neg p_2(x)\).
+
+Di conseguenza, alla sintassi nell'81 vennero sostituiti \(F\) e \(G\) con due operatori binari e dimostrato che con questa agginuta la logica temporale risulta essere equivalente al prim'ordine.
+In particolare, la sintassi diventa:
+\[\phi ::= p \mid \neg \phi \mid \phi \land \phi \mid \phi \lor \phi \mid \phi U \phi \mid R\phi\]
+Dove \(U\) è l'operatore \q{until} e \(R\) è l'operatore \q{release}
+Intuitivamente \(U\) esprime che una proprietà \(p\) è vera fino a quando non diventa vera una proprietà \(q\), mentre \(R\) esprime che una proprietà \(p\) è vera a meno che non diventa vera una proprietà \(q\).
+
+Formalmente:
+\(w,i \models \phi_1 U \phi_2\) se \(\exists j \geq i \st w,j\models \phi_2\) e \(\forall k: i \leq k < j \to w,k\models \phi_1\)
+\(w,i \models R\phi_1 \phi_2\) se \(\forall j \geq i \st w,j\models \phi_2\) o \(\exists k: i \leq k < j \land w,k\models \phi_1\)
+
+Possiamo notare che \(F\phi \equiv \top U \phi\) e che \(G\phi \equiv \bot R \phi\), quindi \(F\) e \(G\) sono esprimibili in termini di \(U\) e \(R\).

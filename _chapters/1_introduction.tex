@@ -10,13 +10,20 @@ Tuttavia, esistono contesti in cui è necessario adottare modalità di verifica 
 In particolare, quando si tratta di software critico, come ad esempio software utilizzato in ambiti come l'aviazione, la medicina, o i sistemi di controllo industriale, è fondamentale garantire un alto livello di affidabilità e sicurezza.
 
 Altra problematica che porta il testing empirico, è la necessità di avere un artefatto software già sviluppato, o comunque in uno stadio di sviluppo sufficientemente avanzato, per poter essere testato.
+
+Il tipico ciclo di sviluppo software segue infatti un andamento simile a quello in \Cref{fig:testing_cycle}.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{_images/testing_cycle}
+  \caption{Ciclo di sviluppo software e testing}\label{fig:testing_cycle}
+\end{figure}
 Diversi studi hanno però dimostrato come il costo di correzione di errori aumenti in maniera considerevole man mano che il software si avvicina o raggiunge la fase di messa in opera, e dunque sarebbe auspicabile poter identificare e correggere errori il prima possibile, idealmente già durante la fase di progettazione o sviluppo, prima ancora che il software sia eseguibile.
 
-% \begin{figure}[H]
-%   \centering
-%   \includegraphics[width=\textwidth]{_images/Liggesmeyer_chart}
-%   \caption{Liggesmeyer et al. 1998}
-% \end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{_images/liggesmeyer_chart}
+  \caption{Liggesmeyer et al. 1998}
+\end{figure}
 
 Un metodo alternativo al testing che risolve quest'ultimo problema è quello della simulazione, in cui un modello del software viene eseguito in un ambiente simulato per verificare il suo comportamento.
 Sebbene questa pratica possa avvicinare la curva della scoperta degli errori a quella di produzione degli stessi, questa introduce ancora più incertezza rispetto al testing empirico, in quanto il modello simulato potrebbe non essere completamente fedele al software reale, avendo quindi un'affidabilità ancora più bassa.
@@ -56,7 +63,7 @@ I sistemi software in cui è necessario garantire valori altissimi per queste pr
 \end{description}
 
 Per garantire formalmente la correttezza di questi sistemi, la verifica formale trattata in questo corso si baserà principalemente sulla dimostrazione di proprietà di correttezza di un modello formale del software, rispetto a specifiche formali dei requisiti.
-\begin{note}
+\begin{note}{}
   La verifica formale non si pone l'obiettivo di creare il software perfetto, poiché è impossibile.
   Le dimostrazioni di correttezza garantiscono che il modello del software soddisfi tutte le specifiche, ma la fase di modellazione stessa introduce inevitabilmente un certo grado di approssimazione, e quindi incertezza, rispetto al software reale.
 
@@ -77,9 +84,28 @@ Il \textbf{secondo filone} concerne le logiche per la specifica delle proprietà
 Si tratta di linguaggi logici specializzati, più espressivi della logica proposizionale ma meno del primo ordine, capaci di descrivere proprietà temporali e comportamentali dei sistemi.
 Queste logiche permettono di formalizzare affermazioni come \qi{il sistema raggiunge sempre uno stato sicuro} o \qi{una certa risorsa non viene mai acceduta da due processi contemporaneamente}.
 
-Il \textbf{ponte concettuale} tra questi due filoni è rappresentato dalla \keyword{relazione di soddisfacimento}: dato un modello \(M\) (la rappresentazione formale del sistema) e una formula \(\varphi\) (la proprietà espressa in logica), l'obiettivo è determinare se \(M \models \varphi\), ovvero se il modello soddisfa la proprietà.
+Il \textbf{ponte concettuale} tra questi due filoni è rappresentato dalla \keyword{relazione di soddisfacimento}: dato un modello \(\mathcal{M}\) (la rappresentazione formale del sistema) e una formula \(\varphi\) (la proprietà espressa in logica), l'obiettivo è determinare se \(\mathcal{M} \models \varphi\), ovvero se il modello soddisfa la proprietà.
 Questa relazione, già nota dalla logica, diventa lo strumento fondamentale per la verifica: il modello rappresenta il \qi{mondo} di cui si vuole parlare, in questo caso il software che intendo verificare, mentre il linguaggio logico fornisce il modo di esprimere le proprietà da verificare su questo mondo.
-La verifica formale consiste quindi nella dimostrazione matematica che tutte le possibili esecuzioni del sistema rispettano le proprietà specificate.
+
+Il programma del corso consiste quindi nel:
+\begin{enumerate}
+  \item definire come modellare e specificare i sistemi e le loro computazioni;
+  \item descrivere i linguaggi logici e le proprietà che possono esprimere;
+  \item definire la relazione di soddisfacimento per il Model Checking;
+  \item sviluppare algoritmi di verifica ragionevolmente efficienti e applicabili in pratica.
+\end{enumerate}
+
+\subsection*{Approcci Alternativi: Conseguenza Logica}
+
+Il problema della verifica può essere riformulato anche in termini di \keyword{conseguenza logica}: \(\Gamma \models \varphi\), dove \(\Gamma\) è un insieme di formule che descrivono il sistema e \(\varphi\) è il requisito.
+La conseguenza logica è definita come: per ogni modello del linguaggio, se il modello soddisfa tutte le formule in \(\Gamma\), allora deve soddisfare anche \(\varphi\).
+
+Se il linguaggio logico è sufficientemente espressivo, \(\Gamma\) può rappresentare una \keyword{teoria} che descrive completamente tutte le computazioni del sistema. In questo caso, \(\Gamma \models \varphi\) significa che tutti i modelli della teoria hanno la proprietà \(\varphi\).
+
+Questo approccio può essere risolto mediante \keyword{dimostrazione automatica di teoremi} (Theorem Proving), utilizzando calcoli deduttivi che sfruttano la relazione tra conseguenza logica e deducibilità.
+
+\begin{note}
+  In questo corso seguiremo principalmente l'approccio semantico tramite Model Checking, ma esistono anche approcci sintattici basati sulla teoria della prova.
+\end{note}
 
 Nell'ambito pratico della verifica formale, vengono utilizzati strumenti automatici come i \keyword{model checker} (NuSMV, SPIN) che automatizzano il processo di verifica esplorando sistematicamente lo spazio degli stati del modello per verificare la validità delle proprietà specificate.
-
