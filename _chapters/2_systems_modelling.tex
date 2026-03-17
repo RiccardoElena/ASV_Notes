@@ -48,7 +48,7 @@ un'astrazione più o meno lontana dalla realtà, dalla verità. Quindi più l'as
 è lontana dalla realtà, più comportamenti ammette e più semplice è la sua
 descrizione.
 
-Ovviamente, questa necessità di bilancaire livello di dettaglio e complessità computazoinale del problema ha fatto nascere delle tecniche di \textit{abstraction refinement}.
+Ovviamente, questa necessità di bilanciare livello di dettaglio e complessità computazoinale del problema ha fatto nascere delle tecniche di \textit{abstraction refinement}.
 Queste partono da una descrizione astratta e, in base ai testimoni spuri che naturalmente vengono prodotti, richiedono dei raffinamenti mirati ad escludere quelle computazioni spurie.
 
 \section{Modellazione}
@@ -89,7 +89,7 @@ Un automa a stati finiti classico per linguaggi regolari possiede tipicamente du
   \item una \keyword{condizione di accettazione}, ovvero un insieme di stati finali che determinano l'accettazione di una stringa.
 \end{itemize}
 
-Un sistema a transizioni può essere visto come un automa in cui l'intero insieme \(S\) è accettante e in cui esiste un unico simbolo (implicito) nell'alfabeto. 
+Un sistema a transizioni può essere visto come un automa in cui l'intero insieme \(S\) è accettante e in cui esiste un unico simbolo (implicito) nell'alfabeto.
 
 Se si introducesse esplicitamente un alfabeto, la relazione di transizione \(R\) dovrebbe diventare una relazione ternaria \(R \subseteq S \times \Sigma \times S\), dove \(\Sigma\) rappresenta l'alfabeto. Tuttavia, quando l'alfabeto contiene un unico simbolo, la presenza di tale simbolo non modifica l'insieme delle coppie di stati raggiungibili, rendendo quindi superflua la sua esplicitazione. La situazione sarebbe differente con più simboli: da uno stato \(s\) con un simbolo \(\sigma_1\) si potrebbe raggiungere uno stato \(s'\), mentre con un simbolo \(\sigma_2\) tale transizione potrebbe non essere ammessa.
 
@@ -159,10 +159,14 @@ Il modello base dei sistemi a transizioni può essere esteso introducendo un ins
 \begin{example}{Vending Machine}
   Consideriamo un esempio concreto di sistema a transizioni etichettato: una macchina distributrice automatica modellata dal LTS in figura.
 
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{_images/vending_machine_example}
+    \caption{Vending Machine}\label{fig:vending_machine_example}
+  \end{figure}
+
 \end{example}
 \subsection{Esempio: Vending Machine}
-
-
 
 Questo sistema, sebbene nella realtà debba interagire con l'ambiente esterno, verrà modellato come un sistema chiuso interpretando tutte le azioni come interne. Le azioni del sistema includono:
 \begin{itemize}
