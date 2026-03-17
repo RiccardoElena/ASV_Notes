@@ -76,14 +76,13 @@ La terminazione è ancora modellabile anche in questi modelli come proprietà de
   Una notazione alternativa per la relazione di transizione è quella di rappresentarla con una freccia, ovvero \(s \xrightarrow{} s'\) per indicare che \((s,s')\in R\).
 \end{note}
 
-\subsection{Sistemi a Transizioni e Automi}
-
 \subsection{Sistemi Chiusi e Sistemi Aperti}
 
 Il modello dei sistemi a transizioni rappresenta la struttura più elementare e generale per la modellazione di sistemi computazionali. È possibile osservare come questo modello sia strettamente correlato al concetto di automa, costituendone essenzialmente il nucleo centrale.
 
 \paragraph{Relazione con gli Automi a Stati Finiti:}
 Un automa a stati finiti classico per linguaggi regolari possiede tipicamente due componenti aggiuntive rispetto a un sistema a transizioni:
+
 \begin{itemize}
   \item un \keyword{alfabeto} di simboli che etichettano le transizioni;
   \item una \keyword{condizione di accettazione}, ovvero un insieme di stati finali che determinano l'accettazione di una stringa.
@@ -125,7 +124,7 @@ Per modellare sistemi aperti è necessario quindi prevedere sia le scelte intern
   In questo corso ci concentreremo esclusivamente su \keyword{sistemi chiusi}, che possono essere interpretati come giochi a un singolo giocatore, in cui il sistema è l'unico responsabile della risoluzione del proprio non-determinismo. I sistemi aperti, pur essendo un argomento di grande interesse teorico e intimamente legato alla teoria dei giochi, non saranno trattati per vincoli di tempo.
 \end{note}
 
-\section{Computazioni e Percorsi}
+\subsection{Computazioni e Percorsi}
 
 All'interno di un sistema a transizioni è possibile definire formalmente il concetto di computazione.
 
@@ -219,7 +218,3 @@ Quando si arricchisce un sistema a transizioni con la funzione di etichettamento
 Le strutture di Kripke devono il loro nome a Saul Kripke, logico che ha definito la semantica delle logiche modali. Le logiche temporali utilizzate in questo corso sono infatti logiche modali, e le strutture di Kripke rappresentano il ponte tra i sistemi a transizioni e i modelli logici.
 
 Le proposizioni atomiche e la funzione di etichettamento \(L\) convertono un sistema a transizioni in un \keyword{modello logico}. Rispetto a questo modello è possibile interpretare e verificare formule espresse in linguaggi logici formali, come verrà discusso nei capitoli successivi.
-
-\begin{note}
-  Nei capitoli seguenti verranno introdotti linguaggi per descrivere sistemi \keyword{data-dependent}, ovvero sistemi dipendenti dai dati (come i Program Graph su insiemi di variabili). Sarà mostrato come tali linguaggi possono essere compilati in sistemi a transizioni, come specificare proprietà di questi oggetti e come risolvere il problema della soddisfazione (model checking).
-\end{note}
