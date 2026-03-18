@@ -88,7 +88,7 @@ Una prima sintassi formale che possiamo introdurre per descrivere le classi di p
 
 \begin{definition}{Espressioni Regolari}
   Un \keyword{espressione regolare} su un alfabeto \(\Sigma\) è una parola formata dalla seguente grammatica:
-\[\alpha ::= \emptyset \mid \varepsilon \mid a \in \Sigma \mid \alpha \cdot \alpha \mid \alpha + \alpha \mid \alpha^* \]
+  \[\alpha ::= \emptyset \mid \varepsilon \mid a \in \Sigma \mid \alpha \cdot \alpha \mid \alpha + \alpha \mid \alpha^* \]
 \end{definition}
 
 \begin{example}{}
@@ -123,6 +123,67 @@ Infine, per associare sintassi e semantica, dobbiamo definire una funzione di va
   \[L(\alpha^*) = {L(\alpha)}^*\]
 \end{definition}
 
+
+\begin{note}{}
+  Attenzione che questa funzione mappa da un insieme numerabile \(\Sigma^*\) a un insieme non numerabile \(2^{\Sigma^*}\). Ciò significa che ci sono infiniti linguaggi che non sono regolari.
+\end{note}
+
 \begin{note}{}
   È fondamentale notare che, nella definizione di valutazione, sebbene sia alle volte usato lo stesso simbolo per input che per output (come nel caso di \(\emptyset\)), questi sono due ogetti completamente diversi. In particolare, \q{l'input} \(\emptyset\) non è altro che un simbolo sintattico, che rappresenta un'espressione regolare, mentre \q{l'output} \(\emptyset\) è un oggetto matematico, ovvero un insieme vuoto di parole su \(\Sigma\).
 \end{note}
+
+
+Le espressioni regolari sono utili poiché ci permettono di descrivere alcune proprietà
+del sistema.
+
+Ad esempio, detto \(H\) l'insieme degli stati terminali, è possibile modellare la proprietà di terminazione come \[\alpha = \Sigma^* \cdot H\]
+Per esprimere invece la non raggiungibilità di uno stato negativo \(B\) possiamo usare
+\[\alpha = {(\Sigma \setminus B)}^* \]
+
+
+Tuttavia, questo linguaggio non ci permette di descrivere comportamenti infiniti (come per esempio descrivere proprietà di reattività continue nel tempo di un server), poiché
+una qualsiasi espressione regolare ha una lunghezza finita, ma per descrivere quel tipo di proprietà abbiamo bisogno di espressione con lunghezza infinita.
+
+Dobbiamo dunque estendere il concetto di linguaggio regolare a linguaggio \(\omega\)-regolare, dove \(\omega\) è il primo ordinale limite.
+
+In primo luogo, è necessario estendere \(\Sigma^*\) a \(\Sigma^\omega\). Già questa modifica ci fa passare da un insieme numerabile a un insieme non numerabile, poiché \(\Sigma^\omega\) è equipotente ai reali.
+
+Infatti se \(A\) è un linguaggio regolare, \(A^\omega\) rappresenta la giustapposizione infinita di stringhe finite estratte da $A$ .
+Formalmente, una parola in $A^\omega$ può essere spezzettata in infiniti frammenti, ciascuno appartenente al linguaggio $A$.
+
+\begin{definition}{Linguaggio \(\omega\)-Regolare}
+  Un \keyword{linguaggio \(\omega\)-regolare} su un alfabeto \(\Sigma\) è un insieme \(A \subseteq \Sigma^\omega\) che rispetta le seguenti regole di formazione:
+  \begin{itemize}
+    \item \(\emptyset\) è un linguaggio \(\omega\)-regolare
+    \item Se \(A\) e \(B\) sono linguaggi \(\omega\)-regolari, allora \(A \cup B\) è un linguaggio \(\omega\)-regolare
+    \item Se \(A\) è regolare, \(A^\omega \) è \(\omega\)-regolare
+    \item Se \(A\) è regolare e \(B\) è \(\omega\)-regolare, allora \(A \cdot B = \set{w_1 \cdot w_2}{w_1 \in A, w_2 \in B}\) è un linguaggio \(\omega\)-regolare
+  \end{itemize}
+\end{definition}
+
+\begin{definition}{Espressioni \(\omega\)-regolari}
+  Un \keyword{espressione \(\omega\)-regolare} su un alfabeto \(\Sigma\) è una parola formata dalla seguente grammatica:
+  \[\lambda ::= \emptyset \mid \alpha^\omega \mid \alpha \cdot \lambda \mid \lambda + \lambda\]
+  dove \(\alpha\) è un'espressione regolare.
+\end{definition}
+
+\begin{note}{}
+  Nota che non è possibile concatenare due espressioni \(\omega\)-regolari tra loro, perché non è possibile individuare il termine della prima espressione a cui poi concatenare l'inizio della seconda, poiché sono espressioni di lunghezza infinita.
+\end{note}
+
+\begin{definition}{Semantica delle espressioni \(\omega\)-regolari}
+  La semantica delle espressioni \(\omega\)-regolari è definita da una funzione \(L : [\lambda] \to 2^{\Sigma^\omega}\) definita come:
+  \[L(\emptyset) = \emptyset\]
+  \[L(\alpha^\omega) = {L(\alpha)}^\omega\]
+  \[L(\alpha \cdot \lambda) = L(\alpha) \cdot L(\lambda)\]
+  \[L(\lambda_1 + \lambda_2) = L(\lambda_1) \cup L(\lambda_2)\]
+\end{definition}
+
+Sebbene le espressioni $\omega$-regolari siano sufficienti a descrivere questi comportamenti, soffrono di un grave problema di prolissità.
+
+Immaginiamo di voler dire la seguente cosa:
+Ho un andamento temporale di eventi, e ho un insime \(\set{e_1,\ldots,e_k}\) di eventi che voglio che prima o poi accadano, ma non è rilevante l'ordine in cui accadono.
+Usando espressioni regolari sarà necessaria un'espressione regolare di lunghezza \(k\)!.
+
+Vedremo che esistono invece linguaggi come \textit{LTL} (Logica Temporale Lineare) che ci permettono di descrivere queste stesse proprietà, ma in modo esponenzialmente più succinto.
+

@@ -1,50 +1,3 @@
-\chapter{Lezione 09/03}
-
-
-\begin{example}{}
-  L'espressione regolare precedente ha come semantica il seguente insieme di parole:
-  \[\set{\varepsilon aac^i,\varepsilon abc^i}[i\in \N]\]
-\end{example}
-
-Le espressioni regolari ci permettono di esprimere diverse delle proprietà che abbiamo visto prima.
-Ad esempio, detto \(H\) l'insieme degli stati terminali, modellare la proprietà proprietà di terminazione come
-\[\alpha = \Sigma^* \cdot H\]
-Per esprimere invece la non raggiungibilità di uno stato negativo \(B\) possiamo usare
-\[\alpha = {(\Sigma \setminus B)}^* \]
-
-Per proprietà di fairness e precedenza tali linguaggi non sono sufficienti, poiché si limitano a parole a lunghezza finita.
-Dobbiamo dunque estendere il concetto di linguaggio regolare a linguaggio \(\omega\)-regolare, dove \(\omega\) è il primo ordinale limite.
-
-In primo luogo, è necessario estendere \(\Sigma^*\) a \(\Sigma^\omega\). Già questa modifica ci fa passare da un insieme numerabile a un insieme non numerabile, poiché \(\Sigma^\omega\) è equipotente ai reali.
-\begin{definition}{Linguaggio \(\omega\)-Regolare}
-  Un \keyword{linguaggio \(\omega\)-regolare} su un alfabeto \(\Sigma\) è un insieme \(A \subseteq \Sigma^\omega\) che rispetta le seguenti regole di formazione:
-  \begin{itemize}
-    \item \(\emptyset\) è un linguaggio \(\omega\)-regolare
-    \item Se \(A\) e \(B\) sono linguaggi \(\omega\)-regolari, allora \(A \cup B\) è un linguaggio \(\omega\)-regolare
-    \item Se \(A\) è regolare, \(A^\omega \) è \(\omega\)-regolare
-    \item Se \(A\) è regolare e \(B\) è \(\omega\)-regolare, allora \(A \cdot B = \set{w_1 \cdot w_2}{w_1 \in A, w_2 \in B}\) è un linguaggio \(\omega\)-regolare
-  \end{itemize}
-\end{definition}
-
-\begin{definition}{Espressioni \(\omega\)-regolari}
-  Un \keyword{espressione \(\omega\)-regolare} su un alfabeto \(\Sigma\) è una parola formata dalla seguente grammatica:
-  \[\lambda ::= \emptyset \mid \alpha^\omega \mid \alpha \cdot \lambda \mid \lambda + \lambda\]
-dove \(\alpha\) è un'espressione regolare. 
-\end{definition}
-
-\begin{definition}{Semantica delle espressioni \(\omega\)-regolari}
-  La semantica delle espressioni \(\omega\)-regolari è definita da una funzione \(L : [\lambda] \to 2^{\Sigma^\omega}\) definita come:
-  \[L(\emptyset) = \emptyset\]
-  \[L(\alpha^\omega) = {L(\alpha)}^\omega\]
-  \[L(\alpha \cdot \lambda) = L(\alpha) \cdot L(\lambda)\]
-  \[L(\lambda_1 + \lambda_2) = L(\lambda_1) \cup L(\lambda_2)\]
-\end{definition}
-
-Immaginiamo di voler dire la seguente cosa:
-Ho un andamento temporale di eventi, e ho un insime \(\set{e_1,\ldots,e_k}\) di eventi che voglio che prima o poi accadano, ma non è rilevante l'ordine in cui accadono.
-Usando espressioni regolari sarà necessaria un'espressione regolare di lunghezza \(k\)!.
-Vedremo che esistono invece linguaggi dallo stesso potere espressivo, ma esponenzialmente più succinti. 
-
 \chapter{Lezione 11/03}
 
 In una struttura di Kripke, la funzione L associa a ogni stato un modello proposizionale che rappresenta le proprietà atomiche vere in quello stato.
@@ -91,9 +44,9 @@ con
 \[\eta[v\leftarrow \expr] = \eta'\]
 dove
 \[\eta' (x)= \begin{cases}
-  \expr & \text{se } x = v\\
-  \eta(x) & \text{altrimenti}
-\end{cases}\]
+    \expr   & \text{se } x = v  \\
+    \eta(x) & \text{altrimenti}
+  \end{cases}\]
 
 Questa definizione non è ben definita perché ci vuole un concectto di valutazione dell'espressione \(\expr\) in \(\Eval(\Var)\). In altre parole un \(\Val(\expr, \eta) \in D\), da definire per induzione strutturale sulla struttura delle espressioni.
 I casi base sono costanti e le variabili (valutate con \(\eta\)). Il resto dipende dalla semantica degli operatori.
@@ -104,9 +57,9 @@ con
 \[\eta[v\leftarrow \Val(\expr,\eta)] = \eta'\]
 dove
 \[\eta' (x)= \begin{cases}
-  \Val(\expr,\eta) & \text{se } x = v\\
-  \eta(x) & \text{altrimenti}
-\end{cases}\]
+    \Val(\expr,\eta) & \text{se } x = v  \\
+    \eta(x)          & \text{altrimenti}
+  \end{cases}\]
 
 Per definire ora la funzione di transizione dovremmo definire quali stati sono collegati da una transizione basandoci su \(\hookrightarrow\) e \(\Eff\).
 
@@ -163,7 +116,7 @@ Dobbiamo quindi avere \(w \models \phi\).
 
 Per il prim'ordine avremo una grammatica di questo tipo, con \(p \in AP\):
 \[\phi ::= p(x) \mid \neg \phi \mid \phi \land \phi \mid \phi \lor \phi\mid \forall x \phi \mid \exists x \phi\]
- 
+
 Normalmente una grammatica di questo tipo porterebbe a un problema indecidibile, ma se ci concentriamo su sole stringhe come modelli allora torna decidibile.
 
 Vediamo dunque la semantica del prim'ordine. La definiremo in maniera composizionale, ovvero definendo la semantica di una proposizione atomica e come gli operatori logici modificano la semantica delle proposizioni atomiche.
