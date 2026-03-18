@@ -1,1 +1,128 @@
 \chapter{Linguaggi}
+
+Per poter esprimere le proprietà di interesse sui sistemi che abbiamo imparato a modellare nel capitolo precedente,
+è necessario introdurre dei linguaggi formali, che ci permettano di descrivere in modo preciso e rigoroso le caratteristiche che vogliamo verificare.
+
+In questo capitolo introdurremo dei linguaggi formali, partendo da quelli più generali, fino ad arrivare a quelli specifici per la verifica di sistemi.
+In particolare, partiremo, il modello che darà semantica alle varie sintassi che introdurremo saranno genericamente parole di un linguaggio regolare.
+
+Per i nostri scopi sarà sufficiente considerare queste parole per ricollegarci ai modelli di sistemi basati su automi visti nel capitolo precedente, poiché esecuzione di un sistema a transizioni può essere vista come una parola su un alfabeto di azioni o stati.
+
+\section{Proprietà}
+
+Prendiamo in considerazione il seguente automa:
+
+\todo{grafo da fabrizio}
+
+Possiamo considerare questo automa come un generatore di sequenze, che corrispondono tanto a computazioni del sistema quanto a percorsi del grafo orientato sottostante.
+
+Potremmo però essere anche interessati ai comportamenti infinitari del sistema, e dunque a sequenze infinite di stati.
+
+Un altro aspetto di cui vorremmo paralre però è la complessità topologica. In particolare potremmo pensare di costruire un grafo con una diversa topologia che generi le stesse sequenze (detti trace-equivalent).
+
+Una volta capito che un sistema a transizioni genera sequenze o computazioni, dobbiamo capire come valutare se tali rispettano o meno le proprietà richieste.
+
+A livello di sistemi reali, potrei infatti voler modificare la struttura interna del sistema, che è esattamente quello che succede sempre nei sistemi critici degli aeroporti.
+In un sistema reale ci possono essere componenti ridondati, non perché servano a generare computazioni logicamente diverse, ma per tolleranza ai guasti. Allora in quel caso potrei voler indagare sulla complessità topologica del sistema e non semplicemente sui suoi comportamenti generati, altrimenti direi solo che i comportamenti sono gli stessi e ho semplicemente un sistema più costoso. Questi aspetti legati alla ridondanza non verranno valutati solo a livello computazionale, ma verranno analizzati a livello architetturale e strutturale degli stati.
+
+Andiamo quindi a definire diversi tipi di proprietà che possiamo esprimere sui sistemi, le quali non necessariamente richiedono lo stesso potere espressivo del linguaggio per essere espresse.
+
+\begin{definition}{Proprietà Universali}
+  Una \keyword{proprietà universale}, o \keyword{invariante}, è una proprietà che deve essere soddisfatta in ogni stato della computazione.
+\end{definition}
+
+\begin{example}{}
+  Esempi di proprietà universali sono:
+  \begin{itemize}
+    \item Non è possibile raggiungere un deadlock
+    \item In ogni istante almeno un processo è attivo
+    \item In ogni sezione critica è presente al più un processo
+    \item Una pre-post condizione, come \(\set{P} \text{ command } \set{Q}\), dove \textit{command} è un istruzione del programma, e \(P\) e \(Q\) sono due proprietà che devono essere soddisfatte rispettivamente prima e dopo l'esecuzione di \textit{command}.
+  \end{itemize}
+
+  Generalmente queste proprietà servono a modellare proprietà di errore che non devono mai verificarsi.
+\end{example}
+
+\begin{definition}{Proprietà Esistenziali}
+  Una \keyword{proprietà esistenziale} è una proprietà che deve essere soddisfatta in almeno uno stato della computazione.
+\end{definition}
+
+\begin{example}{}
+  Esempi di proprietà esistenziali sono:
+  \begin{itemize}
+    \item Il programma prima o poi termina
+    \item Se un treno entra in un tunnel prima o poi uscirà
+    \item Ogni lavoro di stampa in attesa verrà completato
+    \item Ogni messaggio inviato verrà ricevuto
+  \end{itemize}
+
+  Generalmente queste proprietà servono a modellare proprietà che si vorrebbe che si verificassero.
+\end{example}
+
+Ovviamente proprietà universali ed esistenziali sono l'una il duale dell'altra, e dunque se una proprietà universale è violata, allora la sua negazione è una proprietà esistenziale che è soddisfatta.
+
+Queste proprietà per quanto siamo molto generali, riescono solo a esprimere cose che accadranno sempre o prima o poi, ma non ci permettono di definire un concetto di \qi{equità} nel tempo o di \qi{precedenza} tra eventi, che sono invece aspetti fondamentali per la modellazione di sistemi concorrenti.
+
+\begin{definition}{Proprietà di Fairness e di Precedenza}
+  Una proprietà di \keyword{fairness} (o di \keyword{equità}) che esprimono che diversi utenti del sistema verranno serviti.
+  Una proprietà di \keyword{precedenza} è una proprietà che deve essere soddisfatta in un certo ordine.
+\end{definition}
+
+\begin{example}{}
+  \begin{itemize}
+    \item Weak fairness: Ogni richiesta continua prima o poi viene servita
+    \item Strong fairness: Ogni richiesta ripetutua (infinitamente spesso) verrà prima o poi servita
+    \item Precedenza: Se non esiste un processo attivo a priorità più \(n\), posso attivare un provcesso a priorità \(n - 1\)
+  \end{itemize}
+\end{example}
+
+\begin{note}
+  Le proprietà di fairness possono essere viste come una forma più debole di proprietà esistenziali.
+\end{note}
+
+Tutto questo però è un insieme di proprietà ragionevoli che, per il momento, sono espresse a parole, in linguaggio naturale informale. In quanto tali, queste descrizioni possono essere ambigue o indecidibili. Io voglio capire come faccio ad applicare queste definizioni allo spazio sintattico di un linguaggio formale, che è poi possibile elaborare in modo preciso e con una semantica matematica ben chiara.
+
+\section{Espressioni e Linguaggi Regolari}
+
+Una prima sintassi formale che possiamo introdurre per descrivere le classi di proprietà citate in precedenza è quella delle espressioni regolari.
+
+\begin{definition}{Espressioni Regolari}
+  Un \keyword{espressione regolare} su un alfabeto \(\Sigma\) è una parola formata dalla seguente grammatica:
+\[\alpha ::= \emptyset \mid \varepsilon \mid a \in \Sigma \mid \alpha \cdot \alpha \mid \alpha + \alpha \mid \alpha^* \]
+\end{definition}
+
+\begin{example}{}
+  Dato \(\Sigma = \set{a,b,c}\) alfabeto, un'espressione regolare è
+  \[\alpha = \varepsilon a (a+b)\cdot c^* \]
+\end{example}
+
+Come ogni linguaggio formale è fondamentale distinguere propriamente la componente sintattica, in questo caso espressa proprio dalla grammatica delle espressioni regolari, dalla sua componente semantica, ovvero gli ogetti matematici di cui le espressioni sintattiche parlano.
+
+Per quanto riguarda le espressioni regolari, possiamo esprimerne la semantica tramite la nozione di linguaggio regolare.
+
+\begin{definition}{Linguaggio Regolare}
+  Un \keyword{linguaggio regolare} su un alfabeto \(\Sigma\) è un insieme \(A \subseteq \Sigma^*\) che rispetta le seguenti regole di formazione:
+  \begin{itemize}
+    \item \(\emptyset\) è un linguaggio regolare
+    \item \(\set{\varepsilon}\) è un linguaggio regolare
+    \item \(\set{a}\) è un linguaggio regolare per ogni \(a \in \Sigma\)
+    \item Se \(A\) e \(B\) sono linguaggi regolari, allora \(A \cdot B = \set{w_1 \cdot w_2}{w_1 \in A, w_2 \in B}\), \(A \cup B\) e \(A^* = \set{{(w)}^i}[w \in A, i \in \N]\) sono linguaggi regolari.
+  \end{itemize}
+\end{definition}
+
+Infine, per associare sintassi e semantica, dobbiamo definire una funzione di valutazione che, data un'espressione regolare, restituisca il linguaggio regolare che essa rappresenta.
+
+\begin{definition}{Valutazione di Espressioni Regolari}
+  Dato \(\Sigma\) alfabeto, \([\alpha]\) insieme delle espressioni regolari su \(\Sigma\) e \(2^{\Sigma^*}\) l'insieme di tutti i possibili linguaggi su \(\Sigma\), la funzione di valutazione \(L : [\alpha] \to 2^{\Sigma^*}\) è definita come:
+
+  \[L(\emptyset) = \emptyset\]
+  \[L(\varepsilon) = \set{\varepsilon}\]
+  \[L(a) = \set{a}\]
+  \[L(\alpha \cdot \beta) = L(\alpha) \cdot L(\beta)\]
+  \[L(\alpha + \beta) = L(\alpha) \cup L(\beta)\]
+  \[L(\alpha^*) = {L(\alpha)}^*\]
+\end{definition}
+
+\begin{note}{}
+  È fondamentale notare che, nella definizione di valutazione, sebbene sia alle volte usato lo stesso simbolo per input che per output (come nel caso di \(\emptyset\)), questi sono due ogetti completamente diversi. In particolare, \q{l'input} \(\emptyset\) non è altro che un simbolo sintattico, che rappresenta un'espressione regolare, mentre \q{l'output} \(\emptyset\) è un oggetto matematico, ovvero un insieme vuoto di parole su \(\Sigma\).
+\end{note}
