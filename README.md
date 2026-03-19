@@ -2,7 +2,7 @@
 
 Questo repository contiene appunti e materiali di studio relativi al corso di **Automated Software Verification** tenuto dai Prof. M. Benerecetti e F. Mogavero presso l'Università degli Studi Federico II di Napoli nell'Anno Accademico 2025/2026.
 
-[![Download Latest Notes](https://img.shields.io/badge/Download-Latest_Notes-blue.svg)](https://github.com/RiccardoElena/Logic_Notes/releases/latest/download/Logic_for_Computer_Science.pdf)
+[![Download Latest Notes](https://img.shields.io/badge/Download-Latest_Notes-blue.svg)](https://github.com/RiccardoElena/Logic_Notes/releases/latest/download/Automated_Software_Verification.pdf)
 
 ## Contenuti del Corso
 
