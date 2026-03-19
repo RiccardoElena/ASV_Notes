@@ -2,6 +2,8 @@
 
 Questo repository contiene appunti e materiali di studio relativi al corso di **Automated Software Verification** tenuto dai Prof. M. Benerecetti e F. Mogavero presso l'Università degli Studi Federico II di Napoli nell'Anno Accademico 2025/2026.
 
+[![Download Latest Notes](https://img.shields.io/badge/Download-Latest_Notes-blue.svg)](https://github.com/RiccardoElena/Logic_Notes/releases/latest/download/Logic_for_Computer_Science.pdf)
+
 ## Contenuti del Corso
 
 Il corso affronta gli aspetti teorici e pratici della verifica automatica del software, con particolare focus su tecniche formali e algoritmi per garantire la correttezza e l'affidabilità dei sistemi software. Gli argomenti trattati includono:
@@ -23,61 +25,11 @@ Questo documento è prodotto da studenti, per studenti, e potrebbe contenere err
 
 Per compilare questo documento è necessario utilizzare il template LaTeX presente nella repository [https://github.com/RiccardoElena/UniNotes_Template].
 
-### Dipendenze
-
-Il documento LaTeX richiede:
-
-- Il file di classe `csnotes.cls`
-- Il file `_files/_images/logo.pdf` da inserire in un path relativo all'interno della directory degli appunti
-
-### Setup dell'Ambiente di Compilazione
-
-#### Opzione 1: Symlink (Consigliata per sviluppo)
-
-Su sistemi Unix/Linux/macOS:
+Dopo il clone del repository, è necessario inizializzare i submodule per ottenere il template:
 
 ```bash
-# 1. Clonare la repository del template
-git clone [https://github.com/RiccardoElena/UniNotes_Template] template-notes
-
-# 2. Navigare nella directory degli appunti ASV
-cd /path/to/ASV_Notes
-
-# 3. Creare i symlink
-ln -s ../template-notes/csnotes.cls csnotes.cls
-mkdir -p _files/_images
-ln -s ../template-notes/_files/_images/logo.pdf _files/_images/logo.pdf
+git submodule update --init --recursive
 ```
-
-Su Windows (PowerShell con privilegi amministrativi):
-
-```powershell
-# 1. Clonare la repository del template
-git clone [https://github.com/RiccardoElena/UniNotes_Template] template-notes
-
-# 2. Navigare nella directory degli appunti ASV
-cd \path\to\ASV_Notes
-
-# 3. Creare i symlink
-New-Item -ItemType SymbolicLink -Path "csnotes.cls" -Target "..\template-notes\csnotes.cls"
-mkdir -p _files\_images
-New-Item -ItemType SymbolicLink -Path "_files\_images\logo.pdf" -Target "..\template-notes\_files\_images\logo.pdf"
-```
-
-#### Opzione 2: Copia Diretta
-
-Alternativamente, è possibile copiare direttamente i file necessari:
-
-```bash
-# 1. Clonare la repository del template
-git clone [https://github.com/RiccardoElena/UniNotes_Template] template-notes
-
-# 2. Copiare i file nella directory degli appunti
-cp template-notes/csnotes.cls /path/to/ASV_Notes/
-cp -r template-notes/_files /path/to/ASV_Notes/
-```
-
-**Nota**: Con questo metodo sarà necessario aggiornare manualmente i file in caso di modifiche al template.
 
 ### Compilazione
 
@@ -95,7 +47,6 @@ Oppure utilizzare `latexmk` per la compilazione automatica:
 ```bash
 latexmk -pdf main.tex
 ```
-
 ## Struttura della Repository
 
 ```bash
