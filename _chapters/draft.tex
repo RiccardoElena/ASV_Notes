@@ -183,3 +183,60 @@ Formalmente:
 \(w,i \models R\phi_1 \phi_2\) se \(\forall j \geq i \st w,j\models \phi_2\) o \(\exists k: i \leq k < j \land w,k\models \phi_1\)
 
 Possiamo notare che \(F\phi \equiv \top U \phi\) e che \(G\phi \equiv \bot R \phi\), quindi \(F\) e \(G\) sono esprimibili in termini di \(U\) e \(R\).
+
+\chapter{Lezione 18/03}
+
+Se da un lato ci sono i modelli completamenti sincroni dall'altra ci sono quelli completamente asincroni, che generalizzano quelli in cui alcuni si sincronizzano e altri no.
+
+Per farlo in maniera semplice possiamo usare il modello di composizione sincrona ma aggiungendo ad ogni insieme di azioni locali una no operation \(-\) per permettere a ogni automa locale di effettuare un'azione vacua.
+
+Va ovviamente rilassata nella definizone della relazione di transizione globale il vincolo che ogni azione globale sia composta da azioni locali, e invece dire che ogni azione globale è composta da azioni locali o no operation, ma in questo caso lo stato locale di partenza e lo stato locale di arrivo devono essere uguali.
+
+Questo porta chiaramente ad essere raggiungibili stati che precedentemente poteva non esserlo. Questo modello però permette di esprimere sia comportamenti sincroni che asincroni che comportamenti intermedi, e dunque è più generale.
+
+Inoltre questo tipo di modello con asincronismo virtuale è esattamente come vengono gestiti nella pratica i processi concorrenti, infatti come sott'insieme di questo modello abbiamo la composizione asincrona con interleaving, in cui c'è composizione completamente asincrona e ogni azione globale è composta da una sola azione locale e no operation per gli altri stati in maniera non deterministca.
+
+Ovviamente in questo modello non è inficiata la raggiungibilità di stati, ma non vi è vero parallelismo.
+
+\todo{Esempio <ok,ok>, }
+
+Una formulazione equivalente del modello asincrono con interleaving più compatto è quella di avere come insieme delle azioni l'unione disgiunta degli insiemi di azioni locali, ad esempio avendo le azioni rappresentate come coppie \(\angle{i,a}\) con \(i\) indice dell'automa locale e \(a\) azione locale. Allora possiamo appropriamente riformulare la relazione di transizione come da slide.
+
+Questo è un introduzione al concetto di composizione sincrona e asincrona (con interleaving).
+
+Noi avevamo però dei Program Graph per descrivere i componenti, che poi venivano \q{compilati} in LTS. Abbiamo visto come fare composizione di LTS, ma per i program graph dobbiamo modellare la possibilità di poter condividere informazioni.
+
+Nel mondo degli LTS però non c'è il concetto di variabile. Quindi l'approccio di tradurre vari PG in LTS separatamente per poi comporli non è necessariamente corretto, poiché nel passaggio da PG a LTS si perde il concetto di variabile e dunque di condivisione di variaibli.
+
+Dunque questa fusione va fatta a livello di PG, ma allora la composizione va fatta a livello di PG, e dunque è necessario definire una composizione di PG.
+
+Interleaving Program Graph
+
+Dato un insieme di program graph, definiamo l'insieme delle variabili globali come l'unione di tutte le variabili dei PG (NON DISGIUNTA)\footnote{Si assume che se due variabili hanno lo stesso nome sono condivise, se non lo erano andavano disambiguate prima. Una definizione alternativa tiene conto di variabili non condivise con lo stesso nome ma è inutilmente più complesso}.
+
+L'insieme delle locazioni, come le locazioni iniziali sono il prodotto cartesiano. Per le azioni possiamo tranquillamente avere l'unione disgiunta. Per le guardie iniziali invece abbiamo la congiunzione di tutte le guardie iniziali.
+
+Dobbiamo dunque definire le transizioni, ma sono definite come negli LTS, mentre per \(\Eff\) è più complesso.
+
+Abbiamo a disposizione solo le \(\Eff_i: \Act_i \times \Eval(\Var_i)\to \Eval(\Var_i)\). Dobbiamo definire \(\Eff_i:\biguplus \Act_i \times \Eval(\bigcup\Var_i)\to \Eval(\bigcup\Var_i) \).
+
+Andiamo a definire le restrizioni delle \(\eta\), \(\eta_i\).
+
+Troppo veloce, guarda slide.
+
+Esempi mutua esclusione.
+
+C'è un problema di fairness. A noi non interessa come uno scheduler implementi la fairness, purché mi garantisca una certa fairness.
+
+Dobbiamo capire come introdurre dei vincoli di fairness, senza però inserire nel modello uno specifico scheduler.
+
+Per fare ciò quindi non possiamo andare a modificare l'LTS, piuttosto dobbiamo avere un filtro sulle possibili esecuzioni, avendo quindi un algoritmo di analisi che ignori le computazioni che non rispettano i vincoli di fairness.
+
+Ci sono tipi diversi vincoli di fairness:
+\begin{description}
+  \item[Fairness incondizionata:] ogni processo dev'essere schedulato infinitamente spesso.
+  \item[Fairness debole:] se un processo è continuamente abilitato, allora deve essere schedulato infinitamente spesso.
+  \item[Fairness forte:] se un processo è abilitato infinitamente spesso, allora deve essere schedulato infinitamente spesso. 
+\end{description}
+
+La fairness incondizionata è troppo debole, poiché non garantisce che quando un processo viene schedulato sia abilitato a fare qualcosa. La fairness debole è più ragionevole, ma ancora non è sufficiente, poiché richiede che al processo è richiesto di essere continuamente abilitato, che è una richiesta molto forte. 

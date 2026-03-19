@@ -1,3 +1,6 @@
+\makeatletter
+\def\input@path{{template/}}
+\makeatother
 \documentclass{csnotes}
 
 % ==============================================================================
@@ -8,15 +11,15 @@
 
 \NewDocumentCommand{\ti}{m}{\text{\textit{#1}}}
 
-\newcommand{\expr}{\ti{exp}}
-\newcommand{\Expr}{\ti{Expr}}
-\newcommand{\Act}{\ti{Act}}
-\newcommand{\Cond}{\ti{Cond}}
-\newcommand{\Eval}{\ti{Eval}}
-\newcommand{\Val}{\ti{Val}}
-\newcommand{\Var}{\ti{Var}}
-\newcommand{\Loc}{\ti{Loc}}
-\newcommand{\Eff}{\ti{Effect}}
+\newcommand{\expr}{\operatorname{exp}}
+\newcommand{\Expr}{\operatorname{Expr}}
+\newcommand{\Act}{\operatorname{Act}}
+\newcommand{\Cond}{\operatorname{Cond}}
+\newcommand{\Eval}{\operatorname{Eval}}
+\newcommand{\Val}{\operatorname{Val}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Loc}{\operatorname{Loc}}
+\newcommand{\Eff}{\operatorname{Effect}}
 
 % ---------------------------- END CUSTOMIZATIONS ------------------------------
 
