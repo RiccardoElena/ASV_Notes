@@ -218,3 +218,185 @@ Quando si arricchisce un sistema a transizioni con la funzione di etichettamento
 Le strutture di Kripke devono il loro nome a Saul Kripke, logico che ha definito la semantica delle logiche modali. Le logiche temporali utilizzate in questo corso sono infatti logiche modali, e le strutture di Kripke rappresentano il ponte tra i sistemi a transizioni e i modelli logici.
 
 Le proposizioni atomiche e la funzione di etichettamento \(L\) convertono un sistema a transizioni in un \keyword{modello logico}. Rispetto a questo modello è possibile interpretare e verificare formule espresse in linguaggi logici formali, come verrà discusso nei capitoli successivi.
+
+% START NEW LESSON
+
+In una struttura di Kripke, la funzione \(L\) associa a ogni stato un modello proposizionale che rappresenta le proprietà atomiche vere in quello stato.
+Possiamo quindi definire un concetto di soddisfacibilità locale, ovvero in uno stato.
+
+
+\section{Program Graph}
+Non tutti i sistemi possono essere mappati in grafi, infatti per sistemi complessi è necessario decomporre il sistema in \q{building blocks} più semplici.
+I building blocks \q{atomici} sono i \keyword{Program Graph}, che sono definiti da un insieme di variabili \(\Var = \set{v_1,\ldots,v_k}\) con dominio \(D = \bigcup_{1,\ldots,k} D_i\), con \(D_i\) dominio di \(v_i\).
+
+\begin{note}{}
+  Il dominio effettivo delle variabili non è particolarmente importante poiché può essere sempre rappresentato da un insieme numerabile come \(\mathbb{N}\) o \(\mathbb{Z}\).
+\end{note}
+
+Le variabili \(\Var\) rappresentano il concetto di memoria, ciò ci permette di modellare sistemi in cui il comportamento dipende dai dati.
+
+I Program Graph invece rappresentano il concetto di un programma, infatti insieme a
+i Labeled Transition System, permettono di descrivere come il sistema opera sui dati
+durante il flusso di controllo.
+
+\begin{definition}{Program Graph}
+  Un \keyword{Program Graph} è una sestupla \((\Loc,\Act,\Eff,\hookrightarrow , \Loc_0, g_0)\) dove:
+  \begin{itemize}
+    \item \(\Loc\) è un insieme di locazioni o stati di controllo, (dominio del program counter, ovvero l'insieme del numero di linee di codice in un programma);
+    \item \(\Act\) l'insieme delle azioni che modificano lo stato del programma;
+    \item \(\Eff : \Act\times \Eval(\Var) \to \Eval(\Var)\) è una funzione;
+    \item \(\hookrightarrow \subseteq \Loc \times \Cond(\Var) \times \Act \times \Loc\) è la relazione di transizione (che ci permetterà di descrivere il flusso di controllo);
+    \item \(\Loc_0 \subseteq \Loc\) è l'insieme delle locazioni iniziali;
+    \item \(g_0 \in \Eval(\Var)\) è una condizione che le variabili devono soddisfare all'inizio dell'esecuzione.
+  \end{itemize}
+\end{definition}
+
+\paragraph{Relazione di transizione (\(\hookrightarrow\)):} intuitivamente collega \q{temporalmente} locazioni o righe del programma. Nello specifico è una relazione che collega due locazioni tramite una condizione sulle variabili, detta anche guardia e un'azione.
+La guardia, ovvero la verifica di una certa proprietà sulle variabili, mi dice se è possibile eseguire la transizione, e l'azione mi dice come modificare le variabili quando eseguo la transizione.
+
+\paragraph{La funzione \(\Eff\):} descrive la semantica delle azioni. Prende in input un'azione ed associa ad essa una trasformazione del valore delle variabili prima e dopo l'azione. In altre parole fissata un'azione collega \q{temporalmente} stati delle variabili.
+
+
+\subsection{Valutazione delle variabili}
+
+Per definire la funzione \(\Eff\) è necessario introdurre un concetto di valutazione delle variabili, e per farlo usiamo \(\Eval(\Var)\), un insieme di funzioni che mappano ogni variabile al suo valore, rendendo \(\Eval(\Var)\) l'insieme di tutte le possibili configurazioni delle variabili.
+
+
+\subsection{Espressioni}
+\(\Act\) e \(\Cond\) sono definite sulla base del concetto di espressioni \(\Expr(\Var\cup D)\), che ci permette di descrivere sia variabili \(x\in\Var\) sia valori costanti del dominio \(x\in D\). Le espressioni dipendono dai domini delle variabili, se prendiamo ad esempio le espressioni aritmetiche abbiamo \(v+1\).
+
+
+\subsection{Condizioni}
+Le condizioni sono dunque valutazioni tra espressioni del tipo \(\expr_1 \cdot \expr_2\), con \(\cdot\) dipendende dal dominio (per aritmetica \(=, \neq, <, > ecc\)), eventualmente anche con operatori logici.
+
+Con gli operatori logici, infatti possiamo creare combinazioni di condizioni, quindi
+per esempio possiamo combinarle in congiunzione, disgiunzione, implicazione, negazione, ecc..
+Tipicamente utilizzeremo la congiunzione, mentre la negazione verrà applicata internamente alle espressioni atomiche di cui ogni condizione è composta.
+
+\subsection{Azioni}
+Le azioni su \(\Var\) sono l'insieme degli assegnamenti, ovvero espressioni del tipo \(v := exp\), dove \(v\in \Var\) e \(exp\in \Expr(\Var\cup D)\).
+
+
+\subsection{Esempio: Vending Machine come Program Graph}
+
+\begin{example}{Vending Machine come Program Graph}
+  Se prendiamo l'esempio \Cref{fig:vending_machine_example} e lo generalizziamo per ottenere un Program Graph, allora abbiamo la seguente figura.
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{_images/vending_machine_as_pg}
+    \caption{Vending Machine As Program Graph}\label{fig:vending_machine_as_pg}
+  \end{figure}
+
+\end{example}
+
+
+Dove, le variabili \(c\) e \(t\) sono rispettivamente la quantità di caffè a disposizione e la quantità di tè.
+
+Alcune azioni, in particolare quelle non aritmetiche come \(Coin, Coffee\) ecc..\ sono azioni nulle, ovvero non alterano lo stato, ma hanno un impatto sull'evoluzione del sistema da uno stato all'altro.
+
+
+\section{Compilazione di un Program Graph in un Transition System}
+
+Possiamo notare che i grafi sottostanti a questo \Cref{fig:vending_machine_as_pg} e all'esempio precedente \Cref{fig:vending_machine_example} sono isomorfi, ma i due ogetti sono diversissimi, poiché il secondo sta descrivendo un LTS con stati infiniti (essendo il dominio delle variabili infinito).
+
+È possibile però \q{compilare} un oggetto del genere in una Kripke Structure, ma è necessaria la funzione \(\Eff\) per definire la semantica delle azioni.
+Questa compilazione o traduzione, di fatto \q{da semantica} a questa struttura.
+
+
+Per poter effettuare questa traduzione dobbiamo conoscere le seguenti cose:
+\begin{enumerate}
+  \item Lo spazio degli stati dell'LTS indotto;
+  \item L'insieme delle azioni;
+  \item La relazione di transizione dell'LTS indotto;
+  \item Gli stati iniziali;
+  \item L'etichettatura degli stati.
+\end{enumerate}
+
+\subsection{Spazio degli stati}
+Per lo spazio degli stati questo equivale ad \(\Eval(\Var)\) (variabili esplicite) e \(\Loc\) (variabili implicite, ovvero il program counter).
+
+\begin{definition}{Valutazione in \(\Eval\)}
+  Formalmente una valutazione in \(\Eval\) è una funzione \(\eta: \Var \to D\).
+  Inoltre se l'insieme \(\Var\) è finito, una valutazione può essere rappresentata con una tupla lunga col numero di variabile, che accoppiata con una locazione \(l\) rappresenta uno stato del sistema, e dunque un nodo del grafo orientato sottostante.
+\end{definition}
+
+Quindi nella Kripke Structure sottostante, \(S = \Loc \times \Eval(\Var)\).
+
+\subsection{Definizione della semantica delle azioni}
+Col concetto di \(\Eval(\Var)\) definito possiamo adesso definire \(\Eff\), che intuitivamente ci dice come evolveranno i dati nelle transizioni tra stati.
+
+\begin{definition}{\(\Eff\) non ben definita}
+  Data \(\eta \in \Eval(\Var)\) e un azione della forma \(a \overset{\text{def}}{=} v := \expr\), con \(\expr \in \Var \cup D\) allora l'effetto dell'azione è
+  \[\Eff(a,\eta)=\eta[v\leftarrow \expr]\] con
+  \[\eta[v\leftarrow \expr] = \eta'\]
+  dove
+  \[\eta' (x)= \begin{cases}
+      \expr   & \text{se } x = v  \\
+      \eta(x) & \text{altrimenti}
+    \end{cases}\]
+\end{definition}
+
+
+Questa definizione non è ben definita perché ci vuole un concetto di valutazione dell'espressione \(\expr\) in \(\Eval(\Var)\). In altre parole un \(\Val(\expr, \eta) \in D\), da definire per induzione strutturale sulla struttura delle espressioni.
+I casi base sono costanti e le variabili (valutate con \(\eta\)). Il resto dipende dalla semantica degli operatori.
+
+Quindi, se l'espressione è \(v + 1\), la valutazione di \(v + 1\) rispetto a una certa \(\eta\) sarà il numero corrispondente a \(\eta(v) + 1\), qualsiasi questo sia. In un'altra \(\eta\) sarà un altro numero, che sarà \(\eta'(v) + 1\).
+
+Quindi per essere precisi la definizione di \(\Eff\) è la seguente:
+\begin{definition}{\(\Eff\) ben definita}
+  \[\Eff(a,\eta)=\eta[v\leftarrow \Val(\expr, \eta)]\]
+  con
+  \[\eta[v\leftarrow \Val(\expr,\eta)] = \eta'\]
+  dove
+  \[\eta' (x)= \begin{cases}
+      \Val(\expr,\eta) & \text{se } x = v  \\
+      \eta(x)          & \text{altrimenti}
+    \end{cases}\]
+\end{definition}
+
+
+\subsection{Relazione di Transizione}
+Per definire ora la funzione di transizione dovremmo definire quali sono le coppie di stati che sono in relazione semantica, ovvero sono collegati da una transizione basandoci sulla combinazione di \(\hookrightarrow\) e \(\Eff\).
+
+\begin{definition}{Relazione di transizione \(\xrightarrow{}\)}
+  Definiamo la relazione di transizione \(\xrightarrow{} \subseteq S \times \Act \times S\) tale che:
+  \begin{itemize}
+    \item Se \(l \xhookrightarrow{g:a} l' \) è nel \(PG\) e \(\eta \models g\) allora \(\langle l,\eta \rangle \xrightarrow{a} \langle l',\eta' \rangle\) è nella relazione di transizione, con \(\eta' = \Eff(a,\eta)\).
+  \end{itemize}
+\end{definition}
+
+\subsection{Stati iniziali}
+
+\begin{definition}{\(S_0\)}
+  Gli stati iniziali sono definiti come \(S_0 = \set{\langle l, \eta \rangle \mid l \in \Loc_0 \land \eta \models g_0}\)
+\end{definition}
+
+\subsection{Etichettatura degli stati}
+
+\begin{definition}{\(AP\)}
+  Per l'etichettatura, definiamo con \(AP = \Loc \cup \Cond(\Var)\) e \(L : S \to 2^{AP}\) tale che \(L(\langle l,\eta\rangle) = \set{l} \cup \set{g \mid g \in \Cond(\Var) \land {\eta \models g}}\).
+\end{definition}
+
+\chapter{Composizione e Sincronizzazione}
+
+Fatto ciò, abbiamo definito il linguaggio per definire i componenti, ma questo è poco più di un programma sequenziale. Un po' di più perché da possibilità di scelte non deterministiche.
+Per sistemi complessi è però molto difficile specificarli per intero.
+
+Dunque l'approccio più comune è quello di specificarli tramite composizione di componenti più semplici, che interagiscono in modo sequenziale o concorrente.
+La concorrenza è modellabile in tantissimi modi diversi.
+
+\todo{Riccardo: Esempi da trascrizione (Dovrebbe stare nella parte 6 della trascrizione)}
+
+\section{Composizione parallela sincrona}
+La \keyword{composizione parallela sincrona} è facile da definire.
+
+\begin{definition}{Composizione parllela sincrona}
+  Dati \(TS_1, \ldots, TS_n\) sistemi a transizione tali che \(TS_i = (S_i, S_{0i}, A_i, R_i)\) con \(S_i\) disgiunti, allora la composizione parallela sincrona è il sistema a transizioni \(TS = (S,S_0,R,L)\) con:
+  \begin{itemize}
+    \item \(S = S_1 \times \ldots \times S_n\), stati globali
+    \item \(S_0 = S_{01} \times \ldots \times S_{0n}\),
+    \item \(A = A_1 \cup \ldots \cup A_n\), azioni globali
+    \item \(R \subseteq S \times A \times S\) è tale che, dati \(\langle s_1, \ldots, s_n\rangle, \langle s_1', \ldots, s_n'\rangle \in S\) e \(\langle a_1,\ldots, a_n \rangle \in A\) contiene \(\langle s_1,\ldots,s_n \rangle \xrightarrow{\langle a_1,\ldots,a_n \rangle} \langle s_1',\ldots,s_n'\rangle\) se \(s_i \xrightarrow{a_i} s_i'\,, \forall i \in \set{1,\ldots,n}\).
+  \end{itemize}
+\end{definition}
