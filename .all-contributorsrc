@@ -27,6 +27,17 @@
         "doc",
         "maintenance"
       ]
+    },
+    {
+      "login": "ViMen23",
+      "name": "ViMen23",
+      "avatar_url": "https://avatars.githubusercontent.com/u/145158818?v=4",
+      "profile": "https://github.com/ViMen23",
+      "contributions": [
+        "content",
+        "maintenance"
+      ]
     }
-  ]
+  ],
+  "commitType": "docs"
 }
