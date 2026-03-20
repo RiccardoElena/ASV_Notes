@@ -27,10 +27,11 @@ Questo documento è prodotto da studenti, per studenti, e potrebbe contenere err
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
-<table align="center">
+<table>
   <tbody>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/RiccardoElena"><img src="https://avatars.githubusercontent.com/u/23059036?v=4?s=100" width="100px;" alt="Riccardo Elena"/><br /><sub><b>Riccardo Elena</b></sub></a><br /><a href="#content-RiccardoElena" title="Content">🖋</a> <a href="https://github.com/RiccardoElena/ASV_Notes/commits?author=RiccardoElena" title="Documentation">📖</a> <a href="#maintenance-RiccardoElena" title="Maintenance">🚧</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ViMen23"><img src="https://avatars.githubusercontent.com/u/145158818?v=4?s=100" width="100px;" alt="ViMen23"/><br /><sub><b>ViMen23</b></sub></a><br /><a href="#content-ViMen23" title="Content">🖋</a> <a href="#maintenance-ViMen23" title="Maintenance">🚧</a></td>
     </tr>
   </tbody>
 </table>
