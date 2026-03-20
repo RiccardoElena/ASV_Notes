@@ -23,7 +23,8 @@ Questo documento è prodotto da studenti, per studenti, e potrebbe contenere err
 
 ## Contributors
 
-<div style="width: 70%; margin-right: auto; margin-left: auto;"> 
+<div style="width: 70%; margin-right: auto; margin-left: auto;">
+<div align="center">
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
@@ -40,6 +41,7 @@ Questo documento è prodotto da studenti, per studenti, e potrebbe contenere err
 <!-- prettier-ignore-end -->
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
+</div>
 </div>
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification.
