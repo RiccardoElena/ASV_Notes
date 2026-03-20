@@ -179,11 +179,207 @@ Formalmente, una parola in $A^\omega$ può essere spezzettata in infiniti framme
   \[L(\lambda_1 + \lambda_2) = L(\lambda_1) \cup L(\lambda_2)\]
 \end{definition}
 
-Sebbene le espressioni $\omega$-regolari siano sufficienti a descrivere questi comportamenti, soffrono di un grave problema di prolissità.
+% START NEW LESSON
+\subsection{Limiti dei linguaggi omega-regolari}
 
-Immaginiamo di voler dire la seguente cosa:
-Ho un andamento temporale di eventi, e ho un insime \(\set{e_1,\ldots,e_k}\) di eventi che voglio che prima o poi accadano, ma non è rilevante l'ordine in cui accadono.
-Usando espressioni regolari sarà necessaria un'espressione regolare di lunghezza \(k\)!.
+Sebbene le espressioni \(\omega\)-regolari siano sufficienti a descrivere questi comportamenti, soffrono di un grave problema di prolissità.
 
-Vedremo che esistono invece linguaggi come \textit{LTL} (Logica Temporale Lineare) che ci permettono di descrivere queste stesse proprietà, ma in modo esponenzialmente più succinto.
+\begin{example}{}
+  Immaginiamo di voler dire la seguente cosa:
+  Ho un andamento temporale di eventi, e ho un insieme \(\set{e_1,\ldots,e_k}\) di eventi che voglio che prima o poi accadano, ma non è rilevante l'ordine in cui accadono.
+  Usando espressioni regolari sarà necessaria un'espressione regolare di lunghezza \(k!\)
+\end{example}
 
+
+Il problema delle espressioni regolari è che non hanno esplicitamente una congiunzione o intersezione.
+
+Se avessi l'intersezione potrei scrivere la proprietà precedente come \(\bigcap_{i=1}^n \Sigma^* p_i \Sigma^*\). Non avendola però è necessario scrivere un'espressione regolare per ogni ordine.
+
+Questo è perché nei linguaggi regolari l'intersezione e il complemento di base non sono necessari. Ciò comporta però che descrivere una proprietà che non è presente sia complicato.
+
+Dunque vogliamo un linguaggio che sia più vicino all'idea informale di proprietà poiché sarà più facile formalizzare correttamente l'idea informale, e dunque sarà più facile verificare che il sistema soddisfa la proprietà desiderata.
+
+Vedremo che esistono invece linguaggi come la \keyword{Logica Temporale Lineare} (LTL) che ci permettono di descrivere queste stesse proprietà, ma in modo esponenzialmente più succinto.
+
+
+\section{Logica del prim'ordine}
+Passiamo quindi alla logica del prim'ordine, per poi passare alla logica temporale, che cerca di nascondere all'interno di operatori logici dei pattern ricorrenti in logica del prim'ordine.
+
+Quali sono gli oggetti che ci interessano? L'universo, o oggetti del discorso, sono le parole finite \(w: [0,n)\to \Sigma\) oppure infinite \(w: \N \to \Sigma\).
+
+Immaginiamo di voler esprimere la proprietà \qi{Prima o poi il sistema ha stampato ed è in attesa del nuovo input}. Quindi deve esistere un punto nel futuro, non necessariamente stretto, in cui il sistema ha stampato e allo stesso tempo si trova in attesa.
+Poiché questa proprietà non è atomica, dobbiamo assumere come insieme di modelli \(\Sigma = 2^{AP}\), con \(AP\) l'insieme delle proposizioni atomiche.
+
+Chiamiamo la proposizione atomica di aver stampato \(p\) e quella di essere in attesa \(i\).
+Quello che vogliamo verificare è che il sistema si trovi in uno stato in cui la congiunzione di queste proposizioni sia vera in un determinato istante di tempo.
+
+\todo{Espandi esempio con \(p\) e \(i\) print e idle}
+\todo{Vedere appunti di qualcuno perché l'esempio è questo ma non è chiaro}
+\begin{example}{TODO}
+  Quindi per noi la parola significa, ad esempio, una parola che è fatta in questo modo, che sta dicendo: "Guarda, il sistema non è né in idle né ha stampato"; poi potrebbe entrare in idle—per esempio sto tirando una cosa così a caso su una sequenza—potrebbe stare in idle tre istanti temporali (quindi questo è il punto zero), potrebbe tornare a diventare che non è in idle ma non ha ancora stampato, e poi potrebbe diventare uno stato dove ha sia stampato sia in idle. E quindi questa proprietà su un modello del genere sarebbe vera, perché nel futuro rispetto all'origine mi trovo che c'è un punto del tempo in cui quell'istante temporale è etichettato con le due proposizioni atomiche che soddisfano questo criterio.
+\end{example}
+
+Dunque i nostri modelli saranno essenzialmente funzioni fatte in questo modo: \(w:\N \to 2^{AP}\), ovvero a ogni istante temporale associamo l'insieme di proposizioni atomiche vere in quel momento.
+
+
+\begin{example}{}
+  Ad esempio, se stessi considerando un sistema di mutua esclusione, potrei avere le proprietà che sono: il sistema sta in idle, il processo \(p_1\) è nella regione di mutua esclusione, o il processo \(p_2\) è nella regione di mutua esclusione.
+
+  Ora, se è una regione di mutua esclusione, mi devo assicurare che mai accadrà che entrambi siano in mutua esclusione. Quindi posso dire la seguente proprietà
+  q{Non deve mai esistere un punto nel tempo in cui è vero \(p_1 \land p_2\)}.
+
+  Quindi stiamo dicendo che in ogni istante di tempo quella proprietà deve essere falsa, poiché se non fosse così, avremmo violato la mutua esclusione.
+\end{example}
+
+
+\subsection{Sintassi della Logica del Prim'Ordine}
+Per esprimere queste proprietà dobbiamo avere un modello \(w\), ovvero l'oggetto che vogliamo verificare, e una formula \(\phi\) che rappresenta la proprietà che vogliamo soddisfare.
+In altri termini vogliamo verificare questo: \(w \models \phi\).
+
+Partiamo dal definire com'è composta la formula, ovvero fornire la grammatica del prim'ordine.
+
+\begin{definition}{Grammatica del prim'ordine}
+  Per il prim'ordine avremo una grammatica di questo tipo, con \(p \in AP\):
+  \[\phi ::= p(x) \mid \neg \phi \mid \phi \land \phi \mid \phi \lor \phi\mid \forall x \,\phi \mid \exists x\, \phi\]
+\end{definition}
+
+Se \(x\) è l'istante di tempo che ci interessa, dire che \(p(x)\) è vera significa dire che all'istante \(x\) il modello \(w\) ha come immagine dell'istante \(x\) un insieme \(Y\subseteq AP\) tale che \(p\in Y\).
+
+\begin{note}{}
+  Normalmente una grammatica di questo tipo porterebbe a un problema indecidibile, ma se ci concentriamo solo su stringhe come modelli allora torna decidibile.
+\end{note}
+
+\subsection{Semantica del prim'ordine}
+La semantica del prim'ordine verrà definita in maniera composizionale, ovvero definendo la semantica di una proposizione atomica e come gli operatori logici modificano la semantica delle proposizioni atomiche.
+
+In particolare ci serve un assegnamento \(\chi : \Var \to \N\) che ci dice ogni variabile a quale istante temporale si riferisce.
+
+Quindi dato \(\chi(x) = x = 3\), possiamo dire che \(w \models p(x)\) è vero se \(w\) in posizione \(\chi(x)\) contiene \(p\).
+
+\begin{definition}{Semantica del prim'ordine}
+  Per il prim'ordine abbiamo una semantica di questo tipo:
+  \begin{itemize}
+    \item \(w,\chi \models p(x)\) se \(p \in w(\chi(x))\). Con \(w(\chi(x))\) si intende l'elemento di \(w\) in posizione \(\chi(x)\), ovvero l'insieme di proposizioni atomiche vere in quel momento, e \(p \in w(\chi(x))\) significa che \(p\) è una di queste proposizioni atomiche vere in quel momento.
+    \item \(w,\chi \models \neg \phi\) se \(w,\chi \not\models \phi\).
+    \item \(w,\chi \models \phi_1 \land \phi_2\) se \(w,\chi \models \phi_1\) e \(w,\chi \models \phi_2\).
+    \item \(w,\chi \models \phi_1 \lor \phi_2\) se \(w,\chi \models \phi_1\) o \(w,\chi \models \phi_2\).
+    \item \(w,\chi \models \forall x.\,\phi\) se per ogni \(n \in \N\), \(w,\chi[x \to n] \models \phi\). Ovvero sostituendo a \(x\) ogni possibile istante temporale, la formula \(\phi\) è soddisfatta.
+    \item \(w,\chi \models \exists x.\,\phi\) se esiste \(n \in \N\) tale che \(w,\chi[x \to n] \models \phi\). Ovvero sostituendo a \(x\) almeno un istante temporale, la formula \(\phi\) è soddisfatta.
+  \end{itemize}
+\end{definition}
+
+\begin{note}{}
+  Attenzione che nella semantica del \(\forall\) abbiamo scritto per ogni \(n\in\N\) ma \(\N\) è infinito e quindi non può essere verificato. Mostreremo in seguito un modo di ovviare a questo problema algoritmicamente.
+\end{note}
+
+\begin{example}{}
+  Prendiamo ad esempio la parola \(w = \emptyset \set{i} \set{i} \set{i} \emptyset \set{i,p}\). Allora con \(\chi = \set{x \to 3}\) avremo \(w,\chi \not\models p(x)\) poiché \(p \not\in w(3)\), mentre con \(\chi' = \set{x \to 5}\) si ha \(w,\chi' \models p(x)\) poiché \(p \in w(5)\).
+\end{example}
+
+
+\subsection{Espressione di Relazioni Temporali}
+
+Vediamo se questo linguaggio è utile per esprimere proprietà sul futuro.
+
+Ad esempio, \qi{Prima o poi il sistema ha stampato ed è in attesa del nuovo input} può essere scritto nel seguente modo: \(\exists x.\, i(x) \land p(x)\).
+
+Un altro esempio, \qi{Non ho mai due processi in una sezione critica} può essere scritto nel seguente modo: \(\forall x.\, \neg (p_1(x) \land p_2(x))\).
+
+Se invece voglio dire che infinitamente spesso valga la proprietà \(i\), ovvero che vada \textit{infinitamente spesso} in stato di attesa, qui ho una difficoltà, perché mi serve poter esprimere una relazione tra istanti temporali.
+Ci serve quindi poter esprimere il concetto di \qi{dopo}, ed è dunque necessario introdurre una relazione d'ordine tra istanti temporali.
+
+\begin{definition}{Simbolo di precedenza temporale}
+  Sintatticamente introduciamo il simbolo \(\preceq\), la cui semantica è:
+  \(w,\chi \models x\preceq y\) se \(\chi(x) \leq \chi(y)\).
+\end{definition}
+
+\begin{note}{}
+  In questo caso sono stati nettamente separati i simboli \(\preceq\) e \(\leq\) per evidenziare che il primo è un simbolo del linguaggio oggetto, mentre l'altro è l'ordine usuale dei numeri naturali.
+  Nella pratica useremo \(\leq\) anche nel linguaggio oggetto poiché sarà chiaro dal contesto se si tratta di un simbolo del linguaggio o dell'ordine usuale dei numeri naturali.
+\end{note}
+
+Per esprimere quindi che una proprietà \(i\) si verifica infinitamente spesso, possiamo scrivere \(\forall x. \exists y. x \leq y \land i(y)\).
+Se voglio esprimere che arriva un punto dopo il quale sarò sempre in idle posso scrivere \(\exists x. \forall y. x \leq y \to i(y)\).
+
+In generale però possiamo osservare che quando parliamo di proprietà temporali ci troviamo sempre in uno di questi due casi:
+\begin{itemize}
+  \item \qi{Prima o poi} \(p\) è vero, ovvero \(\exists y. x \leq y \land p(y)\)
+  \item \qi{Dopo un certo punto} \(p\) è sempre vero, ovvero \(\exists x. \forall y. x \leq y \to p(y)\)
+\end{itemize}
+
+Ma allora possiamo costruire un linguaggio che abbia sintatticamente due operatori che esprimono esattamente questi due pattern ricorrenti come semantica.
+
+\section{Linear Temporal Logic}
+
+Introdotta da Pnueli nel 1979. In questa logica lasciamo implicito l'istante in cui si verifica una proprietà, ci penserà la semantica degli operatori a gestire questo aspetto.
+
+La \keyword{Linear Temporal Logic} o \keyword{LTL} è una logica temporale, ovvero una specifica logica modale, che così come tutte le altre è un'estensione più naturale della logica proposizionale, in cui le quantificazioni ci sono solo semanticamente.
+
+\subsection{Grammatica LTL '79}
+
+\begin{definition}{Grammatica LTL '79}
+  La grammatica è la seguente, con \(p \in AP\):
+  \[\phi ::= p \mid \neg \phi \mid \phi \land \phi \mid \phi \lor \phi \mid F\phi \mid G\phi\]
+\end{definition}
+
+Dove \(F\) è l'operatore \q{prima o poi} (o \q{eventually}, \q{future}) e \(G\) è l'operatore \q{dopo un certo punto} (o \q{always}, \q{globally}).
+
+\subsection{Semantica LTL '79}
+Ovviamente anche ora parleremo di proprietà delle parole, ma ora a differenza del prim'ordine non useremo più un assegnamento.
+
+Invece, per la semantica, utilizzeremo un indice \(i\) che rappresenta l'istante temporale in cui stiamo valutando la formula, e di conseguenza da cui iniziamo a guardare nel futuro. Quindi parlo sempre soltanto di un punto del tempo, mai di punti tra loro.
+
+\begin{definition}{Semantica LTL '79}
+  Per l'LTL abbiamo una semantica di questo tipo:
+  \begin{itemize}
+    \item \(w,i \models p\) se \(p \in w(i)\).
+    \item \(w,i \models \neg\phi\) se \(w,i\not\models\phi\).
+    \item \(w,i\models\phi_1 \land \phi_2\) se \(w,i\models\phi_1\) e \(w,i\models\phi_2\).
+    \item \(w,i\models\phi_1 \lor \phi_2\) se \(w,i\models\phi_1\) o \(w,i\models\phi_2\).
+    \item \(w,i\models F\phi\) se \(\exists j \geq i \st w, j \models \phi\), ovvero se \(\exists j\st j \geq i \land w,j\models\phi\). Questa espressione significa che prima o poi nel futuro sarà vera \(\phi\).
+    \item \(w,i\models G\phi\) se \(\forall j \geq i.\, w, j \models \phi\), ovvero se \(\forall j\st j \geq i \to w,j\models\phi\). Questa espressione significa che d'ora in poi sarà vera \(\phi\).
+  \end{itemize}
+\end{definition}
+
+\subsection{Esempi di formalizzazione di proprietà in LTL '79}
+Con questa sintassi abbiamo operatori per descrivere formalmente se esiste un punto nel futuro in cui mi troverò sia in uno stato di attesa, sia in uno stato di stampa (\(F(i\land p)\)).
+
+Possiamo ancora descrivere \q{l'infinitamente spesso}? Sì, tramite la concatenazione degli operatori \(G\) ed \(F\), ovvero \(G(F(\phi))\), che può essere tradotta in: \(\forall j \geq i.\,\exists j'\geq j \st w, j' \models \phi\), dove \(\phi\) può essere la proprietà di essere in attesa.
+
+Se invece vogliamo esprimere una proprietà che \q{da un certo punto} in poi il sistema è sempre in attesa, allora basta concatenare \(G\) ed \(F\) in questo modo: \(F(G(\phi))\),
+che può essere tradotta in: \(\exists j \geq i\st \forall j'\geq j. w,j' \models\phi\), dove \(\phi\) è la proprietà di essere in attesa.
+
+\subsection{Limitazioni di LTL '79}
+Con questa sintassi però non è possibile esprimere proprietà che mi descrivono \q{il passato}, come la seguente proprietà: \q{Prima che il processo 1 entri nella regione di mutua esclusione, non voglio che il processo 2 sia in mutua esclusione}.
+Questa proprietà non è esprimibile in LTL '79, ma si può scrivere facilmente al prim'ordine come di seguito: \(\exists x \st p_1(x) \land \forall y\st y < x \to \neg p_2(x)\).
+
+Ciò avviene poiché gli operatori \(F\) e \(G\) non riescono a sezionare intervalli di tempo e valutare ciò che accade prima di un certo punto.
+
+Di conseguenza Pnueli nell'81 dovette sostituire gli operatori \(F\) e \(G\) con altri due operatori binari che permettessero di descrivere queste proprietà, rendendo la Linear Temporal Logic dell'81 equivalente alla logica del prim'ordine.
+
+\subsection{Grammatica di LTL '81}
+
+\begin{definition}{Grammatica di LTL '81}
+  La grammatica è la seguente, con \(p \in AP\):
+  \[\phi ::= p \mid \neg \phi \mid \phi \land \phi \mid \phi \lor \phi \mid \phi U \phi \mid \phi R\phi\]
+\end{definition}
+Dove \(U\) è l'operatore \q{until} e \(R\) è l'operatore \q{release}.
+Intuitivamente \(U\) esprime che una proprietà \(p\) è vera fino a quando non diventa vera una proprietà \(q\), mentre \(R\) esprime che una proprietà \(p\) è vera a meno che non venga rilasciata, ovvero diventa vera una proprietà \(q\).
+
+\subsection{Semantica LTL '81}
+
+\begin{definition}{Semantica LTL '81}
+  La semantica è la seguente:
+  \begin{itemize}
+    \item \(w,i \models p\) se \(p \in w(i)\).
+    \item \(w,i \models \neg\phi\) se \(w,i\not\models\phi\).
+    \item \(w,i\models\phi_1 \land \phi_2\) se \(w,i\models\phi_1\) e \(w,i\models\phi_2\).
+    \item \(w,i\models\phi_1 \lor \phi_2\) se \(w,i\models\phi_1\) o \(w,i\models\phi_2\).
+    \item \(w,i \models \phi_1 U \phi_2\) se \(\exists j \geq i \st w,j\models \phi_2\) e \(\forall k: i \leq k < j \to w,k\models \phi_1\)
+    \item \(w,i \models \phi_1 R\phi_2\) se \(\forall j \geq i \st w,j\models \phi_2\) o \(\exists k: i \leq k < j \land w,k\models \phi_1\)
+  \end{itemize}
+\end{definition}
+
+\begin{note}{}
+  Possiamo notare che \(F\phi \equiv \top U \phi\) e che \(G\phi \equiv \bot R \phi\), quindi \(F\) e \(G\) sono esprimibili in termini di \(U\) e \(R\).
+\end{note}
