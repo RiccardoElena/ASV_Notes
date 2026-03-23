@@ -77,7 +77,7 @@ latexmk -pdf main.tex
 ## Struttura della Repository
 
 ```bash
-E_E_Notes/
+ASV_Notes/
 ├── main.tex           # File principale
 ├── template/           # Template LaTeX (submodule)
 ├── _files/            # Risorse grafiche
