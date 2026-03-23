@@ -73,16 +73,14 @@ Oppure utilizzare `latexmk` per la compilazione automatica:
 ```bash
 latexmk -pdf main.tex
 ```
+
 ## Struttura della Repository
 
 ```bash
-ASV_Notes/
+E_E_Notes/
 ├── main.tex           # File principale
-├── csnotes.cls        # Classe LaTeX (symlink)
+├── template/           # Template LaTeX (submodule)
 ├── _files/            # Risorse grafiche
-│   ├── _images/          # Immagini utilizzate nel documento
-│   │   └── logo.pdf          # symlink
-│   └── ...                # Altri file di risorse
 ├── _chapters/         # Capitoli del documento
 │   ├── 0_intro.tex
 │   ├── 1_introduction.tex
