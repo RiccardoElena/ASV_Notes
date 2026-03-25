@@ -6,7 +6,7 @@ on:
       - master
       - main
     paths:
-      - '**/*.tex'
+      - '**/[0-9A-Z]_*.tex'
 
 permissions:
   contents: write
