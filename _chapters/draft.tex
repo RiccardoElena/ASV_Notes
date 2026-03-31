@@ -240,3 +240,117 @@ Ci sono tipi diversi vincoli di fairness:
 \end{description}
 
 La fairness incondizionata è troppo debole, poiché non garantisce che quando un processo viene schedulato sia abilitato a fare qualcosa. La fairness debole è più ragionevole, ma ancora non è sufficiente, poiché richiede che al processo è richiesto di essere continuamente abilitato, che è una richiesta molto forte. 
+
+\chapter{Lezione 25/03}
+
+Un concetto a cui bisogna stare attenti durante la modellazione è quello dell'atomicità. Un'azione atomica si traduce banalmente in una transizione, ma ciò implica che si è modellato adeguatamente in modo che il sistema concreto possa trattare come atomico ogni cosa che è stato modellato con un unica transizione.
+
+Un tipico esempio è l'operazione di incremento, che potrebbe essere atomica come no, quindi in base al sistema concreto è possibile modellarlo con una transizione o meno.
+
+Approfondiremo più avanti.
+
+Esistono anche contesti di comunicazione con scambio di messaggi. Se stiamo modellando una singola macchina, questa è effettivamente implementata usando una stessa memoria, e quindi le variabili condivise sono equivalenti, ma se stiamo parlando di diverse macchine già è diverso.
+
+L'idea per modellare questo è usare dei simboli condivisi di comunicazione che etichettano le azioni che rappresentano l'invio o la ricezione di un messaggio.
+
+Quindi definisco \(Sync = A_1 \cap A_2\) insieme delle azioni sincronizzanti. Affinché uno dei due possa fare un azione in \(Sync\) c'è bisogno che entrambi la facciano, in modo che quell'azione sia in parallelismo reale.
+
+Tale modello è detto di sincronizzazione via handshake.
+
+La differenza sul \(TS\) composto è che l'insieme di azioni \(A \subset Sync \cup (A\cup\set{-}\setminus Sync)\times(A\cup\set{-}\setminus Sync)\) e la relazione di transizione è tale che \(\langle s_1,s_2\rangle \xrightarrow{a} \langle s_1',s_2'\rangle\) se \(a \in Sync\) e \(s_1 \xrightarrow{a} s_1'\) e \(s_2 \xrightarrow{a} s_2'\) oppure \(a = \langle a_1, a_2\rangle \in A\) e \(s_o\xrightarrow{a_1} s_i'\) per \(i \in \set{1,2}\) se \(a_i \neq -\) o % completa
+
+Un modo tipico è avere handshake con arbitro, in cui compongo oltre ai due processi anche un arbitro che gestisce la comunicazione, e dunque i processi non comunicano direttamente tra loro ma tramite l'arbitro.
+
+Per portarlo a livello di PG si parla di Channel system. Sono essenzialmente dei program graph, in cui le variabili sono tutte locali ma ho dei canali di comunicazione tra i processi.
+
+\chapter{Lezione 30/03}
+
+LTL ci permette di esprimere praticamente tutto ciò che è esprimibile con le espressioni \(\omega\)-regolari, tranne cose come il counting.
+
+Dire che una proprietà \(P\) è vera in posizioni pari (NON ESCLUSIVAMENTE SUI PARI) si può fare facilmente con \({((\Sigma\Sigma)*(p\Sigma))}^\omega\) ma non è possibile esprimere questa proprietà in LTL, come neanche in prim'ordine.
+
+Comunque in entrambe le sintassi manca anche l'operatore di next, che però ha senso solo se si parla di modelli con tempo discreto, e con modelli con tempo continuo non è detto che abbia senso.
+
+Tale operatore è espresso come \(X \phi\), e la sua semantica è \(w,i \models X\phi\) se \(w,i+1 \models \phi\).
+
+Grazie a questo operatore possiamo dire cose come \(G(p\land X \neg p)\), che può sembrare descriva la proprietà di essere vero solo in posizioni pari.
+
+Ma andando a sviluppare questa formula, otteniamo:
+\[w,0\models G(p\land X \neg p) \iff \forall j \geq 0, w,j \models (p\land X \neg p) \iff \forall j \geq 0, (w,j \models p \land w,j+1 \models \neg p)\]
+
+Che è chiaramente insoddisfacibile. Il problema è che questa formula pretende che \(p\) sia vero in ogni punto.
+Un modo più corretto per esprimere questa proprietà è \(G((p \leftrightarrow X \neg p) )\). Ad essere precisi questa ci dice che \(p\) è vera o solo sui pari o solo sui dispari. Per ottenere la proprietà che \(p\) è vera sui pari e falsa sui dispari, allora basta innescarla con \(p\) all'inizio, ovvero \(p \land G((p \leftrightarrow X \neg p) )\).
+
+Espandendola abbiamo:
+\[w,0 \models p \land G((p \leftrightarrow X \neg p) )\iff w,0 \models p \text{ e } \forall j \geq 0, w,j \models p \iff w,j+1 \models X \neg p\]
+
+In questo modo abbiamo che \(p\) è vera in \(0\), allora deve essere falsa in \(1\), allora deve essere vera in \(2\), e così via, ottenendo la proprietà desiderata.
+
+Questa però ci dice che la proprietà è soddisfatta solo in posizioni pari, non che è soddisfatta almeno in posizione pari, che abbiamo già detto non è esprimibile in LTL\@.
+
+Dobbiamo ora dare una nozione formale al meta livello di equivalenza tra formule.
+
+Ad esempio abbiamo che \(\land\) e \(\lor\) rispettano le leggi di De Morgan.
+
+Inoltre abbiamo che \(U\) e \(R\) sono duali, infatti \(w,i \models \phi_1 U \phi_2\) se e solo se \(w,i \models \neg (\neg \phi_1 R \neg \phi_2)\).
+
+Andiamo a dimostrare questa equivalenza:
+
+\[w,i\models \phi_1 U \phi_2 \iff \exists j \geq i( w,j \models \phi_2 \land \forall i\leq k < j, w,k\models \phi_1)\iff\]
+\[\iff \neg \neg \exists j \geq i\st( w,j \models \phi_2 \land \forall i\leq k < j, w,k\models \phi_1) \iff\]
+\[\iff \neg \forall j \geq i,\neg( w,j \models \phi_2 \land \forall i\leq k < j, w,k\models \phi_1) \iff\]
+\[\iff \neg \forall j \geq i, w,j \models \neg \phi_2 \lor \neg \forall i\leq k < j, w,k\models \phi_1 \iff\]
+\[\iff \neg \forall j \geq i, w,j \models \neg \phi_2 \lor \exists i \leq k < j\st w,k\models \neg \phi_1 \iff\]
+\[\iff w,i \models \neg (\neg \phi_1 R \neg \phi_2)\]
+
+Ovviamente per essere un equivalenza stiamo dicendo che tutti questi i passaggi siano corretti a prescindere da \(w\) e \(i\).
+In questo caso in effetti non abbiamo usato nulla di specifico su \(w\) e \(i\), e quindi indipendentemente dalla scelta dalla parola e dal punto in cui partiamo, questa equivalenza è sempre vera.
+
+\begin{definition}{Equivalenza tra formule}
+  Diremo che due formule \(\phi\) e \(\psi\) sono equivalenti, e scriveremo \(\phi \equiv \psi\), se per ogni parola \(w\) e ogni punto \(i\) si ha che \(w,i \models \phi\) se e solo se \(w,i \models \psi\).
+\end{definition}
+
+Grazie a questa definizione possiamo mostrare come LTL del 71 sia sussunta da quella dell'81, infatti \(F\phi \equiv \top U \phi\) e \(G\phi \equiv \bot R \phi\), dove \(\top\) e \(\bot\) sono simboli sintattici assunti presenti nella grammatica, con semantica \(w,i \models \top\) sempre vero e \(w,i \models \bot\) sempre falso. Questo era facile da intuire, poiché la semantica di \(F\) e \(G\) è parte di quella di \(U\) e \(R\), che non fanno altro che aggiungere ulteriori vincoli, i quali vengono ignorati se si usano \(\top\) e \(\bot\). Ovviamente questo mostra una proprietà di dualità tra \(F\) e \(G\), che è la stessa dualità tra \(U\) e \(R\).
+
+Molto spesso, comunque, quello che mi interessa non è usare il counting, quindi il fatto che LTL non sia in grado di esprimere proprietà di counting non è un grosso problema. Inoltre, l'operatore \(X\) non è qualcosa di assoluto, poiché dipende dalla granularità della discretizzazione del tempo. Molto spesso a livello di proprietà pratiche non si usa proprio.
+
+Omettendolo ottengo il frammento stattering free di LTL, che non è espressivamente equivalente a LTL intero, poichè non è possibile distinguere tra parole in cui c'è \qi{idle} in una posizione. Ad esempio le due parole \(ppp\neg p \neg p pp\) e \(p\neg p p\) sono indistinguibili in questo frammento, ma distinguibili in LTL\@. In un certo senso non importa \qi{quanto tempo} sto in uno stato, ma solo i cambiamenti di stato. La cosa importante di questa cosa è che questo operatore porta quasi sempre ad un aumento della complessità da \(NP\) a \(PSPACE\), quindi è un operatore che è meglio evitare se non è necessario.
+
+Proprietà di one-step unfolding. Si può facilmente vedere che vale \(F\phi\equiv \phi \lor X F \phi\). Ho preso la mia formula e l'ho \qi{srotolata} di un passo. In teoria posso srotolarla di un numero qualsiasi di passi, ma srotolarla di un passo è sufficiente per poter costruire un automa. Vale lo stesso per \(G\phi\equiv\phi\land XG\phi\). Dunque saranno vere le opportune generalizzazioni per \(U\) e \(R\). In particolare
+
+\[\phi_1 U \phi_2 \equiv \phi_2 \lor (\phi_1 \land X(\phi_1 U \phi_2 ))\]
+\[\phi_1 R \phi_2 \equiv \phi_2 \land (\phi_1 \lor X(\phi_1 R \phi_2 ))\]
+
+NNF ugale a logica classica usando dualità tra \(U\) e \(R\) e tra \(F\) e \(G\). Per quanto riguarda \(X\) invece, è un operatore self-dual, ovvero \(\neg X \phi \equiv X \neg \phi\).
+
+Scrivi algoritmo formale (banale).
+
+\begin{definition}{Lunghezza}
+  la lunghezza di una formula \(\phi\) è una funzione che rispetta le seguenti regole:
+  \begin{itemize}
+    \item \(len(p) = 1\) per \(p \in AP\)
+    \item \(len(Op \phi) = 1 + len(\phi)\) per \(Op \in \set{\neg,X}\)
+    \item \(len(\phi_1 Op \phi_2) = 1 + len(\phi_1) + len(\phi_2)\) per \(Op \in \set{\land, \lor, U, R}\)
+  \end{itemize}
+\end{definition}
+
+Chiaramente alla peggio portare in NNF mi raddoppia la lunghezza della formula, quindi se la formula originale è di lunghezza \(n\) allora la formula in NNF è di lunghezza al più \(2n\). Questo perché il peggior caso e qullo in cui abbiamo \(\neg\) come opertaore più esterno e tutti i letterali positivi. In questo caso infatti considerando l'albero sintattico andiamo a togliere il nodo in radice e aggiungere un nodo per ogni foglia. Essendo che il numero di foglie è lineare rispetto alla lunghezza della formula, allora la lunghezza della formula in NNF è al più \(2n\). 
+
+Vediamo ora qualche esempio di proprietà espressa di modellazione di sistema espressa in LTL\@.
+
+\paragraph{Reachability}
+
+Classicamente basta \(F\phi\), nel senso che nel mio modello voglio raggiungere uno stato in cui \(\phi\) è vera, e dunque basta dire che prima o poi \(\phi\) è vera. In maniera più strutturata, possiamo esprimerle come \(\phi_1 U \phi_2\), in cui non solo voglio raggiungere uno stato in cui \(\phi_2\) è vera, ma voglio anche che fino a quel momento il sistema si comporti in un certo modo, ovvero che \(\phi_1\) sia vera. 
+
+\paragraph{Safety}
+Queste invece sono esprimibili con \(G\phi\), dove \(\phi\) è una formula che esprime la proprietà di sicurezza, ovvero che non accada qualcosa che non voglio che accada. Anche qui, dualmente, posso esprimerla con \(R\), ad esempio \(\phi_1 R \phi_2\) esprime che \(\phi_2\) è sempre vera a meno che non diventa vera \(\phi_1\), ovvero voglio dire non fare mai qualcosa di sbagliato a meno che non sia successo qualcosa che mi dice che non è più un problema, ad esempio un processo è terminato.
+
+La cosa non è così semplice però, perché come abbiamo già visto, è possibile avere delle tracce spurie, ovvero percorsi nel grafo di computazione che sono ammesse solo perché nell'astrazione del modello si è perso qualche dettaglio, ma che in realtà non sono percorsi realizzabili nel sistema concreto.
+
+Se voglio esprimere una proprietà una proprietà che voglio sia vera infinitamente spesso posso usare \(G F \phi\).
+
+In questo modo posso filtrare tracce che non rispettano un vincolo di fairness. Una proprietà di \(G F \phi \to \psi\) è detta di strong fairness.
+
+I problemi di decisione si basano sul modello di computazione, che abbiamo formalizzato tramite una struttura di kirpke \(K\) il cui linguaggio \(L(K)\) è l'insieme di tutte le parole che rappresentano esecuzioni del sistema concreto. Ora, dato un formula \(\phi\) di LTL\@, vogliamo decidere se \(K \models \phi\), ovvero se tutte le parole in \(L(K)\) soddisfano \(\phi\). Quindi se definiamo il linguaggio \(L(\phi) = \set{w \st w,0 \models \phi}\), allora il problema di verifica è decidere se \(L(K) \subseteq L(\phi)\).\footnote{Per brevità se sto iniziando da indice \(0\), posso scrivere \(w,0\models \phi\) come \(w\models \phi\).}
+
+La negazione di questa proprietà è \(L(K) \cap \overline{L(\phi)} \neq \emptyset\), ovvero \(L(K) \cap L(\neg \phi) \neq \emptyset\). Quindi se un comportamento del sistema soddisfa la negata dalla formula, ho trovato un controesempio. Determinare se dato un sistema \(K\) esiste un suo comportamento che soddisfa la negata è il problema di model checking.
