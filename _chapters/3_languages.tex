@@ -3,16 +3,33 @@
 Per poter esprimere le proprietà di interesse sui sistemi che abbiamo imparato a modellare nel capitolo precedente,
 è necessario introdurre dei linguaggi formali, che ci permettano di descrivere in modo preciso e rigoroso le caratteristiche che vogliamo verificare.
 
-In questo capitolo introdurremo dei linguaggi formali, partendo da quelli più generali, fino ad arrivare a quelli specifici per la verifica di sistemi.
-In particolare, partiremo, il modello che darà semantica alle varie sintassi che introdurremo saranno genericamente parole di un linguaggio regolare.
+In questo capitolo introdurremo dei linguaggi formali, partendo da quelli più generali, fino ad arrivare a quelli specifici, per la verifica di sistemi.
+In generale, il modello che darà semantica alle varie sintassi che introdurremo saranno sempre parole di un linguaggio regolare.
 
-Per i nostri scopi sarà sufficiente considerare queste parole per ricollegarci ai modelli di sistemi basati su automi visti nel capitolo precedente, poiché esecuzione di un sistema a transizioni può essere vista come una parola su un alfabeto di azioni o stati.
+Per i nostri scopi sarà sufficiente considerare queste parole per ricollegarci ai modelli di sistemi basati su automi visti nel capitolo precedente, poiché ogni esecuzione di un sistema a transizioni può essere vista come una parola su un alfabeto di azioni o stati.
 
 \section{Proprietà}
 
 Prendiamo in considerazione il seguente automa:
 
-\todo{grafo da fabrizio}
+\begin{figure}[h]
+  \centering
+  \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
+  \node[state,initial]  (q_0)                 {$q_0$};
+  \node[state]          (q_1) [below =of q_0] {$q_1$};
+  \node[state]          (q_2) [right=of q_0]  {$q_2$};
+  \node[state]          (q_3) [right=of q_1]  {$q_3$};
+
+  \path[->] (q_0) edge              node        {} (q_1)
+                  edge              node        {} (q_2)
+                  edge [loop above] node        {} ()
+            (q_1) edge              node        {} (q_3)
+            (q_2) edge [bend right] node        {} (q_3)
+            (q_3) edge [loop below] node        {} ()
+                  edge              node        {} (q_0)
+                  edge [bend right] node        {} (q_2);
+\end{tikzpicture}
+\end{figure}
 
 Possiamo considerare questo automa come un generatore di sequenze, che corrispondono tanto a computazioni del sistema quanto a percorsi del grafo orientato sottostante.
 
@@ -64,8 +81,8 @@ Ovviamente proprietà universali ed esistenziali sono l'una il duale dell'altra,
 Queste proprietà per quanto siamo molto generali, riescono solo a esprimere cose che accadranno sempre o prima o poi, ma non ci permettono di definire un concetto di \qi{equità} nel tempo o di \qi{precedenza} tra eventi, che sono invece aspetti fondamentali per la modellazione di sistemi concorrenti.
 
 \begin{definition}{Proprietà di Fairness e di Precedenza}
-  Una proprietà di \keyword{fairness} (o di \keyword{equità}) che esprimono che diversi utenti del sistema verranno serviti.
-  Una proprietà di \keyword{precedenza} è una proprietà che deve essere soddisfatta in un certo ordine.
+  Le proprietà di \keyword{fairness} (o di \keyword{equità}) sono proprietà che esprimono una giusta distribuzione di risorse tra diversi utenti del sistema.
+  Le proprietà di \keyword{precedenza} sono proprietà che devono essere soddisfatte in un certo ordine.
 \end{definition}
 
 \begin{example}{}
@@ -106,7 +123,12 @@ Per quanto riguarda le espressioni regolari, possiamo esprimerne la semantica tr
     \item \(\emptyset\) è un linguaggio regolare
     \item \(\set{\varepsilon}\) è un linguaggio regolare
     \item \(\set{a}\) è un linguaggio regolare per ogni \(a \in \Sigma\)
-    \item Se \(A\) e \(B\) sono linguaggi regolari, allora \(A \cdot B = \set{w_1 \cdot w_2}{w_1 \in A, w_2 \in B}\), \(A \cup B\) e \(A^* = \set{{(w)}^i}[w \in A, i \in \N]\) sono linguaggi regolari.
+    \item Se \(A\) e \(B\) sono linguaggi regolari, allora sono regolari anche:
+      \begin{itemize}
+        \item \(A \cdot B = \set{w_1 \cdot w_2}{w_1 \in A, w_2 \in B}\)
+        \item \(A \cup B\)
+        \item \(A^* = \set{{(w)}^i}[w \in A, i \in \N]\)
+      \end{itemize}
   \end{itemize}
 \end{definition}
 
@@ -168,7 +190,7 @@ Formalmente, una parola in $A^\omega$ può essere spezzettata in infiniti framme
 \end{definition}
 
 \begin{note}{}
-  Nota che non è possibile concatenare due espressioni \(\omega\)-regolari tra loro, perché non è possibile individuare il termine della prima espressione a cui poi concatenare l'inizio della seconda, poiché sono espressioni di lunghezza infinita.
+  Non è possibile concatenare due espressioni \(\omega\)-regolari tra loro, perché non è possibile individuare il termine della prima espressione a cui poi concatenare l'inizio della seconda, poiché sono espressioni di lunghezza infinita.
 \end{note}
 
 \begin{definition}{Semantica delle espressioni \(\omega\)-regolari}
@@ -186,8 +208,9 @@ Sebbene le espressioni \(\omega\)-regolari siano sufficienti a descrivere questi
 
 \begin{example}{}
   Immaginiamo di voler dire la seguente cosa:
+
   Ho un andamento temporale di eventi, e ho un insieme \(\set{e_1,\ldots,e_k}\) di eventi che voglio che prima o poi accadano, ma non è rilevante l'ordine in cui accadono.
-  Usando espressioni regolari sarà necessaria un'espressione regolare di lunghezza \(k!\)
+  Usando espressioni regolari sarà necessaria un'espressione regolare di lunghezza \(k\)!
 \end{example}
 
 
@@ -213,11 +236,12 @@ Poiché questa proprietà non è atomica, dobbiamo assumere come insieme di mode
 Chiamiamo la proposizione atomica di aver stampato \(p\) e quella di essere in attesa \(i\).
 Quello che vogliamo verificare è che il sistema si trovi in uno stato in cui la congiunzione di queste proposizioni sia vera in un determinato istante di tempo.
 
-\todo{Espandi esempio con \(p\) e \(i\) print e idle}
-\todo{Vedere appunti di qualcuno perché l'esempio è questo ma non è chiaro}
-\begin{example}{TODO}
-  Quindi per noi la parola significa, ad esempio, una parola che è fatta in questo modo, che sta dicendo: "Guarda, il sistema non è né in idle né ha stampato"; poi potrebbe entrare in idle—per esempio sto tirando una cosa così a caso su una sequenza—potrebbe stare in idle tre istanti temporali (quindi questo è il punto zero), potrebbe tornare a diventare che non è in idle ma non ha ancora stampato, e poi potrebbe diventare uno stato dove ha sia stampato sia in idle. E quindi questa proprietà su un modello del genere sarebbe vera, perché nel futuro rispetto all'origine mi trovo che c'è un punto del tempo in cui quell'istante temporale è etichettato con le due proposizioni atomiche che soddisfano questo criterio.
-\end{example}
+Consideriamo ad esempio la seguente parola \(w\) su \(\Sigma =2^{\set{i,p}}\):
+\[\emptyset\set{i}\set{i}\set{i}\emptyset\set{i,p}\ldots\]
+
+In questa parola ogni simbolo di alfabeto rappresenta un insieme di proposizioni atomiche vere in quel momento, disposti in ordine temporale. In questo caso, all'inizio non è vero nulla, poi per tre istanti di tempo il sistema è in attesa, poi per un istante di tempo non è vero nulla, e poi per un istante di tempo è sia vero che ha stampato che è in attesa, e così via.
+
+In riferimento all'origine, la proprietà \qi{Prima o poi il sistema ha stampato ed è in attesa del nuovo input} è soddisfatta, poiché esiste un punto nel futuro, ovvero l'istante di tempo 5, in cui è vero \(p\land i\).
 
 Dunque i nostri modelli saranno essenzialmente funzioni fatte in questo modo: \(w:\N \to 2^{AP}\), ovvero a ogni istante temporale associamo l'insieme di proposizioni atomiche vere in quel momento.
 
@@ -225,8 +249,9 @@ Dunque i nostri modelli saranno essenzialmente funzioni fatte in questo modo: \(
 \begin{example}{}
   Ad esempio, se stessi considerando un sistema di mutua esclusione, potrei avere le proprietà che sono: il sistema sta in idle, il processo \(p_1\) è nella regione di mutua esclusione, o il processo \(p_2\) è nella regione di mutua esclusione.
 
-  Ora, se è una regione di mutua esclusione, mi devo assicurare che mai accadrà che entrambi siano in mutua esclusione. Quindi posso dire la seguente proprietà
-  q{Non deve mai esistere un punto nel tempo in cui è vero \(p_1 \land p_2\)}.
+  Ora, se è una regione di mutua esclusione, mi devo assicurare che mai accadrà che entrambi siano in mutua esclusione. Quindi posso dire la seguente proprietà:
+
+  \q{Non deve mai esistere un punto nel tempo in cui è vero \(p_1 \land p_2\)}.
 
   Quindi stiamo dicendo che in ogni istante di tempo quella proprietà deve essere falsa, poiché se non fosse così, avremmo violato la mutua esclusione.
 \end{example}
@@ -254,17 +279,19 @@ La semantica del prim'ordine verrà definita in maniera composizionale, ovvero d
 
 In particolare ci serve un assegnamento \(\chi : \Var \to \N\) che ci dice ogni variabile a quale istante temporale si riferisce.
 
-Quindi dato \(\chi(x) = x = 3\), possiamo dire che \(w \models p(x)\) è vero se \(w\) in posizione \(\chi(x)\) contiene \(p\).
+Quindi dato ad esempio \(\chi(x)\), possiamo dire che \(w \models p(x)\) è vero se \(w\) in posizione \(\chi(x)\) contiene \(p\).
 
 \begin{definition}{Semantica del prim'ordine}
   Per il prim'ordine abbiamo una semantica di questo tipo:
   \begin{itemize}
-    \item \(w,\chi \models p(x)\) se \(p \in w(\chi(x))\). Con \(w(\chi(x))\) si intende l'elemento di \(w\) in posizione \(\chi(x)\), ovvero l'insieme di proposizioni atomiche vere in quel momento, e \(p \in w(\chi(x))\) significa che \(p\) è una di queste proposizioni atomiche vere in quel momento.
+    \item \(w,\chi \models p(x)\) se \(p \in w(\chi(x))\).\footnote{Con \(w(\chi(x))\) si intende l'elemento di \(w\) in posizione \(\chi(x)\), ovvero l'insieme di proposizioni atomiche vere in quel momento, e \(p \in w(\chi(x))\) significa che \(p\) è una di queste proposizioni atomiche vere in quel momento.}
     \item \(w,\chi \models \neg \phi\) se \(w,\chi \not\models \phi\).
     \item \(w,\chi \models \phi_1 \land \phi_2\) se \(w,\chi \models \phi_1\) e \(w,\chi \models \phi_2\).
     \item \(w,\chi \models \phi_1 \lor \phi_2\) se \(w,\chi \models \phi_1\) o \(w,\chi \models \phi_2\).
-    \item \(w,\chi \models \forall x.\,\phi\) se per ogni \(n \in \N\), \(w,\chi[x \to n] \models \phi\). Ovvero sostituendo a \(x\) ogni possibile istante temporale, la formula \(\phi\) è soddisfatta.
-    \item \(w,\chi \models \exists x.\,\phi\) se esiste \(n \in \N\) tale che \(w,\chi[x \to n] \models \phi\). Ovvero sostituendo a \(x\) almeno un istante temporale, la formula \(\phi\) è soddisfatta.
+    \item \(w,\chi \models \forall x.\,\phi\) se per ogni \(n \in \N\), vale \(w,\chi[x \to n] \models \phi\).
+      Ovvero sostituendo a \(x\) ogni possibile istante temporale, la formula \(\phi\) è soddisfatta.
+    \item \(w,\chi \models \exists x.\,\phi\) se esiste \(n \in \N\) tale che \(w,\chi[x \to n] \models \phi\).
+      Ovvero sostituendo a \(x\) almeno un istante temporale, la formula \(\phi\) è soddisfatta.
   \end{itemize}
 \end{definition}
 
@@ -303,7 +330,7 @@ Se voglio esprimere che arriva un punto dopo il quale sarò sempre in idle posso
 
 In generale però possiamo osservare che quando parliamo di proprietà temporali ci troviamo sempre in uno di questi due casi:
 \begin{itemize}
-  \item \qi{Prima o poi} \(p\) è vero, ovvero \(\exists y. x \leq y \land p(y)\)
+  \item \qi{Prima o poi} \(p\) è vero, ovvero \(\forall x.\exists y. x \leq y \land p(y)\)
   \item \qi{Dopo un certo punto} \(p\) è sempre vero, ovvero \(\exists x. \forall y. x \leq y \to p(y)\)
 \end{itemize}
 
@@ -336,8 +363,8 @@ Invece, per la semantica, utilizzeremo un indice \(i\) che rappresenta l'istante
     \item \(w,i \models \neg\phi\) se \(w,i\not\models\phi\).
     \item \(w,i\models\phi_1 \land \phi_2\) se \(w,i\models\phi_1\) e \(w,i\models\phi_2\).
     \item \(w,i\models\phi_1 \lor \phi_2\) se \(w,i\models\phi_1\) o \(w,i\models\phi_2\).
-    \item \(w,i\models F\phi\) se \(\exists j \geq i \st w, j \models \phi\), ovvero se \(\exists j\st j \geq i \land w,j\models\phi\). Questa espressione significa che prima o poi nel futuro sarà vera \(\phi\).
-    \item \(w,i\models G\phi\) se \(\forall j \geq i.\, w, j \models \phi\), ovvero se \(\forall j\st j \geq i \to w,j\models\phi\). Questa espressione significa che d'ora in poi sarà vera \(\phi\).
+    \item \(w,i\models F\phi\) se \(\exists j \geq i \st w, j \models \phi\), ovvero se \(\exists j\st j \geq i \land w,j\models\phi\).
+    \item \(w,i\models G\phi\) se \(\forall j \geq i.\, w, j \models \phi\), ovvero se \(\forall j\st j \geq i \to w,j\models\phi\).
   \end{itemize}
 \end{definition}
 
@@ -355,7 +382,7 @@ Questa proprietà non è esprimibile in LTL '79, ma si può scrivere facilmente 
 
 Ciò avviene poiché gli operatori \(F\) e \(G\) non riescono a sezionare intervalli di tempo e valutare ciò che accade prima di un certo punto.
 
-Di conseguenza Pnueli nell'81 dovette sostituire gli operatori \(F\) e \(G\) con altri due operatori binari che permettessero di descrivere queste proprietà, rendendo la Linear Temporal Logic dell'81 equivalente alla logica del prim'ordine.
+Di conseguenza Pnueli nell'81 dovette sostituire gli operatori \(F\) e \(G\) con altri due operatori binari che permettessero di descrivere queste proprietà, rendendo la Linear Temporal Logic dell'81 equivalente alla logica del prim'ordine per quanto riguarda il potere espressivo sulle parole.
 
 \subsection{Grammatica di LTL '81}
 
@@ -375,11 +402,113 @@ Intuitivamente \(U\) esprime che una proprietà \(p\) è vera fino a quando non 
     \item \(w,i \models \neg\phi\) se \(w,i\not\models\phi\).
     \item \(w,i\models\phi_1 \land \phi_2\) se \(w,i\models\phi_1\) e \(w,i\models\phi_2\).
     \item \(w,i\models\phi_1 \lor \phi_2\) se \(w,i\models\phi_1\) o \(w,i\models\phi_2\).
-    \item \(w,i \models \phi_1 U \phi_2\) se \(\exists j \geq i \st w,j\models \phi_2\) e \(\forall k: i \leq k < j \to w,k\models \phi_1\)
-    \item \(w,i \models \phi_1 R\phi_2\) se \(\forall j \geq i \st w,j\models \phi_2\) o \(\exists k: i \leq k < j \land w,k\models \phi_1\)
+    \item \(w,i \models \phi_1 U \phi_2\) se \(\exists j \geq i \st (w,j\models \phi_2 \text{ e } \forall k: i \leq k < j \to w,k\models \phi_1)\)
+    \item \(w,i \models \phi_1 R\phi_2\) se \(\forall j \geq i.\;( w,j\models \phi_2 \text{ o } \exists k: i \leq k < j \land w,k\models \phi_1)\)
   \end{itemize}
 \end{definition}
 
-\begin{note}{}
-  Possiamo notare che \(F\phi \equiv \top U \phi\) e che \(G\phi \equiv \bot R \phi\), quindi \(F\) e \(G\) sono esprimibili in termini di \(U\) e \(R\).
-\end{note}
+Questo nuovo linguaggio ci permette di esprimere praticamente tutto ciò che è esprimibile con le espressioni \(\omega\)-regolari, a meno di proprietà di counting, in cui vogliamo che una certa proprietà \(p\) sia vera almeno in posizioni multiplo di \(n\).
+
+Esprimere una proprietà di questo tipo, con ad esempio \(n=2\), è facilmente esprimibile con \({((\Sigma\Sigma)*(p\Sigma))}^\omega\), in cui l'unica cosa che è garantita è che \(p\) è vera \(0,2,4,\ldots\).
+
+Vedremo che però sarà esprimibile il concetto di una proprietà \(p\) che è vera \textbf{esclusivamente} in posizioni multiplo di \(n\), ovvero ad esempio vera solo sui pari.
+
+Per fare ciò dobbiamo aggiungere alla nostra sintassi un ulteriore operatore, che però risulta ben definito solo nei contesti a tempo discreto.
+
+\begin{definition}{Operatore di next}
+  In LTL in cui il tempo è modellato come discreto, è possibile aggiungere l'operatore \(X \phi\), che esprime che \(\phi\) è vera al prossimo istante di tempo.
+
+  La semantica di questo operatore è \(w,i \models X\phi\) se \(w,i+1 \models \phi\).
+\end{definition}
+
+
+Grazie a questo operatore possiamo dire cose come \(G(p\land X \neg p)\), che può sembrare descriva la proprietà di essere vero solo in posizioni pari.
+
+Ma andando a sviluppare questa formula, otteniamo:
+\[w,0\models G(p\land X \neg p) \iff \forall j \geq 0. w,j \models (p\land X \neg p) \iff \forall j \geq 0. (w,j \models p \land w,j+1 \models \neg p)\]
+
+Che è chiaramente insoddisfacibile. Il problema è che questa formula pretende che \(p\) sia vero in ogni punto.
+Un modo più corretto per esprimere questa proprietà è \(G((p \leftrightarrow X \neg p) )\).
+
+Ad essere precisi questa ci dice che \(p\) è vera o solo sui pari o solo sui dispari.
+
+Per ottenere la proprietà che \(p\) è vera sui pari e falsa sui dispari, allora basta innescarla con \(p\) all'inizio, ovvero \(p \land G((p \leftrightarrow X \neg p) )\).
+
+Espandendola abbiamo:
+\[w,0 \models p \land G((p \leftrightarrow X \neg p) )\iff w,0 \models p \text{ e } \forall j \geq 0. (w,j \models p \leftrightarrow w,j+1 \models X \neg p)\]
+
+In questo modo abbiamo che \(p\) è vera in \(0\), allora deve essere falsa in \(1\), allora deve essere vera in \(2\), e così via, ottenendo la proprietà desiderata.
+
+Questa però ci dice che la proprietà è soddisfatta solo in posizioni pari, non che è soddisfatta almeno in posizione pari, che abbiamo già detto non è esprimibile in LTL\@.
+
+Andiamo dunque a dare una nozione formale al meta livello di equivalenza tra formule.
+
+\begin{definition}{Equivalenza tra formule}
+  Diremo che due formule \(\phi\) e \(\psi\) sono equivalenti, e scriveremo \(\phi \equiv \psi\), se per ogni parola \(w\) e ogni punto \(i\) si ha che \(w,i \models \phi\) se e solo se \(w,i \models \psi\).
+\end{definition}
+
+Sfruttando il concetto di trasformazioni equivalenti, ovvero di trasformazioni che mantengono la semantica a prescindere dalla parola e dal punto in cui partiamo, possiamo mostrare la dualità tra diversi operatori logici.
+
+Ad esempio, sappiamo già che \(\land\) e \(\lor\) sono duali dalle leggi di De Morgan.
+
+Inoltre abbiamo che \(U\) e \(R\) sono duali, infatti \(w,i \models \phi_1 U \phi_2\) se e solo se \(w,i \models \neg (\neg \phi_1 R \neg \phi_2)\).
+
+Andiamo a dimostrare questa equivalenza:
+
+\begin{equation*}
+  \begin{aligned}
+    w,i\models \phi_1 U \phi_2 &\iff \exists j \geq i( w,j \models \phi_2 \land \forall i\leq k < j, w,k\models \phi_1)\\
+                               &\iff \neg \neg \exists j \geq i\st( w,j \models \phi_2 \land \forall i\leq k < j, w,k\models \phi_1) \\
+                              &\iff \neg \forall j \geq i,\neg( w,j \models \phi_2 \land \forall i\leq k < j, w,k\models \phi_1) \\
+                              &\iff \neg \forall j \geq i, w,j \models \neg \phi_2 \lor \neg \forall i\leq k < j, w,k\models \phi_1 \\
+                              &\iff \neg \forall j \geq i, w,j \models \neg \phi_2 \lor \exists i \leq k < j\st w,k\models \neg \phi_1\\
+                              &\iff w,i \models \neg (\neg \phi_1 R \neg \phi_2)
+  \end{aligned}
+\end{equation*}
+
+Ognuno di questi passaggi risulta un'equivalenza, poiché non abbiamo usato nulla di specifico su \(w\) e \(i\), e quindi indipendentemente dalla scelta dalla parola e dal punto in cui partiamo, questa equivalenza è sempre vera.
+
+Grazie a questa definizione possiamo mostrare come LTL '79 sia sussunta da quella dell'81, infatti \(F\phi \equiv \top U \phi\) e \(G\phi \equiv \bot R \phi\), dove \(\top\) e \(\bot\) sono simboli sintattici assunti presenti nella grammatica, con semantica \(w,i \models \top\) sempre vero e \(w,i \models \bot\) sempre falso. Questo era facile da intuire, poiché la semantica di \(F\) e \(G\) è parte di quella di \(U\) e \(R\), che non fanno altro che aggiungere ulteriori vincoli, i quali vengono ignorati se si usano \(\top\) e \(\bot\). Ovviamente questo mostra una proprietà di dualità tra \(F\) e \(G\), che è la stessa dualità tra \(U\) e \(R\).
+
+Molto spesso, comunque, quello che mi interessa non è usare il counting, quindi il fatto che LTL non sia in grado di esprimere proprietà di counting non è un grosso problema. Inoltre, l'operatore \(X\) non è qualcosa di assoluto, poiché dipende dalla granularità della discretizzazione del tempo. Molto spesso a livello di proprietà pratiche non si usa proprio.
+
+Omettendolo ottengo il frammento stattering free di LTL, che non è espressivamente equivalente a LTL intero, poichè non è possibile distinguere tra parole in cui c'è \qi{idle} in una posizione. Ad esempio le due parole \(ppp\neg p \neg p pp\) e \(p\neg p p\) sono indistinguibili in questo frammento, ma distinguibili in LTL\@. In un certo senso non importa \qi{quanto tempo} sto in uno stato, ma solo i cambiamenti di stato. La cosa importante di questa cosa è che questo operatore porta quasi sempre ad un aumento della complessità da \(NP\) a \(PSPACE\), quindi è un operatore che è meglio evitare se non è necessario.
+
+Proprietà di one-step unfolding. Si può facilmente vedere che vale \(F\phi\equiv \phi \lor X F \phi\). Ho preso la mia formula e l'ho \qi{srotolata} di un passo. In teoria posso srotolarla di un numero qualsiasi di passi, ma srotolarla di un passo è sufficiente per poter costruire un automa. Vale lo stesso per \(G\phi\equiv\phi\land XG\phi\). Dunque saranno vere le opportune generalizzazioni per \(U\) e \(R\). In particolare
+
+\[\phi_1 U \phi_2 \equiv \phi_2 \lor (\phi_1 \land X(\phi_1 U \phi_2 ))\]
+\[\phi_1 R \phi_2 \equiv \phi_2 \land (\phi_1 \lor X(\phi_1 R \phi_2 ))\]
+
+NNF ugale a logica classica usando dualità tra \(U\) e \(R\) e tra \(F\) e \(G\). Per quanto riguarda \(X\) invece, è un operatore self-dual, ovvero \(\neg X \phi \equiv X \neg \phi\).
+
+Scrivi algoritmo formale (banale).
+
+\begin{definition}{Lunghezza}
+  la lunghezza di una formula \(\phi\) è una funzione che rispetta le seguenti regole:
+  \begin{itemize}
+    \item \(len(p) = 1\) per \(p \in AP\)
+    \item \(len(Op \phi) = 1 + len(\phi)\) per \(Op \in \set{\neg,X}\)
+    \item \(len(\phi_1 Op \phi_2) = 1 + len(\phi_1) + len(\phi_2)\) per \(Op \in \set{\land, \lor, U, R}\)
+  \end{itemize}
+\end{definition}
+
+Chiaramente alla peggio portare in NNF mi raddoppia la lunghezza della formula, quindi se la formula originale è di lunghezza \(n\) allora la formula in NNF è di lunghezza al più \(2n\). Questo perché il peggior caso e qullo in cui abbiamo \(\neg\) come opertaore più esterno e tutti i letterali positivi. In questo caso infatti considerando l'albero sintattico andiamo a togliere il nodo in radice e aggiungere un nodo per ogni foglia. Essendo che il numero di foglie è lineare rispetto alla lunghezza della formula, allora la lunghezza della formula in NNF è al più \(2n\). 
+
+Vediamo ora qualche esempio di proprietà espressa di modellazione di sistema espressa in LTL\@.
+
+\paragraph{Reachability}
+
+Classicamente basta \(F\phi\), nel senso che nel mio modello voglio raggiungere uno stato in cui \(\phi\) è vera, e dunque basta dire che prima o poi \(\phi\) è vera. In maniera più strutturata, possiamo esprimerle come \(\phi_1 U \phi_2\), in cui non solo voglio raggiungere uno stato in cui \(\phi_2\) è vera, ma voglio anche che fino a quel momento il sistema si comporti in un certo modo, ovvero che \(\phi_1\) sia vera. 
+
+\paragraph{Safety}
+Queste invece sono esprimibili con \(G\phi\), dove \(\phi\) è una formula che esprime la proprietà di sicurezza, ovvero che non accada qualcosa che non voglio che accada. Anche qui, dualmente, posso esprimerla con \(R\), ad esempio \(\phi_1 R \phi_2\) esprime che \(\phi_2\) è sempre vera a meno che non diventa vera \(\phi_1\), ovvero voglio dire non fare mai qualcosa di sbagliato a meno che non sia successo qualcosa che mi dice che non è più un problema, ad esempio un processo è terminato.
+
+La cosa non è così semplice però, perché come abbiamo già visto, è possibile avere delle tracce spurie, ovvero percorsi nel grafo di computazione che sono ammesse solo perché nell'astrazione del modello si è perso qualche dettaglio, ma che in realtà non sono percorsi realizzabili nel sistema concreto.
+
+Se voglio esprimere una proprietà una proprietà che voglio sia vera infinitamente spesso posso usare \(G F \phi\).
+
+In questo modo posso filtrare tracce che non rispettano un vincolo di fairness. Una proprietà di \(G F \phi \to \psi\) è detta di strong fairness.
+
+I problemi di decisione si basano sul modello di computazione, che abbiamo formalizzato tramite una struttura di kirpke \(K\) il cui linguaggio \(L(K)\) è l'insieme di tutte le parole che rappresentano esecuzioni del sistema concreto. Ora, dato un formula \(\phi\) di LTL\@, vogliamo decidere se \(K \models \phi\), ovvero se tutte le parole in \(L(K)\) soddisfano \(\phi\). Quindi se definiamo il linguaggio \(L(\phi) = \set{w \st w,0 \models \phi}\), allora il problema di verifica è decidere se \(L(K) \subseteq L(\phi)\).\footnote{Per brevità se sto iniziando da indice \(0\), posso scrivere \(w,0\models \phi\) come \(w\models \phi\).}
+
+La negazione di questa proprietà è \(L(K) \cap \overline{L(\phi)} \neq \emptyset\), ovvero \(L(K) \cap L(\neg \phi) \neq \emptyset\). Quindi se un comportamento del sistema soddisfa la negata dalla formula, ho trovato un controesempio. Determinare se dato un sistema \(K\) esiste un suo comportamento che soddisfa la negata è il problema di model checking.

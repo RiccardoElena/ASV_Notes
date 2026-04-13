@@ -354,3 +354,82 @@ In questo modo posso filtrare tracce che non rispettano un vincolo di fairness. 
 I problemi di decisione si basano sul modello di computazione, che abbiamo formalizzato tramite una struttura di kirpke \(K\) il cui linguaggio \(L(K)\) è l'insieme di tutte le parole che rappresentano esecuzioni del sistema concreto. Ora, dato un formula \(\phi\) di LTL\@, vogliamo decidere se \(K \models \phi\), ovvero se tutte le parole in \(L(K)\) soddisfano \(\phi\). Quindi se definiamo il linguaggio \(L(\phi) = \set{w \st w,0 \models \phi}\), allora il problema di verifica è decidere se \(L(K) \subseteq L(\phi)\).\footnote{Per brevità se sto iniziando da indice \(0\), posso scrivere \(w,0\models \phi\) come \(w\models \phi\).}
 
 La negazione di questa proprietà è \(L(K) \cap \overline{L(\phi)} \neq \emptyset\), ovvero \(L(K) \cap L(\neg \phi) \neq \emptyset\). Quindi se un comportamento del sistema soddisfa la negata dalla formula, ho trovato un controesempio. Determinare se dato un sistema \(K\) esiste un suo comportamento che soddisfa la negata è il problema di model checking.
+
+\chapter{Lezione 1/04}
+
+Vogliamo introdurre un linguaggio per descrivere sistemi che operano con tempo continuo.
+
+Supponiamo di voler progettare un controllore per un passaggio a livello.
+
+Questo sistema ha una parte digitale, che è quella del controllore, e una parte analogia che sono gli attuatori e i sensori.
+
+Possono essere rappresentate da questi transition system.
+\todo{Aggiungi immagini}
+
+Se usiamo il modello classico sarebbe semplicemente composizione asincrona con interleaving, ma questo porterebbe a dei comportamenti ammessi dal modello ma non desiderabili.
+
+\todo{Immagine computation tree}
+
+Quello che vorremmo e che il treno mandi il segnale di essere vicino sufficientemente prima che arrivi al passaggio a livello, e quindi è necessario poter specificare che le azioni impieghino un certo tempo per essere eseguite, che certe azioni possono essere abilitate solo dopo un certo tempo o che certe azioni devono impiegare al più un certo tempo per essere eseguite.
+
+\todo{Immagine con tempistiche}
+
+In questo modo, se vengono garantite queste tempistiche, allora il comportamento non desiderabile non è più ammesso, e dunque il modello è più preciso.
+
+\todo{Immagine con tempistiche e computation tree}
+
+\begin{note}{}
+  Nonostante abbiamo due vincoli su una transizione sincronizzante, è importante a livello di modellaizone che siano due e su sottomodelli diversi, piuttosto che accorparli in un unico vincolo.
+
+  Questo perché nella fase di modellazione è importante che ogni sottomodello si occupi di descrivere il sottocomponente specifico e le sue caratteristiche, e dunque è importante che ogni sottomodello si occupi solo dei vincoli del componente che sta modellando.
+
+  Il comportamento complessivo del sistema poi dev'essere corretto grazie a proprietà emergenti dalla composizione dei sottomodelli.
+\end{note}
+
+Andiamo a introdurre gli automi temporizzati, come estensione degli automi a stati finiti.
+
+Come per gli automi a pila, prendiamo un automa a stati finiti e aggiungiamo una struttura dati, in questo caso prendiamo un automa a stati finiti e aggiungiamo dei cronometri (o clock), che sono delle variabili i cui valori sono numeri reali non negativi, e che può essere scritto solo in un certo modo, ovvero possono essere resettati a zero o lasciati invariati, ma non possono essere assegnati a valori arbitrari.
+
+Possiamo vedere il clck matematicamente come una funzione \(C: \R^+ \to \R^+\) che è in funzione del tempo reale, tale che \(\frac{d x(t)}{t} = 1\).\footnote{L'importante peril valore di questa derivata è che sia una costante positiva uguale per tutti i clock, ovvero che tutti i clock crescano alla stessa velocità. In tal senso si può prendere tale costante come unità di misura del tempo, e dunque si può assumere che sia \(1\) senza perdita di generalità.} Le transizioni possono avere guardie, le quali possono essere vincoli sui clock. Per semplicità di trattazione, consideriamo solo guardie riguardo ai clock, nonostante in linea di principio le guardie viste in precedenza sono ancora ammesse. Come già detto, l'unica azione che le transazioni possono effettuare sul clock è resettarli a zero.
+
+\begin{note}{}
+  Questo modelo è aperto a molte estensioni utili in diverse situazioni, come ad esempio guardi che comprendono l'interazione tra diversi clock:
+  \begin{itemize}
+    \item vincoli triangolari, ad esempio \(x-y \leq c\). Questi vincoli non cambiano l'espressività dei modelli.
+    \item possibilità di vincoli con somma o prodotti come \(x+y \leq c\), questi invece aumentano l'espressività dei modelli e la complessita dei problemi di decisione.
+    \item possibilità di resettare un clock a un valore diverso da zero, ad esempio \(x := c\). Anche questo non aumenta l'espressività dei modelli o la complessità dei problemi di decisione.
+    \item possibilità di resettare un clock per farlo partire da un valore di un altro clock, ad esempio \(x := y\). Questo invece aumenta l'espressività dei modelli o la complessità dei problemi di decisione.
+  \end{itemize}
+
+  In generali i vincoli introdotti per i timed automata sono rilassabili per avere più succintezza, ma non espressività senza esplosione della complessità.
+\end{note}
+
+I vincoli sui clock \(\phi(X)\) sono:
+
+\[\phi ::= \top \mid x<c\mid x\leq c\mid x > c \mid x \geq c \mid \phi \land \phi\]
+
+Si noti che non è ammessa la negazione (per quello sono aggiunti tutti i possibili confronti di disuguaglianza) e che non è presente la disgiunzione, perché questa è modellata tramite più transizioni avente come guardie i diversi disgiunti che compongono la disgiunzione. Le costanti \(c\) sono invece di un dominio numerabile, ad esempio \(c \in \N\) o \(c \in \Q\), ma non è possibile avere \(c \in \R\) poiché questo porterebbe a problemi di rappresentazione e computazione.
+
+Un'automa temporizzato è quindi definito come
+\[TA = \langle\Sigma, \Loc, \Loc_0,C,\delta,F\rangle\]
+
+Dove \(\Sigma\) è l'alfabeto, \(\Loc\) è l'insieme delle locazioni, \(\Loc_0\) è l'insieme delle locazioni iniziali, \(C\) è l'insieme dei clock, \(\delta \subseteq \Loc \times \Sigma \times \phi(C) \times 2^C \times \Loc\) è l'insieme delle transizioni, e \(F\) è l'insieme delle locazioni finali. Da un punto di vista diagrammatico, una transizione è rappresentata come etichetta con \(t, \phi, a\), dove \(t\) è il trigger, ovvero il simbolo di alfabeto che deve essere letto per poter effettuare la transizione, \(\phi\) è la guardia sui clock che deve essere soddisfatta per poter effettuare la transizione, e \(a\) è l'azione che viene effettuata.
+
+\todo{Aggiungi immagine esempio interruttore}
+
+Questo modello manca ancora di qualcosa. Infatti ci permette di impedire che una transizione avvenga prima di un certo tempo o dopo, e che quindi sia abilitata in un certo intervallo di tempo, ma non ci permette di esprimere che una transizione debba avvenire per forza entro un certo tempo, ovvero che se è abilitata allora deve essere effettuata entro un certo tempo. 
+
+Vediamo prima però la semantica, ovvero il transition system associato a un automa temporizzato.
+Lo stato è ovviamente una tupla \(\langle l, \nu\rangle\) con \(l \in \Loc\) e \(\nu: C \to \R^+\) che è una funzione di valutazione dei clock.
+
+Dobbiamo quindi definire la relazione di transizione tra stati, che può essere dovuta sia da un simbolo di alfabeto che dal passare del tempo. Quindi \(\Act = \Sigma \cup \R^+\), che porta ad avere due tipi di transizioni, quelle discrete etichettate con simboli di \(\Sigma\) da un \(\langle l,\nu \rangle\) a un \(\langle l',\nu' \rangle\), poiché è possibile azzerare alcuni clock e cambiano locazione, e quelle di passaggio del tempo etichettate con un \(d \in \R^+\) da un \(\langle l,\nu \rangle\) a un \(\langle l,\nu + d\rangle\), in cui non cambia la locazione ma i clock aumentano di \(d\).
+
+In particolare per le transizioni discrete, in \(\delta\) deve esserci una transizione \(l \xrightarrow{t, \phi, a} l'\) tale che \(t\) è il simbolo di alfabeto che viene letto, \(\nu\models\phi\), che dobbiamo definire, e un \(\Eff\) che cambia la valutazione, prendendo in input un insieme di clock da resettare \(\lambda\), e dunque \(\Eff(\lambda, \nu) = \nu[\lambda \to 0]\), dove per \(\nu[\lambda \to 0]\) si intende una nuova funzione \(\nu'\) tale che:
+\[\nu'(x) = \begin{cases}
+  0&,x \in \lambda\\
+  \nu(x)&,\text{ altrimenti}
+\end{cases}\]
+
+Per \(\nu\models\phi\) è semplice, per le condizioni atomiche è sufficiente sostituire \(x\) con \(\nu(x)\) e verificare se la disuguaglianza è soddisfatta, mentre per le congiunzioni è necessario verificare che siano soddisfatte entrambe le formule.
+
+Per quelle di passaggio del tempo, invece, è necessario definire \(\Eff(d,\nu) = \nu + d\), dove per \(\nu + d\) si intende una nuova funzione \(\nu'\) tale che \(\nu'(x) = \nu(x)+d\), \(\forall x \in C\).
