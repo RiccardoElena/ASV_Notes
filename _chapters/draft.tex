@@ -433,3 +433,531 @@ In particolare per le transizioni discrete, in \(\delta\) deve esserci una trans
 Per \(\nu\models\phi\) è semplice, per le condizioni atomiche è sufficiente sostituire \(x\) con \(\nu(x)\) e verificare se la disuguaglianza è soddisfatta, mentre per le congiunzioni è necessario verificare che siano soddisfatte entrambe le formule.
 
 Per quelle di passaggio del tempo, invece, è necessario definire \(\Eff(d,\nu) = \nu + d\), dove per \(\nu + d\) si intende una nuova funzione \(\nu'\) tale che \(\nu'(x) = \nu(x)+d\), \(\forall x \in C\).
+
+\chapter{Lezione 8/04}
+
+Appunti mancanti per computer scarico, recuperare tramite registrazione audio e appunti fabrizio.
+
+\chapter{Lezione 13/04}
+
+Problema dell'interezione di automi di Büchi.
+L'esempio classico è il linguaggio \(L=a^\omega\).
+
+Posso costruire due automi di due stati che accettano \(L\) uno che accetta nel primo stato e l'altro nel secondo.
+Entrambi accettano \(L\), perché basta passare infinitamente spesso per uno stato accettante.
+Ci aspetteremo quindi che l'interezioni degli automi accetti l'intersezione dei linguaggi, ovvero \(L\).
+Ma creando l'automa intersezione tramite prodotto cartesiano, otteniamo un automa che non accetta alcuna parola.
+
+Questo perché gli stati accettanti dell'automa intersezione sono quelli in cui entrambi gli automi originali sono in uno stato accettante, ma tali stati non sono raggiungibili.
+Quello che si fa è ammettere che l'accettazione possa avvenire in modo asincrono, ovvero si creano due copie dell'automa intersezione, in cui in una copia si considerano accetanti gli stati in cui il primo automa è in uno stato accettante, e nell'altra copia si considerano accettanti gli stati in cui il secondo automa è in uno stato accettante, e poi si aggiungono delle transizioni che permettono di passare da una copia all'altra, in modo che una volta che il primo automa è passato per uno stato accettante, allora si passa alla copia in cui si considerano accettanti gli stati in cui il secondo automa è in uno stato accettante, e così via, in modo che se una parola è accettata da entrambi gli automi originali, allora è accettata anche dall'automa intersezione.
+
+Formalmente, l'intersezione di automi di Büchi è
+\[A_1 \Cap A_2 = \langle\Sigma, Q_1 \times Q_2\times\set{1,2}, \delta', Q_1^0 \times Q_2^0\times\set{1}, F_1 \times Q_2\times\set{1}\cup Q_1\times F_2\times\set{2} \rangle \]
+
+con \(\delta'\) definita come segue:
+
+\[\delta'((q_1,q_2,i),\sigma)=\delta_1(q_1,\sigma)\times\delta_2(q_2,\sigma)\times\begin{cases}
+  \set{i}&,q_i\notin F_i\\
+  \set{3-i}&,q_i\in F_i
+\end{cases}\]
+
+Quindi gli automi di Büchi sono chiusi per intersezione oltre che per unione. Vedremo successivamente che sono chiusi anche per complementazione, ma non sono chiusi per determinizzazione, ovvero non esiste una procedura per costruire un automa di Büchi deterministico equivalente a un automa di Büchi non deterministico.
+
+Prendiamo ad esempio il linguaggio \(L = \Sigma^* 1^\omega\), con \(\Sigma= \set{0,1}\). In altre parole parole che iniziano in qualsiasi modo ma finiscono con soli \(1\). Possiamo facilmente riconoscere questo linguaggio con il seguente automa di Büchi non deterministico:
+\todo{Aggiungi immagine}
+
+Si potrebbe pensare di applicare la costruzione tramite sott'insiemi degli automi a stati finiti per provare a costruire un automa di Büchi deterministico equivalente, ma otterrei il seguente automa:
+\todo{Aggiungi immagine}
+
+Chiaramente questo automa, indipendentemente da come definiamo chi siano gli stati accettanti, verranno accettate parole che contengono un numero finito di \(0\), che non sono parole di \(L\).
+
+Si potrebbe pensare quindi che il problema sia nel fatto di aver usato la costruzione tramite sott'insiemi e che esista un'altra procedura per costruire un automa di Büchi deterministico equivalente a un automa di Büchi non deterministico. Questo non è così.
+
+\begin{proof}
+  Supponiamo per assurdo che esista un DBA \(D\) tale che \(\mathcal{L}(D)=\mathcal{A} = \Sigma^* 1^\omega\)
+  Allora
+  \[w_0 = 1^\omega \in \mathcal{L}(D) \implies \exists r_0 \in Q^\omega \text{ run su } w_0 \text{ con } inf(r_0) \cap F \neq \emptyset\]
+
+  Per raggiungere lo stato finale deve esistere un \(q_f \in r_0\) tale che \(q_f \in F\) e \(r_0=r_0' q_f r_0''\).
+  Essendo però \(\delta_D\) deterministica, allora la parola sarà del tipo \(w_0=w_0'1w_0''\).
+
+  Andiamo a costruire quindi una parola \(w_1\) tale che dopo l'\(1\) che porta il run ad avere \(q_f\) ha uno \(0\). Ovvero \(w_1 = w_0' 1 0 w_1\).
+
+  Per essere accetata il run corrispondente deve avere.
+  \todo{completa da registrazioni}
+\end{proof}
+
+AUTOMI GENERALIZZATI DI BÜCHI
+
+L'idea è la stessa di quelli di Büchi classici, ma al posto di avere un unica condizione di accettazione, ne ha più di una.
+
+Struttralmente quindi sarà:
+
+\[A = \langle\Sigma,Q,\delta,Q_0,\langle F_0, \ldots,F_t\rangle\rangle\]
+Ovvero al posto di avere un unico insieme di stati accettanti, abbiamo una tupla di insiemi di stati accettanti, e diremo che il linguaggio accettato da questo automa è
+\[L(A)= \set{w\in\Sigma^\omega}[inf(r) \cap F_i \neq \emptyset, \forall i \in \set{0,\ldots,t}]\]
+
+Tali automi sono stati introdotti solo per semplicità di trattazione, in quanto non sono più espressivi di quelli di Büchi classici.
+
+In particolare possiamo usare la costruzione di intersezione asincrona che abbiamo visto precedentemente, ma essendo che gli stati sono identici, al posto di avere una copia per ogni automa che stiamo intersecando avremo una copia per ogni insieme di stati finali della tupla. In particolare avremo
+
+\[\hat{A} = \langle\Sigma, \hat{Q},\hat{\delta},\hat{Q_0},\hat{F}\rangle\]
+Con \(\hat{Q}=Q\times\set{0,\ldots,t}\), \(\hat{Q_0}=Q_0\times\set{0}\), \(\hat{F}=F_0\times\set{0}\) e la funzione di transizione definita come segue:
+
+\[\hat{\delta}((q,i),\sigma) = \delta(q,\sigma) \times \begin{cases}
+  \set{i}&,q\notin F_i\\
+  \set{(i+1) \mod (t+1)}&,q\in F_i
+\end{cases}\]
+
+Tale \(\hat{\delta}\) fa in modo che all'arrivo in uno stato accettante di \(F_i\) si passi ad una copia diversa. Di conseguenza, essendo che una parola è accettata se e solo se il run corrispondente visita infinitamente spesso stati accettanti, per tornare infinitamente spesso in stati accettanti di \(F_0\) devo passare per tutte le copie, ovvero per stati accettanti di tutti gli insiemi \(F_i\), e dunque la parola è accettata se e solo se è accettata da tutti gli automi di Büchi classici che hanno come stati accettanti i diversi \(F_i\).
+
+\begin{theorem}{}
+  \[\forall \psi \in LTL, \exists A_\psi = \langle 2^{AP}, Q, \delta,Q_0,F\rangle \in NBA \st \mathcal{L}(\psi) = \mathcal{L}(A_\psi)\]
+\end{theorem}
+
+Prima di poter dimostrare questa cosa dobbiamo intodurre dei concetti.
+
+\begin{definition}{Chiusura di una formula LTL}
+  La chiusura di una formula LTL è una funzione \(cl:LTL\to 2^{LTL}\) tale che:
+  \begin{enumerate}
+    \item \(\phi \in cl(\phi)\)
+    \item \(Op\phi'\in cl(\phi)\implies \phi'\in cl(\phi), \forall Op \in \set{\neg,X}\)
+    \item \(\phi_1 Op \phi_2 \in cl(\phi) \implies \phi_1, \phi_2 \in cl(\phi), \forall Op \in \set{\land,\lor}\)
+    \item \(\phi_1 U \phi_2 \in cl(\phi) \implies \phi_2 \lor (\phi_1 \land X(\phi_1 U \phi_2)) \in cl(\phi)\)
+    \item \(\phi_1 R \phi_2 \in cl(\phi) \implies \phi_2 \land (\phi_1 \lor X(\phi_1 R \phi_2)) \in cl(\phi)\)
+  \end{enumerate}
+\end{definition}
+
+\begin{example}{}
+  Sia \(\phi=p\land X(rUq)\).
+  La chiusura avrà i seguenti elementi:
+  \begin{itemize}
+    \item \(p\land X(rUq)\) per la regola 1
+    \item \(p\) e \(X(rUq)\) per la regola 3
+    \item \(rUq\) per la regola 2
+    \item \(q \lor (r \land X(rUq))\) per la regola 4
+    \item \(q\) per la regola 3
+    \item \(r \land X(rUq)\) per la regola 3
+    \item \(r\) per la regola 3
+    \item \(X(rUq)\) per la regola 2
+  \end{itemize}
+
+  Questo esempio ci fa notare che le regole 4 e 5 portano ad aggiungere anche formule similmente alla regola 2.
+
+  Si può facilmente vedere che \(2\abs{\phi}\geq \abs{cl(\phi)}\).
+\end{example}
+
+La chiusura è una nozione puramente sintattica, infatti tratta ugualmente cose come \(\land\) e \(\lor\). Di fatto la chiusura non è altro che l'insieme delle sottoforumle con l'aggiunta del one-step unfolding per \(U\) e \(R\).
+
+\begin{definition}{Atomi di formule LTL}
+  Data una formual \(\phi\) definiamo gli atomi di \(\phi\) come l'insime \(ATM(\phi)\subseteq 2^{cl(\phi)}\) tale che, un certo \(A \in ATM(\phi)\) se e solo se:
+  \begin{itemize}
+    \item \(A\subseteq cl(nnf(\phi))\)
+    \item \(\forall p \in AP, p\in A \oplus  \neg p \in A\), ovvero \(p\in A\iff \neg p \notin A\)
+    \item \(\phi_1 \land \phi_2 \in A \implies \phi_1, \phi_2 \in A\)
+    \item \(\phi_1 \lor \phi_2 \in A \implies \phi_1 \in A \text{ o } \phi_2 \in A\)
+    \item \(\phi_1 R \phi_2 \in A \implies \phi_2 \land (\phi_1 \lor X(\phi_1 R \phi_2)) \in A\)
+    \item \(\phi_1 U \phi_2 \in A \implies \phi_2 \lor (\phi_1 \land X(\phi_1 U \phi_2)) \in A\)
+  \end{itemize}
+\end{definition}
+
+Notare che l'operatore \(X\) non è presente nelle condizioni dell'atomo, questo perché la semantica di \(X\) necessità di parlare di più punti della parola, e dunque non è possibile definire una condizione che riguarda solo un punto della parola, come invece è possibile fare per gli altri operatori.
+
+\begin{definition}{Sequenza di Hintikka}
+  Una sequenza di Hintikka per una formula \(\phi\) è una parola infinita di atomi di \(\phi\) ovvero \(\alpha \in (ATM(\phi))^\omega\) tale che:
+  \begin{enumerate}
+    \item \(\phi \in \alpha_0\)
+    \item \(\forall i, X\phi' \in \alpha_i \implies \phi' \in \alpha_{i+1}\)
+    \item \(\forall i, \phi_1U\phi_2 \in \alpha_i \implies \exists j \in \N\st\phi_2\in\alpha_{i+j}\)
+  \end{enumerate}
+\end{definition}
+
+\begin{theorem}{}
+  \[\forall \phi \in LTL, Sat(\phi) \iff \exists \alpha \in (ATM(\phi))^\omega\st\alpha \text{ è una sequenza di Hintikka per } \phi\]
+\end{theorem}
+\begin{proof}
+  VEDI REGISTRAZIONE
+\end{proof}
+
+Possiamo finalmente dimostrare il teorema di traduzione da LTL a NBA\@.
+Per fare ciò anremo a costruire un automa di Büchi \(A_\phi\) che accetta esattamente le sequenze di Hintikka per \(\phi\), e dunque, essendo che una parola soddisfa \(\phi\) se e solo se esiste una sequenza di Hintikka per \(\phi\) che è uguale alla parola, allora \(A_\phi\) accetterà esattamente le parole che soddisfano \(\phi\).
+
+Sia quindi \[A_\phi = \langle 2^{AP}, Q, \delta, Q_0, \hat{F} = \langle F_0, \ldots, F_t\rangle\rangle\]
+Dove \(Q = ATM(\phi)\), \(Q_0 = \set{A \in ATM(\phi) }[\phi \in A]\), la funzione di transizione \(\delta\) si assicurerà che varrà la seconda condizione delle sequenze di Hintikka, ovvero
+\[\delta(A,\sigma)=\begin{cases}
+  \set{A'\in ATM(\phi)}[\forall X\psi \in A, \psi \in A']&, \sigma = A \cap AP\\
+  \emptyset&, \text{ altrimenti}
+\end{cases}\]
+mentre gli stati di accettazione saranno quelli che soddisfano la terza condizione delle sequenze di Hintikka, creando un insieme di stati di accettazione per ogni formula del tipo \(\phi_1 U \phi_2\) presente nella chiusura, ovvero
+\[\hat{F} = \set{\set{A\in ATM(\phi)}[\phi_1 U \phi_2 \in A \implies \phi_2\in A]}[\phi_1 U \phi_2 \in cl(\phi)]\]
+
+Tale costruzione ci permette di accettare solo parole che passano infinitamente spesso per stati in cui ogni until è soddisfatto localmente, ovvero \(\phi_1 U \phi_2\) è vera perché \(\phi_2\) è vera.
+
+
+\begin{example}{}
+  Sia \(\phi= F p \land q U r\).
+  \[cl(\phi) = \set{\phi, Fp,qUr, r\lor q \land X(q\cup r),p\lor XFp, r,p,q,X(qUr),xFp}\]
+
+  Fortunatamente non tutte le combinazioni di questi elementi sono atomi validi.
+  Possiamo partire dagli stati iniziali, ovvero dagli atomi che contengono \(\phi\),
+
+  INSERIRE IMMAGINI ATOMI
+\end{example}
+
+\chapter{Lezione 15/03}
+
+In termini di teoria dei linguaggi questi automi ci permettono di esprimere linguaggi temporizzati, in cui gli elementi delle parole sono dette segnali, ovvero coppie di un simbolo di alfabeto e un istante di tempo in cui tale simbolo viene emesso. In tal senso i run di un automa temporizzato su una traccia temporizzata è una sequenza di transizione del transition system come in figura 
+
+\todo{Vedi slide, aggiungi immagini}
+
+Ovviamente nei percorsi temporizzati per ogni percorso tra due transizioni discrete ci sono infiniti altri sottopercorsi che sezionano la transizione temporale in sotto transizioni con ritardi la cui somma è la stessa della transizione originale.
+
+In particolare per ogni transizione con ritardo \(d\), esiste una coppia di transizioni con ritardo \(d_1\) e \(d_2\) equivalente per ogni coppia tale che \(d=d_1+d_2\).
+
+Per questi automi è possibile avere transizioni discrete solo con stimoli esterni, per fare in modo di avere una transizione spontanea dobbiamo aggiungere le \(\tau-\)transizioni, ovvero aggiungere un simbolo di alfabeto \(\tau\) che indica una transizione che avviene senza stimolo esterno. A differenza delle \(\epsilon-\)transizioni negli automi a stati finiti, le \(\tau-\)transizioni aumentano il potere espressivo degli automi temporizzati.
+
+Questo lo possiamo vedere nell'automa temporizzato con \(\tau-\)transizioni sottostante.
+
+Nessun automa temporizzato senza \(\tau-\)transizioni può riconoscere lo stesso linguaggio di questo automa, perché la transazione spontanea azzera il clock, permettendo di accettare tutte le parole del tipo \((a,t_1)(a,t_2)\ldots(a,t_n)\ldots\) con \(t_i \in \N\). Questo perché a ogni istante di tempo intero il clock può essere azzerato, potendoli quindi scandire tutti. Non avendo la possibilità di azzerare il clock in maniera spontanea invece non sarebbe possibile scandire il clock, perché potrei solamente valutare che c'è un intero specifico di distanza fra due clock, ma non di azzerarli in modo da poter scandire tutti gli interi.
+
+Dobbiamo ancora capire come forzare l'avvenimento di una transizione. Queste \(\tau-\)transizioni per ora ci permettono solo di dare la possibilità che avvenga, non forzano l'automa a effettuarla.
+
+Per fare ciò, si introduce una funzione detta di invariante \(Inv: \Loc \to \Phi(C)\) che associa un vincolo sui clock a ogni locazione, la cui semantica è di limitare il tempo che è possibile trascorrere in una locazione, ovvero se \(Inv(l) = x \leq c\) allora è possibile rimanere in \(l\) solo per un tempo al più \(c\). Il senso è forzare che ogni percorso che non rispetti l'invariante termini, ovvero che ogni percorso che non la rispetta sia considerata un'esecuzione spuria del sistema.
+
+Ovviamente non è tutto rose e fiori, perché l'introduzione di questa invariante può portare all'interruzione del sistema, che in linea di principio può introdurre condizioni simili al deadlock, detta timelock, in cui il sistema deve evolvere perché sta per andare a incontro a una deadline dovuta a una invariante ma tutte le transizioni sono disabilitate e quindi non può fare niente.
+
+Dobbiamo aggiornare la semantica per introdurre questa invariante, in particolare inserendo transizioni di passaggio del tempo solo se tale passaggio soddisfa l'invariante, ovvero se \(\nu + d \models Inv(l)\). Per quando riguarda le transizioni discrete invece, è invece necessario assicurarsi che la valutazione del clock dopo l'effetto della transizione soddisfi l'invariante, ovvero che \(\nu' \models Inv(l')\).
+
+L'aggiunta delle invarianti ci permette quinidi di modellare le durate delle azioni, oltre che hai ritardi già espressi dalle guardie.
+
+Per quanto riguarda la composizione di automi temporizzati, avendo considerato il caso senza variabili, possiamo utilizzare il modello di sincronizzazione con handshaking, in cui le transizioni sincronizzanti sono quelle che hanno lo stesso simbolo di alfabeto, mentre le altre transizioni sono asincrone.
+
+Andiamo a vedere nel dettaglio qualche problema di modellazione che può avvenire negli automi temporizzati.
+
+Un primo problema è la time convergence, che è inevitabile, ma che può essere risolto in fase di verifica.
+Un secondo problema è quello del timelock, che è introdotto dalle invarianti, e ne abbiamo già parlato, ma approfondiremo.
+L'ultimo è quello di zenoness, in cui infinite azioni avvengono un intervallo di tempo finito, e questo può avvenire essendo che le transizioni discrete sono istantanee e in particolare quelle spontanee non necessitano di uno stimolo esterno. Questo è un problema perché ametterle porterebbe a un sistema con una velocità di esecuzione arbitrariamente alta.
+
+Andiamoli a definire nel dettaglio.
+
+Si ha time convergence quando esiste un percorso infinito il cui tempo converge verso un valore finito.
+
+Questo è facile vedere che possa avvenire, ad esempio con l'automa in figura.
+
+Chiamando il percorso \(\pi\) possiamo definire il tempo di esecuzione di \(\pi\) come
+\[ExecTime(\pi) = \sum_{i \geq 1} ExecTime(d_i) = \sum_{i \geq 1} \frac{1}{2^i} = 1\]
+
+Se \(ExecTime(\pi)<\infty\) allora \(\pi\) è un percorso convergente. Tali percorsi possono essere ignorati se il numero di transizioni discrete in \(\pi\) è finito, perché in tal caso è possibile accorpare le infinite transizioni temporali in un'unica transizione temporale con ritardo pari al limite della somma dei ritardi, e dunque non si perderebbe alcuna parola accettata dall'automa. 
+
+Dato uno stato di partenza \(s\) ci interesseremo solo dell'insieme dei percorsi che partono da \(s\) e che sono divergenti, ovvero:
+\[Path_{div}(S) = \set{\pi}[\pi_0 = s \land ExecTime(\pi) =\infty]\]
+
+Definiamo invece un timelock come uno stato \(s\) tale che \(Path_{div}(s) = \emptyset\), ovvero non esiste alcun percorso divergente che parte da \(s\). Questo non vuol dire che da \(s\) non parta alcun percorso, o che il sistema non evolva, ma che tutti i percorsi che partono da \(s\) sono convergenti. Ad esempio, nell'automa in figura
+
+L'automa può evolvere se non in percorsi convergenti.
+
+Per quanto riguarda la zenoness, la situazione è più complessa. Un percorso \(\pi\) è zeno se \(ExecTime(\pi)<\infty\) e il numero di transizioni discrete in \(\pi\) è infinito. Un automa temporizzato è non-zeno se non ammette percorsi zeno, ovvero se ogni percorso con un numero infinito di transizioni discrete è divergente. 
+
+Purtroppo la verifica di presenza di zenoness è un problema difficile, ma conosciamo una condizione sufficiente per la non-zenoness.
+
+In particolare, se in ogni ciclo semplice dell'automa temporizzato esiste un clock \(x\) che rispetta le seguenti proprietà:
+\begin{itemize}
+  \item \(x\) è resettato in almeno una transizione del ciclo
+  \item in ogni valutazione del ciclo, esiste un intero positivo \(c\) tale che \(x \geq c\) è una guardia di almeno una transizione del ciclo
+\end{itemize}
+allora l'automa temporizzato è non-zeno. Infatti ognuno di questi cicli richiede un tempo di esecuzione di almeno \(c\) per essere attraversato. Il percorso indotto da tale ciclo nell'LTS associato non è necessariamente un ciclo, perché gli stati possono essere diversi a causa della valutazione dei clock, ma considerando solo le locazioni, necessariamente dovrà contentere dei cicli. In particolare tali cicli devono essere attraversati un numero infinito di volte, essendo che il numero di cicli semplici è finito, e dunque il tempo di esecuzione del percorso è infinito, poiché sarà almeno \(c\) per ogni ciclo attraversato, e dunque il percorso non è zeno.
+
+\chapter{Lezione 20/04}
+
+A questo punto dobbiamo capire come usare questi automi per risolvere problemi di model checking e soddisfacibilità.
+
+In particolare, data una struttura di kripke dobbiamo capire se questa soddisfa una formula \(\psi\). Questo equivale a dire che 
+\(\mathcal{L}(k)\subseteq \mathcal{L}(\psi) = \mathcal{A_\psi}\). Questo però equivale a richiedere che tutti i percorsi di \(k\) siano accettati da \(\mathcal{A_\psi}\).
+
+Per semplicità, piuttosto di considerare che tutti i percorsi di \(k\) siano accettati da \(\mathcal{A_\psi}\), possiamo considerare il modello della negata e verificare che l'intersezione sia vuota.
+
+Ricordiamo che la struttura di kripke \(k\) è definita come \(k = \langle W, R, AP, \lambda, w_0\rangle\) con \(W\) insieme dei mondi possibili o stati, \(R \subseteq W\times W\) relazione di transizione, \(AP\) insieme di proposizioni atomiche, \(\lambda: W \to 2^{AP}\) funzione di etichettatura che associa a ogni stato un insieme di proposizioni atomiche vere in quello stato, e \(w_0\) mondo iniziale.
+
+A quel punto cotruire un automa risulta molto facile considerando \(A_k = \langle \Sigma=2^{AP}, Q = W, \delta, q_0 = w_0,  F=W\rangle\) con
+\[\delta(w,\sigma) = \begin{cases}
+\set{w' \in W}[R(w,w')]&, \text{ se } \sigma = \lambda(w)\\
+\emptyset&, \text{ altrimenti}
+\end{cases}\]
+
+Tale automa accetta tutte e sole le parole del linguaggio della struttura di kripke \(k\), e dunque se l'intersezione di prima risulta essere \(\mathcal{L}(A_k) \cap \mathcal{L}(A_{\neg\psi})\), ovvero \(A_{k,\neg\psi} = A_{\neg\psi} \cap \mathcal{L}(A_k)\).
+Quindi \(k\models \psi\) se e solo se \(A_{k,\neg\psi} = \emptyset\).
+
+Questo va bene per il model checking, per la soddisfacibilità invece è sufficiente costruire \(A_\psi\) e verificare che \(\mathcal{L}(A_\psi)\neq \emptyset\). Per la validitò uguale ma usando \(A_{\neg\psi}\) e controllando che \(\mathcal{L}(A_{\neg\psi}) = \emptyset\).
+
+Quindi l'ultima cosa che ci serve è un algoritmo per verificare se il linguaggio di un automa di Büchi è vuoto o meno.
+
+Consideriamo per ora un NFA dato da \(A = \langle \Sigma,Q,\delta,Q_0,F\rangle\) e cerchiamo di capire se \(\mathcal{L}(A) = \emptyset\).
+
+Consideriamo inizialmente l'esempio in figura.
+
+\todo{Aggiungi immagine}
+
+Intuitivamente per capire se è vuoto o meno dobbiamo vedere se esiste un percorso da uno stato iniziale a uno stato di accettazione, ovvero che uno stato finale sia raggiungibile dallo stato iniziale.
+
+Trovato un percorso infatti posso sembre vedere quali archi abbiamo attraversato e usarne le etichette per sintetizzare la parola accettata.
+
+Nel'esempio di prima \(S_0 S_1 S_2\) è un percorso accettante, le cui etichette sono \(bb\). Questo ci dice che \(bb\in \mathcal{L}(A)\).
+
+Un modo banale è di usare un normale algoritmo di reachability sul grafo trasposto a partire dagli satati finali, e vedere se riesco a raggiungere uno stato iniziale, verificabile con un iterazione sugli stati raggiunti.
+
+Esiste però un algoritmo non in NLOGSPACE, ovvero non deterministico a cui basta spazio logaritmico.
+
+TODO PULISCI ALGORITMO E USA AMBIENTE APPROPRIATO
+
+\begin{enumerate}
+  \item Guess \(s \in Q_0\)
+  \item Guess \(\sigma \in \Sigma\)
+  \item Guess \(s' \in \delta(s,\sigma)\)
+  \item If \(s' \in F\) then
+  \item return yes
+  \item else
+  \item s \(\gets t\)
+  \item goto 2
+\end{enumerate}
+
+Questo è non deterministico perché ci sono dei guess, valuiamo il perché è LOGSPACE\@.
+
+Qui abbiamo 3 variabili \(s, \sigma, s'\) ma ognuna di queste può rappresentare un elemento di \(Q\) o \(\Sigma\) in spazio logaritmicol, in particolare \(2\log(\abs{Q}) + \log(\abs{\Sigma})\).
+
+Sapendo che lo spazio è limitato, possiamo aggiungere la condizione di terminazione per la procedura contando il numero di archi attraversati, se supera il numero di stati sono in un ciclo sicuramente.
+
+\begin{enumerate}
+  \item count \(\gets 0\)
+  \item Guess \(s \in Q_0\)
+  \item Guess \(\sigma \in \Sigma\)
+  \item Guess \(s' \in \delta(s,\sigma)\)
+  \item If \(s' \in F\) then
+  \item   return yes
+  \item else if count < \(\abs{Q}\)
+  \item   s \(\gets t\)
+  \item goto 2
+  \item else
+  \item   return no
+\end{enumerate}
+
+Questa nuova variabile è ancora logaritmica.
+
+Dobbiamo ora estendere agli automi di Büchi, in cui non voglio semplicemente raggiungere uno stato, ma voglio raggiungere uno stato infinite volte.
+
+Possiamo estendere l'algoritmo precedente facendo guess dello stato da raggiungere, per potermelo ricordare, e poi verificando che ci ritorno.
+
+\begin{enumerate}
+  \item Guess \(s \in Q_0\)
+  \item Guess \(\sigma \in \Sigma\), Guess \(s' \in \delta(s,\sigma)\)
+  \item \(s'\gets t\)
+  \item if \(s' \in F\) then
+  \item   Guess \(\sigma \in \Sigma\), Guess \(s \in \delta(s',\sigma)\)
+  \item   if \(s = s'\) then
+  \item     return yes
+  \item   else
+  \item     goto 5
+  \item else
+  \item  goto 2
+\end{enumerate}
+
+Questo algoritmo è ancora in NLOGSPACE\@, e prima trova un percorso verso uno stato finale, e poi verifica che esiste un ciclo che torna a quello stato finale, dunque almeno un modo per passarci infinitamente spesso esiste.
+
+Per farlo in maniera direttamente deterministica calcolando le componenti fortemente connesse del grafo, e verificando se esiste uno stato finale che è in una componente fortemente connessa. Di quelli che hanno questa proprietà, bisogna verificare che siano raggiungibili da uno stato iniziale, e se è così allora il linguaggio è non vuoto, altrimenti è vuoto.
+
+Per gli automi di CO-Büchi invece, è sufficiente escludere i nodi di rifiuto nel calcolo delle componenti fortemente connesse, in modo da individuare cicli che non passano mai per stati di rifiuto, e verificare che tali cicli siano raggiungibili dallo stato iniziale, eventualmente passando anche per stati di rifiuto (poiché solo un numero finito di volte).
+
+Andiamo quindi a dimostrare che con gli automi di Büchi accettano tutti e soli i linguaggi omega-regolari.
+
+Partiamo dal teorema sugli automi a stati finiti.
+
+\begin{theorem}
+  Un linguaggio \(L\) è regolare se e solo se \(\exists NFA A \st \mathcal{L}(A) = L\)
+\end{theorem}
+
+Questo è facile da vedere ed è dato per scontato dal corso di EDIT.
+
+\begin{theorem}
+  Un linguaggio \(L\) è \(\omega-\)regolare se e solo se \(\exists NBA A \st \mathcal{L}(A) = L\)
+\end{theorem}
+
+\begin{proof}
+  \begin{description}
+    \item[(\(\implies\))] \(L\) \(\omega-\)regolare \(\implies \exists \gamma = \alpha_1\beta_1^\omega+\alpha_2\beta_2^\omega+\cdots + \alpha_n\beta_n^\omega \st \mathcal{L}(\gamma) = L\). Ovviamente ogni \(\alpha_i,\beta_i\) sono regolari, quindi dal teorema precedente esistono \(DFA A_{i}, B_{i}\) tali che \(\mathcal{L}(A_i) = \alpha_i\) e \(\mathcal{L}(B_i) = \beta_i\). 
+    Cotruiamo quindi per ogni componente \(i\) un automa di Büchi \(C_i= \langle \Sigma, Q_A \cup Q_B, \delta, \set{q_{0_A}}, \set{q_{0_B}}\rangle\) con \(\delta\) definita come:
+    \[\delta(q,\sigma)=\begin{cases}
+      \set{\delta_A(q,\sigma)} &,q \in Q_A \land \delta_A(q,\sigma)\notin F_A\\
+      \set{\delta_A(q,\sigma), q_{0_B}} &,q \in Q_A \land \delta_A(q,\sigma)\in F_A\\
+      \set{\delta_B(q,\sigma)}&,q \in Q_B \land \delta_B(q,\sigma)\notin F_B\\
+      \set{\delta_B(q,\sigma), q_{0_B}} &,q \in Q_B \land \delta_B(q,\sigma)\in F_B\\
+    \end{cases}\]
+
+    Tale costruzione fa si che ogni componente si comporti come la parte regolare \(\alpha_i\), fino a non-deterministicamente decidere di passare alla parte regolare \(\beta_i\), che è estesa per essere un ciclo, in modo da passare infinitamente spesso per lo stato \(q_{0_B}\) che è l'unico stato accettante, e dunque accettare esattamente le parole di \(\alpha_i\beta_i^\omega\). A questo punto mi è sufficiente fare l'unione di tutti questi automi \(C_i\) per ottenere un automa di Büchi che accetta esattamente le parole di \(\gamma\), ovvero di \(L\).
+    \item[(\(\impliedby\))] Consideriamo il NBA \(N = \langle \Sigma, Q, \delta, Q_0, F\rangle\) con \(F = \set{q_0\ldots,q_k}\) stati finali di \(N\). Per \(i \in \set{1,\ldots,k}\) definiamo \(A_i = \langle \Sigma, Q, \delta, Q_0, \set{q_i}\rangle\) e \(B_i = \langle \Sigma, Q, \delta, \set{q_i}, \set{q_i}\rangle\). Interpretando ognuno di questi automi come NFA otteniamo che i linguaggi accettati da \(A_i\) e \(B_i\) sono regolari per il teorema precedente. Inoltre, possiamo separare il nostro \(N\) in \(k\) sottoautomi, ognuno dei quali con \(F_i = \set{q_i}\). Ovviamente il linguaggo dell'unione di questi sottoautomi è uguale a quello di \(N\). Ognuno di questi sottoautomi però ha linguaggio \(L(N_i) = L(A_i)\cdot L(B_i)\omega\). Dunque \(L(N) = \bigcup_{i=1}^k L(A_i)\cdot {L(B_i)}^\omega\), ovvero è \(\omega-\)regolare.
+  \end{description}
+\end{proof}
+
+Quindi i NBA sono sufficientemente espressivi per accettare tutti e soli i linguaggi \(\omega-\)regolari, a differenza di come abbiamo visto per LTL. Lo abbiamo osservato con l'esempio dell'espressione regolre  che accetta le parole che hanno P vera in posizione pari. Questo è facilisimo però da fare con un automa di Büchi, banalmente 
+
+  P
+  ->
+SF  N
+  <-
+  *
+
+Vediamo ora un elenco di diverse condizioni di accettazioni per automi che caratterizzano diversi tipi di linguaggi e proprietà di essi. Considerato \(\rho\) un run di un automa avremo:
+
+\begin{itemize}
+  \item Accettazione al finito, \(last(\rho) \in F\)
+  \item Accettazione di Buchi, \(\inf(\rho) \cap F \neq \emptyset\) o CO-Buchi, \(\inf(\rho) \subseteq F = \emptyset\)
+  \item Generalized Buchi, \(\bigwedge_i \inf(\rho) \cap F_i \neq \emptyset\) o Generalized CO-Buchi, \(\bigvee_i \inf(\rho) \cap F_i = \emptyset\)
+  \item Accettazione di Muller, abbiamo \(F\subseteq 2^Q\), \(\inf(\rho) \in F\). Questa è più simile a quella a finito che alle altre, perché per accettare richiediamo una condizione specifica per il comportamento all'infinito, mentre in quelli di buchi è sufficiente che uno stato sia attraversato infinitamente spesso il resto non mi interessa. Questa è molto più costosa però, perché non mi basta usare raggiungibilità, ma devo verificare com'è fatto il run, e verificare se la sua parte infinita è in \(F\).
+  \item Accettazione di Rabin, abbiamo \(F = {(2^Q\times 2^Q)}^*\), quindi \(F = \langle (G_i,B_i),\ldots,(G_k, B_k)\rangle\), \(\bigvee_i \inf(\rho) \cap G_i \neq \emptyset \land \inf(\rho) \cap B_i = \emptyset\)
+  \item Accettazione di Street, abbiamo \(F = {(2^Q\times 2^Q)}^*\), quindi \(F = \langle (G_i,B_i),\ldots,(G_k, B_k)\rangle\), \(\bigwedge_i \inf(\rho) \cap G_i \neq \emptyset \lor \inf(\rho) \cap B_i = \emptyset\)
+\end{itemize}
+
+Le ultime 3 nel caso non deterministico si possono ridurre a quelle di Büchi, con un costo non indifferente, mentre per il determinismo non è possibile trovare una riduzione a quelle di Büchi, e dunque sono più espressive. 
+
+\chapter{Lezione 22/04}
+
+Tool SPIN che usa Program Graph e LTL. Spin in realtà è più vicino a un transpiler, perchè dato un file con il modello non fa la verifica ma crea un file C che incorpora il modello e la proprietà da verificare con il verificatore, che va compilato e lanciato per avere il risultato della verifica. Spin permette anche la simulazione del modello, sia in maniera guidata dall'utente, che in maniera casuale, che guidata da una traccia di errore.
+
+Per specificare il modello in SPIN si usa un linguaggio di specifica detto Promela. Un modello in Promela è una collezione di \q{proctype} che sono prototipi di processo che vengono istanziati ed eseguiti in parallelo.
+
+\todo{inserire immagine di esempio}
+
+Ci sono diverse istruzioni nel linguaggio che sono considerate atomiche, ovvero che verranno eseguite senza interruzioni, e dunque mappate su una singola transizione nel transition system. I conditional statement e i repetition statement invece sono particolari poiché vogliamo modellare anche non determinismo. In particolare i costrutti "if" e "do" sono un elenco di guardie e azioni, e se più di una guardia è vera allora viene scelto non deterministicamente quale azione eseguire. L'unica differenza tra i due è che "if" viene eseguito una sola volta, mentre "do" viene eseguito finché non raggiunge un break o un goto.
+
+\todo{inserire immagine su if e do}
+
+Una differenza interessante da notare rispetto al C è che nel linguaggio C ogni istruzione è un espressione, ovvero ha un valore che posso assegnare a una variabile. In Promela invece ogni espressione è un istruzione, nel senso che un confronto booleano è un istruzione che è eseguibile se è vera e non eseguibile se è falsa. In particolare, la verifica per le condizioni è fatta sull'eseguibilità dell'istruzione, e quindi è possibile usare ogni istruzione come guardia, e non solo confronti booleani.
+
+Per le formule LTL invece, SPIN usa la sintassi modale per rappresentare gli operatori temporali, ovvero \(\square\) per \(G\), \(\diamond\) per \(F\), \(U\) per \(U\) e \(V\) per \(R\), con \(\square\) rappresentato come [] e \(\diamond\) rappresentato come <>. \todo{aggiungi listing in line}.
+
+Tipi standard più Channel e PID per i canali e i process ID. Approfondisci con slide.
+
+[ESEMPI IN SPIN]
+
+\chapter{Lezione 27/04}
+
+Passiamo ora dalle logiche temporali lineari a quelle ramificate, in particolare con \(CTL^*\) (full computation tree logic) che contiene LTL ma permette di esprimere anche proprietà che non sono esprimibili in LTL\@.
+
+In particolare vedremo il frammento CTL, che è un sottoinsieme di \(CTL^*\) che però è più facile da verificare, di cui vorremo risolvere il model checking. In particolare vedremo inizialmente un algoritmo diretto per il model checking di CTL, e poi vedremo un alogoritmo più efficiente che usa una struttura dati specifica chiamata OBDD\@.
+
+In particolare questa logica aggiunge dei quantificatori sui percorsi, \(A\) e \(E\), che indicano rispettivamente che una proprietà è vera su tutti i percorsi o su almeno un percorso. 
+
+\begin{definition}{Grammatica \(CTL^*\)}
+  La grammatica di \(CTL^*\) è formata da due grammatiche dette grammatica delle formule di stato \(\phi\) e grammatica delle formule di percorso\(\psi\), definite come segue:
+  \[\phi ::= p \in AP \mid \neg \phi \mid \phi \land \phi \mid \phi \lor \phi \mid A\psi \mid E\psi\]
+  \[\psi ::= \phi \mid \neg \psi \mid \psi \land \psi \mid \psi \lor \psi \mid X\psi \mid \psi U\psi \mid \psi R\psi\]
+
+\end{definition}
+Possiamo qundi vedere \(\psi\) come \(LTL\) su \(\phi\). Per la soddisfacibilità in \(LTL\) abbiamo detto che per \(\psi \in LTL\) \(k \models_{LTL} \psi\) se ogni percorso della struttura di kripke soddisfa la proprietà. Possiamo modellarlo anche in \(CTL^*\) con \(k \models_{CTL^*} A\psi\), ovvero \(\psi\) è vera su tutti i percorsi.
+
+Passando alla semantica per \(\psi\) è praticamente a LTL se non per il caso atomico in cui va generalizzato da \(p\) a \(\phi\), mentre per la semantica per \(\phi\) è più complessa.
+
+Per i casi base e per i connettivi booleani è abbastanza intuitiva, mentre per i quantificatori sui percorsi si ritorna a \(\psi\).
+
+\begin{definition}{Semantica \(CTL^*\)}
+  Data una struttura \(k = \langle AP, W, R, w_0, r \rangle\) con \(AP\) insieme di proposizioni atomiche, \(W\) insieme dei mondi possibili o stati, \(R \subseteq W\times W\) relazione di transizione, \(w_0\) mondo iniziale e \(r: W \to 2^{AP}\) funzione di etichettatura che associa a ogni stato un insieme di proposizioni atomiche vere in quello stato, e dato uno stato \(w \in W\) di partenza (\(w_0\) se omesso), diremo che:
+  \begin{itemize}
+    \item \(k,w \models p\) se e solo se \(p \in r(w)\)
+    \item \(k,w \models \neg \phi\) se e solo se \(k,w \not\models \phi\)
+    \item \(k,w \models \phi_1 \land \phi_2\) se e solo se \(k,w \models \phi_1\) e \(k,w \models \phi_2\)
+    \item \(k,w \models \phi_1 \lor \phi_2\) se e solo se \(k,w \models \phi_1\) o \(k,w \models \phi_2\)
+    \item \(k,w \models A\psi\) se e solo se \(\forall \pi \in Paths(k,w), k,\pi \models \psi\)
+    \item \(k,w \models E\psi\) se e solo se \(\exists \pi \in Paths(k,w), k,\pi \models \psi\)
+  \end{itemize}
+  Importante notare che fino ai quantificatori sui percorsi la semantica è definita su stati, quindi non ha alcuna nozionne temporale, mentre nei quantificatori si passa alla semantica LTL\@, che è definita sui percorsi, e dunque ha una nozione temporale. Normalmente a LTL basterebbe \(\pi\), ma essendo che in una formula di percorso posso tornare a una formula di stato è necessario mantenere la struttura \(k\) per poter valutare le formule di stato che possono essere presenti in \(\psi\).
+
+  In particolare, per la semantica di \(\psi\) abbiamo esattamente la stessa semantica di LTL\@, con l'unica differenza che
+  \[k, \pi, i\models \text{ se e solo se} k,(\pi)_i\models \phi\]
+\end{definition}
+
+Vedimo ora il frammento CTL di \(CTL^*\), che è un sottoinsieme di \(CTL^*\) in cui ogni operatore temporale è preceduto da un quantificatore sui percorsi.
+
+Quello che cambia è la grammatica di \(\psi\), che non è l'intera grammatica di LTL\@, ma solo:
+\[\psi ::= X\phi \mid \phi U\phi \mid \phi R\phi\]
+
+In questo modo non c'è nesting di operatori temporali, e dunque ogni operatore temporale è preceduto da un quantificatore sui percorsi, e dunque ogni formula di percorso è del tipo \(X\phi\), \(\phi U \phi\) o \(\phi R \phi\).
+
+Una formulazione alternativa e la prima proposta usa un'unica grammatica:
+\[\phi ::= p \in AP \mid \neg \phi \mid \phi \land \phi \mid \phi \lor \phi \mid AX\phi \mid EX\phi \mid \phi AU \phi \mid \phi AR \phi \mid \phi EU \phi \mid \phi ER \phi\]
+
+Questa sintassi esplicità è più prolissa ma è usata in molti software perché il problema di model checking di CTL è risolto risolvendo dei sottoproblemi per le sottoformule di questa forma e poi combinando.
+
+Essendo molto prolissa, se ne utilizza una versione in cui si rimuovono quelli non necessari, ad esempio \(\land\) in presenza di \(\lor\) e \(\neg\).
+Chiaramente questo vale per ogni coppia di operatore duale, ad esempio \(A\) e \(E\), \(U\) e \(R\), \(X\) e \(X\).
+
+Dunque \(\neg AX\phi \equiv E\neg X \phi \equiv EX \neg \phi\), quindi l'operatore \(AX\) è ridondante.
+Similmente \(\neg A \phi_1 U \phi_2 \equiv E \neg (\phi_1 U \phi_2) \equiv E \neg \phi_1 R \neg \phi_2\), e di conseguenza \(AU\) è ridondante. Ugualemente \(AR\) è ridondante. Quindi a livello algoritmico è sufficiente considerare solo il \q{frammento esistenzaile} di CTL\@, ovvero quello che contiene solo \(E\) come quantificatore.
+
+Consideriamo inoltre, \(\phi_1 R \phi_2\). Supponiamo che \(\phi_1\) non sia mai vera, allora \(\phi_1 R \phi_2\) è vera se e solo se \(\phi_2\) è sempre vera, ovvero \(G\phi_2\). Altrimenti \(\phi_1\) dev'essere sempre vera fino a quando \(\phi_2\) non diventa vera, e dunque \(\phi_1 R \phi_2\) è vera se e solo se \(\phi_1 U \phi_2\). Dunque \(\phi_1 R \phi_2 \equiv G \phi_2 \lor \phi_2 U (\phi_1 \land \phi_2)\).
+
+Formalmente \(\phi_1 R \phi_2\) è definita come:
+\[\forall j \geq i, (\pi, j \models \phi_2 \lor \exists k \geq i, \pi, k \models \phi_1 \land \phi_2)\]
+
+Il primo disgiunto è esattamente \(G\phi_2\), mentre il secondo disgiunto è esattamente \(\phi_2 U (\phi_1 \land \phi_2)\).
+Questo vale a livello di LTL, ma a livello di CTL dobbiamo vederlo usando solo \(\lor\) e \(E\).
+\[E \phi_1 R \phi_2 \equiv E(G\phi_2 \lor \phi_2 U(\phi_1 \land \phi_2))\]
+
+Essendo che \(E\) distribuisce su \(\lor\) abbiamo proprio
+\[E \phi_1 R \phi_2 \equiv E G\phi_2 \lor E \phi_2 U(\phi_1 \land \phi_2)\]
+
+Dunque la logica che andremo veramente a risolvere è la seguente:
+\[\phi::= p \in AP \mid \neg \phi \mid \phi \lor \phi \mid EX \phi \mid E\phi U \phi \mid EG \phi\]
+
+Quello che andremo a fare è un algoritmo bottom-up, in cui risolviamo le sottoformule e andremo ad etichettare il nostro modello con delle etichette che indicano quali formule sono soddisfatte in ogni stato.
+
+Prendiamo ad esempio \(E((p\land q) U r)\equiv E((\neg(\neg p \lor \neg q))U r)\). Andremo a etichettare ogni stato che soddisfa \(p\) con \(f_p\), ogni stato che soddisfa \(q\) con \(f_q\), ogni stato che soddisfa \(\neg p \lor \neg q\) con \(f_{\neg p \lor \neg q}\) e così via.
+
+Prima di vedere l'algoritmo però ci serve ampliare il concetto di one-step unfolding visto in precedenza.
+In particolare, \(\phi_1 U \phi_2 \equiv \phi_2 \lor (\phi_1 \land X(\phi_1 U \phi_2))\). In \(CTL^*\) quindi avremo
+\[E(\phi_1 U \phi_2 )\equiv E(\phi_2 \lor (\phi_1 \land X(\phi_1 U \phi_2))) \equiv E\phi_2 \lor E(\phi_1 \land X(\phi_1 U \phi_2))\]
+
+Nella sintassi di CTL\@, non possiamo esprimere \(E \phi_2\), ma quello che sta dicendo questa formula è che esista un percorso il cui primo stato soddisfa \(\phi_2\), che è equivalente a richiedere semplicemente \(\phi_2\).
+Per quanto riguarda \(E(\phi_1 \land X(\phi_1 U \phi_2))\) stiamo richiedendo che esista un percorso in cui \(\phi_1\) è vero in radice e che lo stato successivo soddisfa \(\phi_1 U \phi_2\). Questo è equivalente a \(\phi_1 \land E(X (\phi_1 U \phi_2))\).
+Quest'ultimo pezzo può essere riscritto come \(\phi_1 \land EX (E \phi_1 U \phi_2)\), e dunque abbiamo una formula in CTL per one-step unfolding.
+
+Dobbiamo fare lo stesso con \(G\) e per farlo vedere passeremo per \(R\)
+\[E(\phi_1 R \phi_2) \equiv E(\phi_2 \land (\phi_1 \lor X(\phi_1 R \phi_2)))\equiv\]
+\[\phi_2 \land E(\phi_1 \lor X(\phi_1 R \phi_2))\equiv\]
+\[\phi_2 \land (\phi_1 \lor EX (E \phi_1 R \phi_2))\]
+
+Essendo che \(G \phi_2 \equiv \bot R \phi_2\), abbiamo che \(EG \phi_2 \equiv \phi_2 \land EX (EG \phi_2)\) sostituendo e semplificando \(\bot\).
+
+Iniziamo quindi a vedere questi algoritmi partendo dal \(X\).
+
+Iniziamo dalla definizione di chiusura, similmente a quella che abbiamo visto per LTL.
+
+\(cl(\phi) \in NCTL\) è definita come
+\begin{itemize}
+  \item \(\phi \in cl(\phi)\)
+  \item \(\neg \phi' \in cl(\phi)\implies \phi' \in cl(\phi)\)
+  \item \(\phi_1 \lor \phi_2 \in cl(\phi)\implies \phi_1, \phi_2 \in cl(\phi)\)
+  \item \(EX \phi' \in cl(\phi)\implies \phi' \in cl(\phi)\)
+  \item \(E\phi_1 U \phi_2 \in cl(\phi)\implies \phi_1, \phi_2 \in cl(\phi)\)
+  \item \(EG \phi' \in cl(\phi)\implies \phi' \in cl(\phi)\)
+\end{itemize}
+
+Quello che farà l'algoritmo è etichettare ogni stato con le formule di \(cl(\phi)\) che sono soddisfatte in quello stato andando bottom-up\@, ovvero partendo dalle formule proposizionali e risalendo fino alla formula \(\phi\) che vogliamo verificare.
+
+Per \(EX\) l'algoritmo è il seguente
+
+\begin{algorithmdesc}{Checking \(EX\)}
+    \begin{algorithmic}[1]
+      \Statex{} \textbf{signature} \(\textsc{CheckEX:} \quad Kripke \times Formula \to Boolean\)
+      \Function{\(\textsc{Resolution}\)}{$(k,\phi)$} % chktex 46
+          \State{} \(T \gets \set{w \in W}[k,w\models \phi]\)
+          \While{\(T\neq \emptyset\)}
+              \State{} \(s \gets\) choose \(T\)
+              \For{\(t \in R^{-1}(s)\)}
+                  \State{} \(r(t)\gets r(t)\cup{EX p}\)
+              \EndFor{}
+          \EndWhile{}
+      \EndFunction{}
+    \end{algorithmic}
+\end{algorithmdesc}
+
+\chapter{Lezione 29/04}
+
+ALTRI ESEMPI SU SPIN\@
