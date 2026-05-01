@@ -219,8 +219,6 @@ Le strutture di Kripke devono il loro nome a Saul Kripke, logico che ha definito
 
 Le proposizioni atomiche e la funzione di etichettamento \(L\) convertono un sistema a transizioni in un \keyword{modello logico}. Rispetto a questo modello è possibile interpretare e verificare formule espresse in linguaggi logici formali, come verrà discusso nei capitoli successivi.
 
-% START NEW LESSON
-
 In una struttura di Kripke, la funzione \(L\) associa a ogni stato un modello proposizionale che rappresenta le proprietà atomiche vere in quello stato.
 Possiamo quindi definire un concetto di soddisfacibilità locale, ovvero in uno stato.
 
@@ -378,7 +376,7 @@ Per definire ora la funzione di transizione dovremmo definire quali sono le copp
   Per l'etichettatura, definiamo con \(AP = \Loc \cup \Cond(\Var)\) e \(L : S \to 2^{AP}\) tale che \(L(\langle l,\eta\rangle) = \set{l} \cup \set{g \mid g \in \Cond(\Var) \land {\eta \models g}}\).
 \end{definition}
 
-\chapter{Composizione e Sincronizzazione}
+\section{Composizione e Sincronizzazione}
 
 Fatto ciò, abbiamo definito il linguaggio per definire i componenti, ma questo è poco più di un programma sequenziale. Un po' di più perché da possibilità di scelte non deterministiche.
 Per sistemi complessi è però molto difficile specificarli per intero.
@@ -388,10 +386,10 @@ La concorrenza è modellabile in tantissimi modi diversi.
 
 \todo{Riccardo: Esempi da trascrizione (Dovrebbe stare nella parte 6 della trascrizione)}
 
-\section{Composizione parallela sincrona}
+\subsection{Composizione parallela sincrona}
 La \keyword{composizione parallela sincrona} è facile da definire.
 
-\begin{definition}{Composizione parllela sincrona}
+\begin{definition}{Composizione parallela sincrona}
   Dati \(TS_1, \ldots, TS_n\) sistemi a transizione tali che \(TS_i = (S_i, S_{0i}, A_i, R_i)\) con \(S_i\) disgiunti, allora la composizione parallela sincrona è il sistema a transizioni \(TS = (S,S_0,R,L)\) con:
   \begin{itemize}
     \item \(S = S_1 \times \ldots \times S_n\), stati globali
@@ -400,3 +398,374 @@ La \keyword{composizione parallela sincrona} è facile da definire.
     \item \(R \subseteq S \times A \times S\) è tale che, dati \(\langle s_1, \ldots, s_n\rangle, \langle s_1', \ldots, s_n'\rangle \in S\) e \(\langle a_1,\ldots, a_n \rangle \in A\) contiene \(\langle s_1,\ldots,s_n \rangle \xrightarrow{\langle a_1,\ldots,a_n \rangle} \langle s_1',\ldots,s_n'\rangle\) se \(s_i \xrightarrow{a_i} s_i'\,, \forall i \in \set{1,\ldots,n}\).
   \end{itemize}
 \end{definition}
+
+Prendiamo come esempio una coppia di Transition Systems, che rappresentano due astrazioni di semafori.
+
+Il semaforo si può trovare in due stati, rosso o verde. Inoltre ci sono due transizioni: una che passano dallo stato rosso allo stato verde etichettata con \q{OK} e l'altra che passa dallo stato verde allo stato rosso etichettata con \q{KO}.
+
+Immaginando di avere due semafori con stato iniziale differente otteniamo la seguente figura.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[shorten >=1pt,node distance=3cm,on grid,auto, bend right=30]
+    \node[state,initial, label=\(TS_1\)]  (RED)                      {RED};
+    \node[state]          (GREEN) [below=of RED] {GREEN};
+
+    \path[->] (RED) edge[bend right] node[swap] {OK} (GREEN)
+    (GREEN) edge[bend right] node[swap] {KO} (RED);
+
+    \node[state, initial, label=\(TS_2\)] (GREEN) [right=7cm of RED] {GREEN};
+    \node[state]  (RED)   [below=of GREEN]  {RED};
+
+    \path[->] (RED) edge[bend right] node[swap] {OK} (GREEN)
+    (GREEN) edge[bend right] node[swap] {KO} (RED);
+  \end{tikzpicture}
+  \caption{Transition Systems di due semafori}\label{fig:ts_semaphore}
+\end{figure}
+
+Se adesso applichiamo l'operazione di composizione sincrona ai due Transition Systems otteniamo il seguente:
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[shorten >=1pt,node distance=4cm,on grid,auto, bend right=30]
+    \node[state,initial]  (RED-GREEN) {RED,GREEN};
+    \node[state] (GREEN-RED) [below=of RED-GREEN] {GREEN,RED};
+
+    \path[->] (RED-GREEN) edge[bend right] node[swap] {\(\langle OK,KO\rangle\)} (GREEN-RED)
+    (GREEN-RED) edge[bend right] node[swap] {\(\langle KO,OK\rangle\)} (RED-GREEN);
+
+    \node[draw=none, font=\Huge] (label) [above=2cm of RED-GREEN] {\(TS_1\,\|\,TS_2\)};
+
+  \end{tikzpicture}
+  \caption{Composizione sincrona di Transition Systems di due semafori}\label{fig:ts_semaphore_sync_composition}
+\end{figure}
+
+In realtà il risultato della composizione non è proprio così, poiché gli stati derivanti dal prodotto cartesiano sono quattro: (red, green), (red, red), (green, green), (green red) come riportato dalla figura è la seguente:
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[shorten >=1pt,node distance=4cm,on grid,auto, bend right=30]
+    \node[state,initial]  (RED-GREEN) {RED,GREEN};
+    \node[state] (GREEN-RED) [below=of RED-GREEN] {GREEN,RED};
+
+    \path[->] (RED-GREEN) edge[bend right] node[swap] {\(\langle OK,KO\rangle\)} (GREEN-RED)
+    (GREEN-RED) edge[bend right] node[swap] {\(\langle KO,OK\rangle\)} (RED-GREEN);
+
+    \node[state] (RED-RED) [right=7cm of RED-GREEN] {RED,RED};
+    \node[state] (GREEN-GREEN) [below=of RED-RED] {GREEN,GREEN};
+
+    \path[->] (RED-RED) edge[bend right] node[swap] {\(\langle OK,OK\rangle\)} (GREEN-GREEN)
+    (GREEN-GREEN) edge[bend right] node[swap] {\(\langle KO,KO\rangle\)} (RED-RED);
+
+    \node[draw=none, font=\Huge] (label) [above=2cm of RED-GREEN, xshift=4cm] {\(TS_1\,\|\,TS_2\)};
+  \end{tikzpicture}
+  \caption{Composizione sincrona di Transition Systems di due semafori (completa)}\label{fig:ts_semaphore_sync_composition_complete}
+\end{figure}
+
+\begin{note}{}
+  Notiamo però che non essendoci percorsi dallo stato iniziale (RED,GREEN) agli altri due stati, li possiamo escludere poiché stati che non saranno mai raggiungibili.
+\end{note}
+
+\subsection{Composizione parallela asincrona}
+
+Se da un lato ci sono i modelli completamenti sincroni dall'altra ci sono quelli completamente asincroni, che generalizzano quelli in cui alcuni si sincronizzano e altri no.
+
+L'idea è quella di avere un modello che permette di descrivere sistemi che evolvono indipendentemente da eventi esterni.
+
+Per farlo in maniera semplice possiamo usare il modello di composizione sincrona ma aggiungendo ad ogni insieme di azioni locali una \textit{no operation} \(-\) per permettere a ogni automa locale di effettuare un'azione vacua, ovvero un azione che non modifica lo stato del sistema.
+
+
+In generale la composizione sincrona è definita come la composizione sincrona, ma con l'aggiunta dell'azione \textit{no operation}, in cui intuitivamente se ci troviamo in un particolare stato e abbiamo come  transizione da eseguire l'azione \q{\(-\)} allora lo stato partenza sarà uguale allo stato di arrivo.
+
+Questo permette, inoltre, a stati che precedentemente non erano raggiungibili di diventarlo, poiché non vi è più una sincronizzazione esterna.
+
+Definiamo adesso formalmente la composizione asincrona.
+
+\begin{definition}{Composizione asincrona}
+  Assumiamo \(TS_1,\ldots,TS_n\) Transition Systems tali che \(\forall i \in 1\ldots n, TS_i = \langle S_i,A_i,R_i,S_{i0}\rangle \). Il Transition system ottenuto dalla composizione asincrona di questi transition systems è \( TS = TS_1 \| \ldots \| TS_n = \langle S,A,R,S_0\rangle \) tale che:
+  \begin{itemize}
+    \item \( S = S_1 \times \ldots \times S_n \)
+    \item \( A = (A_1 \cup \{-\}) \times \ldots \times (A_n \cup \{-\}) \)
+    \item \( S_0 = S_{10} \times \ldots \times S_{n0} \)
+    \item \( R \) contiene \( \langle s_1,\ldots,s_n \rangle \xrightarrow{\langle a_1,\ldots,a_n \rangle} \langle s_1',\ldots,s_n' \rangle \), se \( \langle a_1,\ldots,a_n \rangle \in A \) e, per ogni \( 1 \leq i \leq n \),
+          \begin{itemize}
+            \item \( s_i = s_i' \) e \( a_i = - \) oppure
+            \item \( s_i \xrightarrow{a_i}_i s_i' \) e \( a_i \neq - \).
+          \end{itemize}
+  \end{itemize}
+\end{definition}
+
+Questo modello ammette vari tipi di comportamenti, da comportamenti sincroni a comportamenti del tutto asincroni,
+
+Inoltre questo tipo di modello in cui la concorrenza è virtuale, è esattamente come vengono gestiti nella pratica i processi concorrenti, infatti come sott'insieme di questo modello abbiamo la composizione asincrona con interleaving, in cui c'è composizione completamente asincrona, ovvero in ogni momento un solo componente esegue un'azione, ma tale scelta è non deterministica.
+
+Nel caso dello schedule dei processi, la scelta non è non deterministica, infatti ci sono diverse politiche che possono essere usate come criterio di scelta. Ma in generale, nel caso in cui non si riuscisse a definire una politica da adottare, la scelta sarà non deterministica, come infatti avviene nei Labeled Transition System.
+
+Dunque mentre la composizione sincrona non aggiunge nessun non determinismo se non già presente negli LTS che lo compongono, la composizione asincrona interleaving e quella generale introducono implicitamente scelte non determistiche.
+
+Intuitivamente come definizione possiamo usare quella generale, a cui applichiamo la seguente restrizione: ogni azione globale è composta da una sola azione locale e no operation per gli altri stati in maniera non deterministica.
+
+
+\begin{definition}{Composizione Asincrona Interleaving}
+  Assumiamo \(TS_1,\ldots,TS_n\) Transition Systems tali che \(\forall i \in 1\ldots n, TS_i = \langle S_i,A_i,R_i,S_{i0}\rangle \). Il Transition system ottenuto dalla composizione asincrona (interleaving) di questi transition systems è \( TS = TS_1 \parallel \ldots \parallel TS_n = \langle S,A,R,S_0\rangle \) tale che:
+  \begin{itemize}
+    \item \( S = S_1 \times \ldots \times S_n \)
+    \item \( A \subset (A_1 \cup \{-\}) \times \ldots \times (A_n \cup \{-\}) \) tale che \( \langle a_1,\ldots,a_n \rangle \in A \) se e solo se, per ogni \( j \neq i \), \( a_i \in A_i \) implica \( a_j = - \)
+    \item \( S_0 = S_{10} \times \ldots \times S_{n0} \)
+    \item \( R \) contiene \( \langle s_1,\ldots,s_n \rangle \xrightarrow{\langle a_1,\ldots,a_n \rangle} \langle s_1',\ldots,s_n' \rangle \), se \( \langle a_1,\ldots,a_n \rangle \in A \) e, per ogni \( 1 \leq i \leq n \),
+          \begin{itemize}
+            \item \( s_i = s_i' \) e \( a_i = - \) oppure
+            \item \( s_i \xrightarrow{a_i}_i s_i' \) e \( a_i \neq - \).
+          \end{itemize}
+  \end{itemize}
+\end{definition}
+
+Ovviamente in questo modello non è inficiata la raggiungibilità di stati, ma non vi è vero parallelismo, ed inoltre vi è una perdita delle informazioni riguardo al numero dei percorsi e quindi di computazioni. In generale però è un modello che viene utilizzato molto frequentemente poiché offre una buona astrazione.
+
+Consideriamo l'esempio precendente e applichiamo la composizione asincrona interleaving:
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[shorten >=1pt,node distance=3cm,on grid,auto, bend right=30]
+    \node[state,initial] (RED-GREEN) {RED,GREEN};
+    \node[state] (GREEN-RED) [right=7cm of RED-GREEN] {GREEN,RED};
+    \node[state] (RED-RED) [above right=5cm of RED-GREEN] {RED,RED};
+    \node[state] (GREEN-GREEN) [below right=5cm of RED-GREEN] {GREEN,GREEN};
+    \node[draw=none, above=1.5cm of RED-RED] {};
+
+
+    \path[->] (RED-GREEN) edge[bend right] node[] {\(\langle -,KO\rangle\)} (RED-RED)
+    edge[bend right] node[swap] {\(\langle OK,-\rangle\)} (GREEN-GREEN)
+    (RED-RED) edge[bend right] node[swap] {\(\langle -,OK\rangle\)} (RED-GREEN)
+    (GREEN-GREEN) edge[bend right] node[] {\(\langle KO,-\rangle\)} (RED-GREEN)
+    ;
+
+
+    \path[->] (GREEN-RED) edge[bend right] node[swap] {\(\langle KO,-\rangle\)} (RED-RED)
+    edge[bend right] node[] {\(\langle -,KO\rangle\)} (GREEN-GREEN)
+    (RED-RED) edge[bend right] node[] {\(\langle OK,-\rangle\)} (GREEN-RED)
+    (GREEN-GREEN) edge[bend right] node[swap] {\(\langle -,KO\rangle\)} (GREEN-RED)
+    ;
+  \end{tikzpicture}
+  \caption{Composizione asincrona interleaving di Transition Systems di due semafori}\label{fig:ts_semaphore_async_composition}
+\end{figure}
+
+
+Una formulazione equivalente del modello asincrono con interleaving più compatto è quella di avere come insieme delle azioni l'unione disgiunta degli insiemi di azioni locali, ad esempio avendo le azioni rappresentate come coppie \(\langle i,a\rangle\) con \(i\) indice dell'automa locale e \(a\) azione locale. Allora possiamo appropriamente riformulare la relazione di transizione nel seguente modo.
+
+\begin{definition}{Composizione Asincrona Interleaving Compatta}
+  Assumiamo \(TS_1,\ldots,TS_n\) Transition Systems tali che \(\forall i \in 1\ldots n, TS_i = \langle S_i,A_i,R_i,S_{i0}\rangle \). Il Transition system ottenuto dalla composizione asincrona (interleaving) di questi transition systems è \( TS = TS_1 \parallel \ldots \parallel TS_n = \langle S,A,R,S_0\rangle \) tale che:
+  \begin{itemize}
+    \item \( S = S_1 \times \ldots \times S_n \)
+    \item \( A = \bigcup_{1 \leq i \leq n} A_i \) (oppure l'unione disgiunta \(\uplus\))
+    \item \( S_0 = S_{10} \times \ldots \times S_{n0} \)
+    \item \( R \) contiene \( \langle s_1,\ldots,s_n \rangle \xrightarrow{a} \langle s_1,\ldots,s_i',\ldots,s_n \rangle \), se si ha \( s_i \xrightarrow{a}_i s_i' \), per qualche \( 1 \leq i \leq n \).
+  \end{itemize}
+\end{definition}
+
+
+Noi avevamo però dei Program Graph per descrivere i componenti, che poi venivano \q{compilati} in LTS. Abbiamo visto come fare composizione di LTS, ma per i program graph dobbiamo modellare la possibilità di poter condividere informazioni, modellare forme di comunicazioni tra processi. Uno dei modi per fare ciò è attraverso la condivisione di variabili, ovvero condividere aree di memoria in cui più processi possono leggere e scrivere.
+
+Nel mondo degli LTS però non c'è il concetto di variabile. Quindi l'approccio di tradurre vari PG in LTS separatamente per poi comporli non è necessariamente corretto, poiché nel passaggio da PG a LTS si perde il concetto di variabile e dunque di condivisione di variaibli.
+
+\begin{example}{}
+  Vediamo cosa succede nello specifico con un esempio.
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{_images/pg_incorrect_variable_sharing_example}
+    \caption{Esempio di condivisione delle variabili errata}\label{fig:pg_incorrect_variable_sharing_example}
+  \end{figure}
+\end{example}
+
+Quindi quello che succede è che quando ottengo l'LTS composto, non vi è nessuna releazione tra le due variabili \(x\) quindi operazioni come incremento o decremento, esse avvengono soltanto sull'oggetto su cui si applicano.
+
+Dunque questa fusione va fatta a livello di PG, ma allora la composizione va fatta a livello di PG, e dunque è necessario definire una composizione di PG.
+
+\subsection{Interleaving Program Graph}
+
+\begin{definition}{Composizione Asincrona (Interleaving) di Program Graph}
+  Dati \(n\) Program Graph \(PG_i = (\Loc_i, \Act_i, \Eff_i, \hookrightarrow_i, \Loc_{i0}, g_{i0})\) definiti sui rispettivi insiemi di variabili \(\Var_i\), il Program Graph ottenuto dalla loro composizione asincrona con interleaving è:
+  \[ PG = PG_1 \parallel PG_2 \parallel \ldots \parallel PG_n = (\Loc, \Act, \Eff, \hookrightarrow, \Loc_0, g_0) \]
+  definito sull'insieme di variabili globali \(\Var = \bigcup_{1 \leq i \leq n} \Var_i\), dove:
+  \begin{itemize}
+    \item \(\Loc = \Loc_1 \times \Loc_2 \times \ldots \times \Loc_n\) è il prodotto cartesiano delle locazioni;
+    \item \(\Act = \bigcup{1 \leq i \leq n} \Act_i\) è l'unione delle azioni (può essere anche disgiunta);
+    \item \(\Loc_0 = \Loc_{10} \times \Loc_{20} \times \ldots \times \Loc_{n0}\) è l'insieme delle locazioni iniziali;
+    \item \(g_0 = g_{10} \land g_{20} \land \ldots \land g_{n0}\) è la condizione (o guardia) iniziale globale.
+  \end{itemize}
+\end{definition}
+
+\paragraph{Condivisione delle variabili:}
+L'insieme delle variabili globali \(\Var\) è l'unione (non disgiunta) delle variabili dei singoli processi. Per semplicità, assumiamo che se due variabili locali in processi diversi sono definite con lo stesso nome, esse siano implicitamente condivise\footnote{Nel caso in cui due variabili omonime non debbano essere condivise, è necessario disambiguarle prima della composizione (ad esempio rinominandole). Una definizione alternativa potrebbe tenere conto di variabili non condivise con lo stesso nome, ma risulterebbe inutilmente più complessa senza aggiungere effettivo potere espressivo.}.
+In questo modo, il problema riscontrato con l'LTS globale (in cui si perdeva la relazione tra le variabili) non sussiste più: la modifica che un processo opera su una variabile condivisa diventa immediatamente visibile a tutti gli altri processi.
+
+\paragraph{Relazione di Transizione (\(\hookrightarrow\)):}
+Le transizioni vengono definite in modo del tutto analogo all'interleaving degli LTS. Se il processo \(i\)-esimo esegue un'azione locale, la locazione globale si aggiorna modificando solo la componente \(i\)-esima, lasciando inalterate le locazioni di tutti gli altri processi. Formalmente:
+\[
+  \text{Se } l_i \xhookrightarrow{g:a}_i l_i' \text{ in } PG_i \implies \langle l_1, \ldots, l_i, \ldots, l_n \rangle \xhookrightarrow{g:a} \langle l_1, \ldots, l_i', \ldots, l_n \rangle
+\]
+
+\paragraph{Definizione della funzione degli effetti (\(\Eff\)) globale:}
+L'aspetto più complesso della composizione riguarda la funzione \(\Eff\), che funge da ponte tra la sintassi e la semantica. Dobbiamo infatti costruire una funzione globale
+\[ \Eff : \Act \times \Eval(\Var) \to \Eval(\Var) \]
+avendo a disposizione esclusivamente le funzioni locali
+\[ \Eff_i : \Act_i \times \Eval(\Var_i) \to \Eval(\Var_i) \]
+
+Presa un'azione arbitraria \(a \in \Act\) e una valutazione globale \(\eta \in \Eval(\Var)\), dobbiamo costruire la nuova valutazione globale \(\eta'\). Essendo \(\Act\) un'unione disgiunta, sappiamo esattamente a quale set locale \(\Act_i\) appartiene l'azione \(a\).
+
+Tuttavia, non possiamo passare direttamente \(\eta\) alla funzione \(\Eff_i\), poiché i domini sono disallineati: \(\eta\) è valutata su tutto \(\Var\), mentre \(\Eff_i\) richiede una valutazione definita solo su \(\Var_i\).
+Per risolvere questo problema, procediamo in tre fasi:
+\begin{enumerate}
+  \item \textbf{Restrizione:} Definiamo una valutazione locale \(\eta_i\) ottenuta restringendo il dominio della funzione globale \(\eta\) alle sole variabili del processo \(i\)-esimo. Ovvero: \(\eta_i(v) = \eta(v)\) per ogni \(v \in \Var_i\).
+  \item \textbf{Applicazione:} Ora che i formati sono compatibili, possiamo applicare la funzione locale per calcolare i nuovi valori delle variabili modificate dall'azione: \(\eta_i' = \Eff_i(a, \eta_i)\).
+  \item \textbf{Estensione (Completamento):} Infine, ricostruiamo la nuova valutazione globale \(\eta'\). Per le variabili appartenenti a \(\Var_i\), assegniamo il risultato appena calcolato \(\eta_i'\). Per tutte le altre variabili di sistema che non appartengono a \(\Var_i\), applichiamo sostanzialmente la funzione identità, mantenendo il valore che avevano nella \(\eta\) originale.
+\end{enumerate}
+
+Formalmente, l'effetto di un'azione sulla valutazione \(\eta\) per una qualsiasi variabile \(v \in \Var\) si definisce come:
+\[
+  \Eff(a, \eta)(v) =
+  \begin{cases}
+    \Eff_i(a, \eta_i)(v) & \text{se } a \in \Act_i \text{ e } v \in \Var_i \\
+    \eta(v)              & \text{altrimenti}
+  \end{cases}
+\]
+dove \(\eta_i\) è la restrizione di \(\eta\) alle variabili in \(\Var_i\).
+
+
+\begin{example}{Composizione di PG con Variabile Condivisa}
+  Riprendendo il problema della variabile condivisa visto in \Cref{fig:pg_incorrect_variable_sharing_example}, se effettuiamo la composizione a livello di Program Graph otteniamo un modello corretto \(PG_1 \parallel PG_2\).
+
+  Nello stato iniziale globale \((l_1^1, l_1^2)\), una singola valutazione \(\eta\) traccia il valore dell'unica variabile condivisa \(x\).
+  Se il primo processo esegue l'incremento (\(x := x+1\)), il sistema transita nella locazione globale \((l_2^1, l_1^2)\). Successivamente, se il secondo processo esegue il decremento (\(x := x-1\)), il sistema raggiunge lo stato \((l_2^1, l_2^2)\). Applicando la semantica della funzione \(\Eff\) globale, queste operazioni avvengono sulla medesima istanza di \(x\), riportandola coerentemente al suo valore originale. Lo stesso vale per l'ordine inverso di esecuzione.
+\end{example}
+
+Dal momento che non c'è nessun impegno semantico a modellare cosa succede veramente a livello puramente sintattico, il comportamento reale emerge durante la traduzione in LTS (utilizzando la funzione \(\Eff\) globale come ponte).
+Durante questa compilazione, gli stati dell'LTS diventano coppie formate dalla locazione globale e dalla valutazione globale delle variabili: \(\langle (l_a, l_b), \eta \rangle\).
+
+In assenza di variabili condivise, la composizione diretta degli LTS originali non causerebbe problemi poiché i domini sarebbero del tutto indipendenti. Il problema sorge unicamente in presenza di memoria condivisa: se gli LTS non mantengono traccia di questa condivisione, le modifiche rimangono isolate alla realtà di un singolo processo, rendendo impossibile ristabilire una coerenza nello stato comune. L'approccio corretto è dunque spostare l'operazione di composizione parallelamente in alto, a livello del linguaggio astratto (Program Graph).
+
+
+\subsection{Protocolli di Mutua Esclusione}
+
+Per calare questi concetti di modellazione in un contesto pratico, introdurremo degli esempi concreti ispirati ai \keyword{protocolli di mutua esclusione}.
+
+Questi sistemi sono sufficientemente semplici ma ricchi di sfumature da prestarsi perfettamente allo studio con i tool di verifica formale (Model Checking). Tali strumenti, infatti, storicamente nascono proprio per analizzare ed evidenziare difetti in questa tipologia di protocolli.
+
+I protocolli di mutua esclusione che analizzeremo sono progettati per operare in modo \keyword{distribuito}, ovvero senza un sistema centralizzato di risoluzione dei conflitti. La sincronizzazione avviene esclusivamente ed in maniera autonoma tra i processi tramite \keyword{variabili condivise}.
+
+\begin{example}{Un Primo Tentativo di Protocollo}
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{_images/mutual_exclusion_protocol_code_example}
+    \caption{Esempio di Protocollo di Mutua Esclusione}\label{fig:mutual_exclusion_protocol_example}
+  \end{figure}
+
+  Questo primo tentativo garantisce la mutua esclusione tramite l'uso di due variabili booleane condivise, \texttt{flag1} e \texttt{flag2}. Ogni processo utilizza il proprio flag per segnalare l'intenzione di accedere alla sezione critica.
+\end{example}
+
+Nota che, l'obiettivo della verifica formale in questo contesto non è analizzare lo specifico codice di un processo applicativo, bensì il \keyword{meccanismo di mutua esclusione} in sé. Per questo motivo, si ricorre a una forte astrazione: la logica del protocollo di comunicazione rimane esplicita nel modello, mentre il resto del codice (che varia da processo a processo ed è arbitrariamente lungo) viene astratto in blocchi generici e opachi.
+
+Strutturalmente, ogni processo esegue ciclicamente le seguenti fasi:
+\begin{enumerate}
+  \item Sezione di codice non critico (\textit{non-critical code});
+  \item Protocollo di ingresso (\textit{entry protocol});
+  \item Sezione critica (\textit{critical section});
+  \item Protocollo di uscita (\textit{exit protocol});
+\end{enumerate}
+
+
+Per poter sottoporre questo codice a verifica formale, dobbiamo prima modellarlo. Possiamo astrarre le diverse fasi dell'esecuzione assegnando delle locazioni specifiche a ciascuna sezione di codice:
+\begin{itemize}
+  \item \(nc_a, nc_b\): astrae e racchiude tutta la parte di esecuzione del codice non critico indipendente.
+  \item \(wt_a, wt_b\): attesa per l'accesso, o fase di \textit{entry protocol} (in cui si testa il while);
+  \item \(cr_a, cr_b\): esecuzione della sezione critica (\textit{critical section});
+  \item \(ex_a, ex_b\): rilascio della risorsa, o fase di \textit{exit protocol}.
+\end{itemize}
+
+Dunque un possibile automata per il processo A e B è il seguente:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{_images/automata_for_mutual_exclusion}
+  \caption{Automata del Processo A e B per l'esempio di protocollo di Mutua Esclusione}\label{fig:automata_mutual_exclusion_protocol_example}
+\end{figure}
+
+Andiamo adesso ad analizzare le transizioni per il processo A
+
+\begin{itemize}
+  \item \(\mathbf{nc_a \xrightarrow{\text{True: } flag_1 := \text{True}} wt_a}\): Dalla sezione non critica, il processo può decidere in qualsiasi momento (guardia \texttt{True}) di avviare il protocollo di ingresso, impostando il proprio flag a \texttt{True} e portandosi nello stato di attesa.
+  \item \(\mathbf{wt_a \xrightarrow{flag_2} wt_a}\): Se il flag del processo avversario è \texttt{True}, il processo rimane bloccato nello stato d'attesa (attesa attiva).
+  \item \(\mathbf{wt_a \xrightarrow{\neg flag_2} cr_a}\): Se il flag avversario è \texttt{False}, la sezione critica è libera e il processo vi accede. \textit{Nota:} questa guardia e la precedente sono ovviamente mutuamente esclusive.
+  \item \(\mathbf{cr_a \xrightarrow{\text{True}} ex_a}\): L'uscita dalla sezione critica può avvenire in qualsiasi momento, portando il sistema nella fase di exit.
+  \item \(\mathbf{ex_a \xrightarrow{\text{True: } flag_1 := \text{False}} nc_a}\): Il processo rilascia la risorsa impostando il proprio flag a \texttt{False} e ritorna in esecuzione non critica.
+\end{itemize}
+
+\begin{note}{Assunzione di Atomicità}
+  Questa versione astratta assume implicitamente che l'intera esecuzione della porzione di codice associata ad una locazione (\(nc, wt,\ldots\)) si esaurisca in un singolo passo atomico del modello.
+\end{note}
+
+Andando adesso a comporre i due automata, si ottiene l'LTS globale del sistema. Negli stati di questo LTS, la funzione di etichettatura traccerà le locazioni correnti di entrambi i processi e le variabili booleane vere in quel momento (se una proposizione non compare, è falsa).
+
+Ad esempio, lo stato iniziale è denotato come \((nc_a, nc_b)\), senza flag, il che significa che entrambi i processi sono nel codice non critico e \(flag_1, flag_2\) sono entrambi falsi.
+
+Ecco adesso un frammento dell'LTS finale:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{_images/lts_fragment_for_mutual_exclusion}
+  \caption{Frammento dell'LTS per l'esempio di protocollo di Mutua Esclusione}\label{fig:lts_fragment_mutual_exclusion_protocol_example}
+\end{figure}
+
+
+Analizzando le possibili computazioni in questo LTS, emergono immediatamente due criticità fondamentali:
+
+\begin{itemize}
+  \item Situazione di Deadlock:
+        Esiste una traccia in cui il Processo A esegue il primo passo portandosi in \(wt_a\) (e impostando \(flag_1\) a \texttt{True}). Subito dopo, lo schedulatore cede il controllo al Processo B, il quale a sua volta esegue il primo passo portandosi in \(wt_b\) (impostando \(flag_2\) a \texttt{True}). (Nel LTS finale non viene rappresentato questo stato poiché è un frammento, ma nell'LTS completo esso compare)
+        A questo punto, il sistema si trova nello stato globale \((wt_a, wt_b)\) con \(f_1\) e \(f_2\) entrambi veri. Nessuno dei due processi potrà mai procedere verso la sezione critica: il sistema è in \keyword{deadlock}. Dunque il protocollo descritto è errato.
+  \item Starvation (Esecuzioni Spurie):
+        Esiste inoltre una traccia circolare infinita in cui il Processo A viene ininterrottamente scelto per l'esecuzione:
+        \[
+          (nc_a, nc_b) \xrightarrow{f_1:=T} (wt_a, nc_b) \xrightarrow{\neg f_2} (cr_a, nc_b) \xrightarrow{} (ex_a, nc_b) \xrightarrow{f_1:=F} (nc_a, nc_b) \dots
+        \]
+        In questa sequenza, il Processo A entra nella sezione critica, esce, e vi rientra ripetutamente all'infinito, mentre il Processo B rimane bloccato in \(nc_b\) senza mai avere la possibilità di agire.
+
+        Perché si verifica questo comportamento indesiderato? Il problema non è intrinseco al protocollo di mutua esclusione, ma è una conseguenza diretta di come stiamo modellando l'interazione concorrente.
+\end{itemize}
+
+
+\subsection{Lo Schedulatore e il Concetto di Fairness}
+
+Nel nostro modello LTS, lo schedulatore dei processi è modellato implicitamente tramite il non-determinismo puro.
+
+Il non-determinismo puro assume che, se ci sono più transizioni possibili, qualsiasi di esse può essere scelta, senza alcun vincolo. Ciò significa che il modello ammette uno schedulatore \q{non fair} che sceglie sistematicamente e all'infinito di eseguire il Processo A, ignorando il Processo B.
+
+Per risolvere questa anomalia potremmo essere tentati di modellare esplicitamente uno specifico schedulatore aggiungendolo come componente al sistema. Tuttavia, questo approccio va contro l'idea di avere un modello astratto, poiché quello che si vorrebbe verificare è che il protocollo di mutua esclusione sia corretto \textit{a prescindere} dalla specifica politica di schedulazione utilizzata, a patto che questa sia ragionevole.
+
+Per risolvere questo problema senza appesantire il modello con la specifica dettagliata di uno scheduler, si introduce il concetto di \keyword{fairness} (equità). A livello di verifica formale, la fairness non viene modellata modificando l'LTS, ma agisce come un filtro sulle esecuzioni.
+
+L'intuizione è la seguente: l'algoritmo di analisi non deve considerare tutti i percorsi possibili dell'LTS, ma solo quelli definiti \textit{fair}. I percorsi che violano i vincoli di equità vengono ignorati, poiché rappresentano comportamenti che, sebbene strutturalmente possibili nel grafo, non sono concretamente realizzabili in un sistema operativo reale. Questo ci permette di verificare le proprietà del protocollo sotto qualsiasi scheduler \q{ragionevole}
+
+\begin{definition}{I Vincoli di Fairness}
+  Esistono tre categorie principali di vincoli di fairness, con diversi gradi di restrizione:
+
+  \begin{description}
+    \item[Unconditional Fairness:] Ogni processo deve essere schedulato infinitamente spesso. In altre parole, non può esistere un punto nell'esecuzione oltre il quale un processo non viene mai più scelto.
+      \begin{itemize}
+        \item \textit{Limite:} Nel contesto degli scheduler, è un vincolo troppo debole. Non garantisce che il processo evolva, poiché potrebbe essere schedulato proprio quando tutte le sue azioni sono disabilitate dalle guardie.
+      \end{itemize}
+
+    \item[Weak Fairness:] Se un processo è \textit{continuamente} abilitato, allora deve essere schedulato infinitamente spesso.
+      \begin{itemize}
+        \item \textit{Limite:} È ancora piuttosto restrittiva, poiché richiede che l'abilitazione non venga mai meno affinché il vincolo si applichi.
+      \end{itemize}
+
+    \item[Strong Fairness:] Se un processo è abilitato \textit{infinitamente spesso} (anche se non continuativamente), allora deve essere schedulato infinitamente spesso.
+      \begin{itemize}
+        \item \textit{Vantaggio:} È il vincolo più ragionevole per la modellazione di sistemi concorrenti, poiché copre anche i casi in cui un processo alterna momenti di abilitazione a momenti di blocco.
+      \end{itemize}
+  \end{description}
+\end{definition}
+
+
+Nel caso del protocollo di mutua esclusione analizzato precedentemente, uno qualsiasi di questi tre vincoli sarebbe sufficiente per escludere il ciclo infinito in cui solo il Processo A accede alla risorsa. Infatti, mentre A cicla, il Processo B si trova in una locazione (come \(nc_b\)) dove ha sempre almeno un'azione abilitata (avendo guardia \texttt{true}).

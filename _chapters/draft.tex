@@ -236,10 +236,10 @@ Ci sono tipi diversi vincoli di fairness:
 \begin{description}
   \item[Fairness incondizionata:] ogni processo dev'essere schedulato infinitamente spesso.
   \item[Fairness debole:] se un processo è continuamente abilitato, allora deve essere schedulato infinitamente spesso.
-  \item[Fairness forte:] se un processo è abilitato infinitamente spesso, allora deve essere schedulato infinitamente spesso. 
+  \item[Fairness forte:] se un processo è abilitato infinitamente spesso, allora deve essere schedulato infinitamente spesso.
 \end{description}
 
-La fairness incondizionata è troppo debole, poiché non garantisce che quando un processo viene schedulato sia abilitato a fare qualcosa. La fairness debole è più ragionevole, ma ancora non è sufficiente, poiché richiede che al processo è richiesto di essere continuamente abilitato, che è una richiesta molto forte. 
+La fairness incondizionata è troppo debole, poiché non garantisce che quando un processo viene schedulato sia abilitato a fare qualcosa. La fairness debole è più ragionevole, ma ancora non è sufficiente, poiché richiede che al processo è richiesto di essere continuamente abilitato, che è una richiesta molto forte.
 
 \chapter{Lezione 25/03}
 
@@ -334,13 +334,13 @@ Scrivi algoritmo formale (banale).
   \end{itemize}
 \end{definition}
 
-Chiaramente alla peggio portare in NNF mi raddoppia la lunghezza della formula, quindi se la formula originale è di lunghezza \(n\) allora la formula in NNF è di lunghezza al più \(2n\). Questo perché il peggior caso e qullo in cui abbiamo \(\neg\) come opertaore più esterno e tutti i letterali positivi. In questo caso infatti considerando l'albero sintattico andiamo a togliere il nodo in radice e aggiungere un nodo per ogni foglia. Essendo che il numero di foglie è lineare rispetto alla lunghezza della formula, allora la lunghezza della formula in NNF è al più \(2n\). 
+Chiaramente alla peggio portare in NNF mi raddoppia la lunghezza della formula, quindi se la formula originale è di lunghezza \(n\) allora la formula in NNF è di lunghezza al più \(2n\). Questo perché il peggior caso e qullo in cui abbiamo \(\neg\) come opertaore più esterno e tutti i letterali positivi. In questo caso infatti considerando l'albero sintattico andiamo a togliere il nodo in radice e aggiungere un nodo per ogni foglia. Essendo che il numero di foglie è lineare rispetto alla lunghezza della formula, allora la lunghezza della formula in NNF è al più \(2n\).
 
 Vediamo ora qualche esempio di proprietà espressa di modellazione di sistema espressa in LTL\@.
 
 \paragraph{Reachability}
 
-Classicamente basta \(F\phi\), nel senso che nel mio modello voglio raggiungere uno stato in cui \(\phi\) è vera, e dunque basta dire che prima o poi \(\phi\) è vera. In maniera più strutturata, possiamo esprimerle come \(\phi_1 U \phi_2\), in cui non solo voglio raggiungere uno stato in cui \(\phi_2\) è vera, ma voglio anche che fino a quel momento il sistema si comporti in un certo modo, ovvero che \(\phi_1\) sia vera. 
+Classicamente basta \(F\phi\), nel senso che nel mio modello voglio raggiungere uno stato in cui \(\phi\) è vera, e dunque basta dire che prima o poi \(\phi\) è vera. In maniera più strutturata, possiamo esprimerle come \(\phi_1 U \phi_2\), in cui non solo voglio raggiungere uno stato in cui \(\phi_2\) è vera, ma voglio anche che fino a quel momento il sistema si comporti in un certo modo, ovvero che \(\phi_1\) sia vera.
 
 \paragraph{Safety}
 Queste invece sono esprimibili con \(G\phi\), dove \(\phi\) è una formula che esprime la proprietà di sicurezza, ovvero che non accada qualcosa che non voglio che accada. Anche qui, dualmente, posso esprimerla con \(R\), ad esempio \(\phi_1 R \phi_2\) esprime che \(\phi_2\) è sempre vera a meno che non diventa vera \(\phi_1\), ovvero voglio dire non fare mai qualcosa di sbagliato a meno che non sia successo qualcosa che mi dice che non è più un problema, ad esempio un processo è terminato.
@@ -417,7 +417,7 @@ Dove \(\Sigma\) è l'alfabeto, \(\Loc\) è l'insieme delle locazioni, \(\Loc_0\)
 
 \todo{Aggiungi immagine esempio interruttore}
 
-Questo modello manca ancora di qualcosa. Infatti ci permette di impedire che una transizione avvenga prima di un certo tempo o dopo, e che quindi sia abilitata in un certo intervallo di tempo, ma non ci permette di esprimere che una transizione debba avvenire per forza entro un certo tempo, ovvero che se è abilitata allora deve essere effettuata entro un certo tempo. 
+Questo modello manca ancora di qualcosa. Infatti ci permette di impedire che una transizione avvenga prima di un certo tempo o dopo, e che quindi sia abilitata in un certo intervallo di tempo, ma non ci permette di esprimere che una transizione debba avvenire per forza entro un certo tempo, ovvero che se è abilitata allora deve essere effettuata entro un certo tempo.
 
 Vediamo prima però la semantica, ovvero il transition system associato a un automa temporizzato.
 Lo stato è ovviamente una tupla \(\langle l, \nu\rangle\) con \(l \in \Loc\) e \(\nu: C \to \R^+\) che è una funzione di valutazione dei clock.
@@ -426,9 +426,9 @@ Dobbiamo quindi definire la relazione di transizione tra stati, che può essere 
 
 In particolare per le transizioni discrete, in \(\delta\) deve esserci una transizione \(l \xrightarrow{t, \phi, a} l'\) tale che \(t\) è il simbolo di alfabeto che viene letto, \(\nu\models\phi\), che dobbiamo definire, e un \(\Eff\) che cambia la valutazione, prendendo in input un insieme di clock da resettare \(\lambda\), e dunque \(\Eff(\lambda, \nu) = \nu[\lambda \to 0]\), dove per \(\nu[\lambda \to 0]\) si intende una nuova funzione \(\nu'\) tale che:
 \[\nu'(x) = \begin{cases}
-  0&,x \in \lambda\\
-  \nu(x)&,\text{ altrimenti}
-\end{cases}\]
+    0      & ,x \in \lambda      \\
+    \nu(x) & ,\text{ altrimenti}
+  \end{cases}\]
 
 Per \(\nu\models\phi\) è semplice, per le condizioni atomiche è sufficiente sostituire \(x\) con \(\nu(x)\) e verificare se la disuguaglianza è soddisfatta, mentre per le congiunzioni è necessario verificare che siano soddisfatte entrambe le formule.
 
@@ -457,9 +457,9 @@ Formalmente, l'intersezione di automi di Büchi è
 con \(\delta'\) definita come segue:
 
 \[\delta'((q_1,q_2,i),\sigma)=\delta_1(q_1,\sigma)\times\delta_2(q_2,\sigma)\times\begin{cases}
-  \set{i}&,q_i\notin F_i\\
-  \set{3-i}&,q_i\in F_i
-\end{cases}\]
+    \set{i}   & ,q_i\notin F_i \\
+    \set{3-i} & ,q_i\in F_i
+  \end{cases}\]
 
 Quindi gli automi di Büchi sono chiusi per intersezione oltre che per unione. Vedremo successivamente che sono chiusi anche per complementazione, ma non sono chiusi per determinizzazione, ovvero non esiste una procedura per costruire un automa di Büchi deterministico equivalente a un automa di Büchi non deterministico.
 
@@ -505,9 +505,9 @@ In particolare possiamo usare la costruzione di intersezione asincrona che abbia
 Con \(\hat{Q}=Q\times\set{0,\ldots,t}\), \(\hat{Q_0}=Q_0\times\set{0}\), \(\hat{F}=F_0\times\set{0}\) e la funzione di transizione definita come segue:
 
 \[\hat{\delta}((q,i),\sigma) = \delta(q,\sigma) \times \begin{cases}
-  \set{i}&,q\notin F_i\\
-  \set{(i+1) \mod (t+1)}&,q\in F_i
-\end{cases}\]
+    \set{i}                & ,q\notin F_i \\
+    \set{(i+1) \mod (t+1)} & ,q\in F_i
+  \end{cases}\]
 
 Tale \(\hat{\delta}\) fa in modo che all'arrivo in uno stato accettante di \(F_i\) si passi ad una copia diversa. Di conseguenza, essendo che una parola è accettata se e solo se il run corrispondente visita infinitamente spesso stati accettanti, per tornare infinitamente spesso in stati accettanti di \(F_0\) devo passare per tutte le copie, ovvero per stati accettanti di tutti gli insiemi \(F_i\), e dunque la parola è accettata se e solo se è accettata da tutti gli automi di Büchi classici che hanno come stati accettanti i diversi \(F_i\).
 
@@ -585,9 +585,9 @@ Per fare ciò anremo a costruire un automa di Büchi \(A_\phi\) che accetta esat
 Sia quindi \[A_\phi = \langle 2^{AP}, Q, \delta, Q_0, \hat{F} = \langle F_0, \ldots, F_t\rangle\rangle\]
 Dove \(Q = ATM(\phi)\), \(Q_0 = \set{A \in ATM(\phi) }[\phi \in A]\), la funzione di transizione \(\delta\) si assicurerà che varrà la seconda condizione delle sequenze di Hintikka, ovvero
 \[\delta(A,\sigma)=\begin{cases}
-  \set{A'\in ATM(\phi)}[\forall X\psi \in A, \psi \in A']&, \sigma = A \cap AP\\
-  \emptyset&, \text{ altrimenti}
-\end{cases}\]
+    \set{A'\in ATM(\phi)}[\forall X\psi \in A, \psi \in A'] & , \sigma = A \cap AP \\
+    \emptyset                                               & , \text{ altrimenti}
+  \end{cases}\]
 mentre gli stati di accettazione saranno quelli che soddisfano la terza condizione delle sequenze di Hintikka, creando un insieme di stati di accettazione per ogni formula del tipo \(\phi_1 U \phi_2\) presente nella chiusura, ovvero
 \[\hat{F} = \set{\set{A\in ATM(\phi)}[\phi_1 U \phi_2 \in A \implies \phi_2\in A]}[\phi_1 U \phi_2 \in cl(\phi)]\]
 
@@ -606,7 +606,7 @@ Tale costruzione ci permette di accettare solo parole che passano infinitamente 
 
 \chapter{Lezione 15/03}
 
-In termini di teoria dei linguaggi questi automi ci permettono di esprimere linguaggi temporizzati, in cui gli elementi delle parole sono dette segnali, ovvero coppie di un simbolo di alfabeto e un istante di tempo in cui tale simbolo viene emesso. In tal senso i run di un automa temporizzato su una traccia temporizzata è una sequenza di transizione del transition system come in figura 
+In termini di teoria dei linguaggi questi automi ci permettono di esprimere linguaggi temporizzati, in cui gli elementi delle parole sono dette segnali, ovvero coppie di un simbolo di alfabeto e un istante di tempo in cui tale simbolo viene emesso. In tal senso i run di un automa temporizzato su una traccia temporizzata è una sequenza di transizione del transition system come in figura
 
 \todo{Vedi slide, aggiungi immagini}
 
@@ -647,7 +647,7 @@ Questo è facile vedere che possa avvenire, ad esempio con l'automa in figura.
 Chiamando il percorso \(\pi\) possiamo definire il tempo di esecuzione di \(\pi\) come
 \[ExecTime(\pi) = \sum_{i \geq 1} ExecTime(d_i) = \sum_{i \geq 1} \frac{1}{2^i} = 1\]
 
-Se \(ExecTime(\pi)<\infty\) allora \(\pi\) è un percorso convergente. Tali percorsi possono essere ignorati se il numero di transizioni discrete in \(\pi\) è finito, perché in tal caso è possibile accorpare le infinite transizioni temporali in un'unica transizione temporale con ritardo pari al limite della somma dei ritardi, e dunque non si perderebbe alcuna parola accettata dall'automa. 
+Se \(ExecTime(\pi)<\infty\) allora \(\pi\) è un percorso convergente. Tali percorsi possono essere ignorati se il numero di transizioni discrete in \(\pi\) è finito, perché in tal caso è possibile accorpare le infinite transizioni temporali in un'unica transizione temporale con ritardo pari al limite della somma dei ritardi, e dunque non si perderebbe alcuna parola accettata dall'automa.
 
 Dato uno stato di partenza \(s\) ci interesseremo solo dell'insieme dei percorsi che partono da \(s\) e che sono divergenti, ovvero:
 \[Path_{div}(S) = \set{\pi}[\pi_0 = s \land ExecTime(\pi) =\infty]\]
@@ -656,7 +656,7 @@ Definiamo invece un timelock come uno stato \(s\) tale che \(Path_{div}(s) = \em
 
 L'automa può evolvere se non in percorsi convergenti.
 
-Per quanto riguarda la zenoness, la situazione è più complessa. Un percorso \(\pi\) è zeno se \(ExecTime(\pi)<\infty\) e il numero di transizioni discrete in \(\pi\) è infinito. Un automa temporizzato è non-zeno se non ammette percorsi zeno, ovvero se ogni percorso con un numero infinito di transizioni discrete è divergente. 
+Per quanto riguarda la zenoness, la situazione è più complessa. Un percorso \(\pi\) è zeno se \(ExecTime(\pi)<\infty\) e il numero di transizioni discrete in \(\pi\) è infinito. Un automa temporizzato è non-zeno se non ammette percorsi zeno, ovvero se ogni percorso con un numero infinito di transizioni discrete è divergente.
 
 Purtroppo la verifica di presenza di zenoness è un problema difficile, ma conosciamo una condizione sufficiente per la non-zenoness.
 
@@ -671,7 +671,7 @@ allora l'automa temporizzato è non-zeno. Infatti ognuno di questi cicli richied
 
 A questo punto dobbiamo capire come usare questi automi per risolvere problemi di model checking e soddisfacibilità.
 
-In particolare, data una struttura di kripke dobbiamo capire se questa soddisfa una formula \(\psi\). Questo equivale a dire che 
+In particolare, data una struttura di kripke dobbiamo capire se questa soddisfa una formula \(\psi\). Questo equivale a dire che
 \(\mathcal{L}(k)\subseteq \mathcal{L}(\psi) = \mathcal{A_\psi}\). Questo però equivale a richiedere che tutti i percorsi di \(k\) siano accettati da \(\mathcal{A_\psi}\).
 
 Per semplicità, piuttosto di considerare che tutti i percorsi di \(k\) siano accettati da \(\mathcal{A_\psi}\), possiamo considerare il modello della negata e verificare che l'intersezione sia vuota.
@@ -680,9 +680,9 @@ Ricordiamo che la struttura di kripke \(k\) è definita come \(k = \langle W, R,
 
 A quel punto cotruire un automa risulta molto facile considerando \(A_k = \langle \Sigma=2^{AP}, Q = W, \delta, q_0 = w_0,  F=W\rangle\) con
 \[\delta(w,\sigma) = \begin{cases}
-\set{w' \in W}[R(w,w')]&, \text{ se } \sigma = \lambda(w)\\
-\emptyset&, \text{ altrimenti}
-\end{cases}\]
+    \set{w' \in W}[R(w,w')] & , \text{ se } \sigma = \lambda(w) \\
+    \emptyset               & , \text{ altrimenti}
+  \end{cases}\]
 
 Tale automa accetta tutte e sole le parole del linguaggio della struttura di kripke \(k\), e dunque se l'intersezione di prima risulta essere \(\mathcal{L}(A_k) \cap \mathcal{L}(A_{\neg\psi})\), ovvero \(A_{k,\neg\psi} = A_{\neg\psi} \cap \mathcal{L}(A_k)\).
 Quindi \(k\models \psi\) se e solo se \(A_{k,\neg\psi} = \emptyset\).
@@ -782,27 +782,27 @@ Questo è facile da vedere ed è dato per scontato dal corso di EDIT.
 
 \begin{proof}
   \begin{description}
-    \item[(\(\implies\))] \(L\) \(\omega-\)regolare \(\implies \exists \gamma = \alpha_1\beta_1^\omega+\alpha_2\beta_2^\omega+\cdots + \alpha_n\beta_n^\omega \st \mathcal{L}(\gamma) = L\). Ovviamente ogni \(\alpha_i,\beta_i\) sono regolari, quindi dal teorema precedente esistono \(DFA A_{i}, B_{i}\) tali che \(\mathcal{L}(A_i) = \alpha_i\) e \(\mathcal{L}(B_i) = \beta_i\). 
-    Cotruiamo quindi per ogni componente \(i\) un automa di Büchi \(C_i= \langle \Sigma, Q_A \cup Q_B, \delta, \set{q_{0_A}}, \set{q_{0_B}}\rangle\) con \(\delta\) definita come:
-    \[\delta(q,\sigma)=\begin{cases}
-      \set{\delta_A(q,\sigma)} &,q \in Q_A \land \delta_A(q,\sigma)\notin F_A\\
-      \set{\delta_A(q,\sigma), q_{0_B}} &,q \in Q_A \land \delta_A(q,\sigma)\in F_A\\
-      \set{\delta_B(q,\sigma)}&,q \in Q_B \land \delta_B(q,\sigma)\notin F_B\\
-      \set{\delta_B(q,\sigma), q_{0_B}} &,q \in Q_B \land \delta_B(q,\sigma)\in F_B\\
-    \end{cases}\]
+    \item[(\(\implies\))] \(L\) \(\omega-\)regolare \(\implies \exists \gamma = \alpha_1\beta_1^\omega+\alpha_2\beta_2^\omega+\cdots + \alpha_n\beta_n^\omega \st \mathcal{L}(\gamma) = L\). Ovviamente ogni \(\alpha_i,\beta_i\) sono regolari, quindi dal teorema precedente esistono \(DFA A_{i}, B_{i}\) tali che \(\mathcal{L}(A_i) = \alpha_i\) e \(\mathcal{L}(B_i) = \beta_i\).
+      Cotruiamo quindi per ogni componente \(i\) un automa di Büchi \(C_i= \langle \Sigma, Q_A \cup Q_B, \delta, \set{q_{0_A}}, \set{q_{0_B}}\rangle\) con \(\delta\) definita come:
+      \[\delta(q,\sigma)=\begin{cases}
+          \set{\delta_A(q,\sigma)}          & ,q \in Q_A \land \delta_A(q,\sigma)\notin F_A \\
+          \set{\delta_A(q,\sigma), q_{0_B}} & ,q \in Q_A \land \delta_A(q,\sigma)\in F_A    \\
+          \set{\delta_B(q,\sigma)}          & ,q \in Q_B \land \delta_B(q,\sigma)\notin F_B \\
+          \set{\delta_B(q,\sigma), q_{0_B}} & ,q \in Q_B \land \delta_B(q,\sigma)\in F_B    \\
+        \end{cases}\]
 
-    Tale costruzione fa si che ogni componente si comporti come la parte regolare \(\alpha_i\), fino a non-deterministicamente decidere di passare alla parte regolare \(\beta_i\), che è estesa per essere un ciclo, in modo da passare infinitamente spesso per lo stato \(q_{0_B}\) che è l'unico stato accettante, e dunque accettare esattamente le parole di \(\alpha_i\beta_i^\omega\). A questo punto mi è sufficiente fare l'unione di tutti questi automi \(C_i\) per ottenere un automa di Büchi che accetta esattamente le parole di \(\gamma\), ovvero di \(L\).
+      Tale costruzione fa si che ogni componente si comporti come la parte regolare \(\alpha_i\), fino a non-deterministicamente decidere di passare alla parte regolare \(\beta_i\), che è estesa per essere un ciclo, in modo da passare infinitamente spesso per lo stato \(q_{0_B}\) che è l'unico stato accettante, e dunque accettare esattamente le parole di \(\alpha_i\beta_i^\omega\). A questo punto mi è sufficiente fare l'unione di tutti questi automi \(C_i\) per ottenere un automa di Büchi che accetta esattamente le parole di \(\gamma\), ovvero di \(L\).
     \item[(\(\impliedby\))] Consideriamo il NBA \(N = \langle \Sigma, Q, \delta, Q_0, F\rangle\) con \(F = \set{q_0\ldots,q_k}\) stati finali di \(N\). Per \(i \in \set{1,\ldots,k}\) definiamo \(A_i = \langle \Sigma, Q, \delta, Q_0, \set{q_i}\rangle\) e \(B_i = \langle \Sigma, Q, \delta, \set{q_i}, \set{q_i}\rangle\). Interpretando ognuno di questi automi come NFA otteniamo che i linguaggi accettati da \(A_i\) e \(B_i\) sono regolari per il teorema precedente. Inoltre, possiamo separare il nostro \(N\) in \(k\) sottoautomi, ognuno dei quali con \(F_i = \set{q_i}\). Ovviamente il linguaggo dell'unione di questi sottoautomi è uguale a quello di \(N\). Ognuno di questi sottoautomi però ha linguaggio \(L(N_i) = L(A_i)\cdot L(B_i)\omega\). Dunque \(L(N) = \bigcup_{i=1}^k L(A_i)\cdot {L(B_i)}^\omega\), ovvero è \(\omega-\)regolare.
   \end{description}
 \end{proof}
 
-Quindi i NBA sono sufficientemente espressivi per accettare tutti e soli i linguaggi \(\omega-\)regolari, a differenza di come abbiamo visto per LTL. Lo abbiamo osservato con l'esempio dell'espressione regolre  che accetta le parole che hanno P vera in posizione pari. Questo è facilisimo però da fare con un automa di Büchi, banalmente 
+Quindi i NBA sono sufficientemente espressivi per accettare tutti e soli i linguaggi \(\omega-\)regolari, a differenza di come abbiamo visto per LTL. Lo abbiamo osservato con l'esempio dell'espressione regolre  che accetta le parole che hanno P vera in posizione pari. Questo è facilisimo però da fare con un automa di Büchi, banalmente
 
-  P
-  ->
+P
+->
 SF  N
-  <-
-  *
+<-
+*
 
 Vediamo ora un elenco di diverse condizioni di accettazioni per automi che caratterizzano diversi tipi di linguaggi e proprietà di essi. Considerato \(\rho\) un run di un automa avremo:
 
@@ -815,7 +815,7 @@ Vediamo ora un elenco di diverse condizioni di accettazioni per automi che carat
   \item Accettazione di Street, abbiamo \(F = {(2^Q\times 2^Q)}^*\), quindi \(F = \langle (G_i,B_i),\ldots,(G_k, B_k)\rangle\), \(\bigwedge_i \inf(\rho) \cap G_i \neq \emptyset \lor \inf(\rho) \cap B_i = \emptyset\)
 \end{itemize}
 
-Le ultime 3 nel caso non deterministico si possono ridurre a quelle di Büchi, con un costo non indifferente, mentre per il determinismo non è possibile trovare una riduzione a quelle di Büchi, e dunque sono più espressive. 
+Le ultime 3 nel caso non deterministico si possono ridurre a quelle di Büchi, con un costo non indifferente, mentre per il determinismo non è possibile trovare una riduzione a quelle di Büchi, e dunque sono più espressive.
 
 \chapter{Lezione 22/04}
 
@@ -835,7 +835,7 @@ Per le formule LTL invece, SPIN usa la sintassi modale per rappresentare gli ope
 
 Tipi standard più Channel e PID per i canali e i process ID. Approfondisci con slide.
 
-[ESEMPI IN SPIN]
+  [ESEMPI IN SPIN]
 
 \chapter{Lezione 27/04}
 
@@ -843,7 +843,7 @@ Passiamo ora dalle logiche temporali lineari a quelle ramificate, in particolare
 
 In particolare vedremo il frammento CTL, che è un sottoinsieme di \(CTL^*\) che però è più facile da verificare, di cui vorremo risolvere il model checking. In particolare vedremo inizialmente un algoritmo diretto per il model checking di CTL, e poi vedremo un alogoritmo più efficiente che usa una struttura dati specifica chiamata OBDD\@.
 
-In particolare questa logica aggiunge dei quantificatori sui percorsi, \(A\) e \(E\), che indicano rispettivamente che una proprietà è vera su tutti i percorsi o su almeno un percorso. 
+In particolare questa logica aggiunge dei quantificatori sui percorsi, \(A\) e \(E\), che indicano rispettivamente che una proprietà è vera su tutti i percorsi o su almeno un percorso.
 
 \begin{definition}{Grammatica \(CTL^*\)}
   La grammatica di \(CTL^*\) è formata da due grammatiche dette grammatica delle formule di stato \(\phi\) e grammatica delle formule di percorso\(\psi\), definite come segue:
@@ -944,18 +944,18 @@ Quello che farà l'algoritmo è etichettare ogni stato con le formule di \(cl(\p
 Per \(EX\) l'algoritmo è il seguente
 
 \begin{algorithmdesc}{Checking \(EX\)}
-    \begin{algorithmic}[1]
-      \Statex{} \textbf{signature} \(\textsc{CheckEX:} \quad Kripke \times Formula \to Boolean\)
-      \Function{\(\textsc{Resolution}\)}{$(k,\phi)$} % chktex 46
-          \State{} \(T \gets \set{w \in W}[k,w\models \phi]\)
-          \While{\(T\neq \emptyset\)}
-              \State{} \(s \gets\) choose \(T\)
-              \For{\(t \in R^{-1}(s)\)}
-                  \State{} \(r(t)\gets r(t)\cup{EX p}\)
-              \EndFor{}
-          \EndWhile{}
-      \EndFunction{}
-    \end{algorithmic}
+  \begin{algorithmic}[1]
+    \Statex{} \textbf{signature} \(\textsc{CheckEX:} \quad Kripke \times Formula \to Boolean\)
+    \Function{\(\textsc{Resolution}\)}{$(k,\phi)$} % chktex 46
+    \State{} \(T \gets \set{w \in W}[k,w\models \phi]\)
+    \While{\(T\neq \emptyset\)}
+    \State{} \(s \gets\) choose \(T\)
+    \For{\(t \in R^{-1}(s)\)}
+    \State{} \(r(t)\gets r(t)\cup{EX p}\)
+    \EndFor{}
+    \EndWhile{}
+    \EndFunction{}
+  \end{algorithmic}
 \end{algorithmdesc}
 
 \chapter{Lezione 29/04}
