@@ -1,0 +1,15 @@
+\chapter{Automi Temporizzati (Timed Automata)}
+
+Per modellare adeguatamente i sistemi \keyword{embedded} ovvero sistemi di controllo immersi in un ambiente analogico in cui le reazioni dipendono strettamente dalle tempistiche del mondo fisico il formalismo puramente discreto degli LTS risulta insufficiente. Si introduce pertanto un nuovo modello matematico: gli \keyword{Automi Temporizzati}. Questo modello arricchisce la struttura dei classici automi a stati finiti con variabili a dominio continuo che scorrono autonomamente misurando il progresso del tempo reale.
+
+\begin{observation}{Il Problema della Decidibilità}
+    Come discusso in precedenza, l'aggiunta di una variabile a tempo continuo genera uno spazio degli stati denso e non numerabile. Di conseguenza, il problema della verifica formale (model checking) diviene intrinsecamente problematico sotto il profilo della \keyword{decidibilità}.
+
+    Tuttavia, la decidibilità dipende fortemente dalla granularità della proprietà che si intende analizzare: se i requisiti parlano esclusivamente della raggiungibilità delle locazioni o delle variabili di programma senza esplicitare vincoli quantitativi esatti sul tempo, il problema di verifica mantiene spesso la sua trattabilità.
+\end{observation}
+
+\begin{definition}{Rappresentazione Finita e Costruzione del Quoziente}
+    Per aggirare l'ostacolo degli stati infiniti e poter eseguire l'analisi algoritmica, è indispensabile costruire una rappresentazione astratta e finita del sistema temporizzato che preservi la validità delle proprietà logiche di interesse.
+
+    Tale costruzione sfrutta una \keyword{relazione di equivalenza} matematica applicata allo spazio degli stati: situazioni (stati) infinite e continue che risultano indistinguibili rispetto alle evoluzioni temporali critiche per l'ambiente vengono raggruppate in \keyword{classi di equivalenza}. L'insieme finito di queste classi costituisce il \keyword{quoziente} del sistema originario (fondamento teorico di quello che in letteratura è noto come \ti{Region Graph}).
+\end{definition}

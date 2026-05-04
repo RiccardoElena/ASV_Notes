@@ -392,8 +392,8 @@ La \keyword{composizione parallela sincrona} è facile da definire.
 \begin{definition}{Composizione parallela sincrona}
   Dati \(TS_1, \ldots, TS_n\) sistemi a transizione tali che \(TS_i = (S_i, S_{0i}, A_i, R_i)\) con \(S_i\) disgiunti, allora la composizione parallela sincrona è il sistema a transizioni \(TS = (S,S_0,R,L)\) con:
   \begin{itemize}
-    \item \(S = S_1 \times \ldots \times S_n\), stati globali
-    \item \(S_0 = S_{01} \times \ldots \times S_{0n}\),
+    \item \(S = S_1 \times \cdots \times S_n\), stati globali
+    \item \(S_0 = S_{01} \times \cdots \times S_{0n}\),
     \item \(A = A_1 \cup \ldots \cup A_n\), azioni globali
     \item \(R \subseteq S \times A \times S\) è tale che, dati \(\langle s_1, \ldots, s_n\rangle, \langle s_1', \ldots, s_n'\rangle \in S\) e \(\langle a_1,\ldots, a_n \rangle \in A\) contiene \(\langle s_1,\ldots,s_n \rangle \xrightarrow{\langle a_1,\ldots,a_n \rangle} \langle s_1',\ldots,s_n'\rangle\) se \(s_i \xrightarrow{a_i} s_i'\,, \forall i \in \set{1,\ldots,n}\).
   \end{itemize}
@@ -484,9 +484,9 @@ Definiamo adesso formalmente la composizione asincrona.
 \begin{definition}{Composizione asincrona}
   Assumiamo \(TS_1,\ldots,TS_n\) Transition Systems tali che \(\forall i \in 1\ldots n, TS_i = \langle S_i,A_i,R_i,S_{i0}\rangle \). Il Transition system ottenuto dalla composizione asincrona di questi transition systems è \( TS = TS_1 \| \ldots \| TS_n = \langle S,A,R,S_0\rangle \) tale che:
   \begin{itemize}
-    \item \( S = S_1 \times \ldots \times S_n \)
-    \item \( A = (A_1 \cup \{-\}) \times \ldots \times (A_n \cup \{-\}) \)
-    \item \( S_0 = S_{10} \times \ldots \times S_{n0} \)
+    \item \( S = S_1 \times \cdots \times S_n \)
+    \item \( A = (A_1 \cup \{-\}) \times \cdots \times (A_n \cup \{-\}) \)
+    \item \( S_0 = S_{10} \times \cdots \times S_{n0} \)
     \item \( R \) contiene \( \langle s_1,\ldots,s_n \rangle \xrightarrow{\langle a_1,\ldots,a_n \rangle} \langle s_1',\ldots,s_n' \rangle \), se \( \langle a_1,\ldots,a_n \rangle \in A \) e, per ogni \( 1 \leq i \leq n \),
           \begin{itemize}
             \item \( s_i = s_i' \) e \( a_i = - \) oppure
@@ -509,9 +509,9 @@ Intuitivamente come definizione possiamo usare quella generale, a cui applichiam
 \begin{definition}{Composizione Asincrona Interleaving}
   Assumiamo \(TS_1,\ldots,TS_n\) Transition Systems tali che \(\forall i \in 1\ldots n, TS_i = \langle S_i,A_i,R_i,S_{i0}\rangle \). Il Transition system ottenuto dalla composizione asincrona (interleaving) di questi transition systems è \( TS = TS_1 \parallel \ldots \parallel TS_n = \langle S,A,R,S_0\rangle \) tale che:
   \begin{itemize}
-    \item \( S = S_1 \times \ldots \times S_n \)
-    \item \( A \subset (A_1 \cup \{-\}) \times \ldots \times (A_n \cup \{-\}) \) tale che \( \langle a_1,\ldots,a_n \rangle \in A \) se e solo se, per ogni \( j \neq i \), \( a_i \in A_i \) implica \( a_j = - \)
-    \item \( S_0 = S_{10} \times \ldots \times S_{n0} \)
+    \item \( S = S_1 \times \cdots \times S_n \)
+    \item \( A \subset (A_1 \cup \{-\}) \times \cdots \times (A_n \cup \{-\}) \) tale che \( \langle a_1,\ldots,a_n \rangle \in A \) se e solo se, per ogni \( j \neq i \), \( a_i \in A_i \) implica \( a_j = - \)
+    \item \( S_0 = S_{10} \times \cdots \times S_{n0} \)
     \item \( R \) contiene \( \langle s_1,\ldots,s_n \rangle \xrightarrow{\langle a_1,\ldots,a_n \rangle} \langle s_1',\ldots,s_n' \rangle \), se \( \langle a_1,\ldots,a_n \rangle \in A \) e, per ogni \( 1 \leq i \leq n \),
           \begin{itemize}
             \item \( s_i = s_i' \) e \( a_i = - \) oppure
@@ -556,15 +556,15 @@ Una formulazione equivalente del modello asincrono con interleaving più compatt
 \begin{definition}{Composizione Asincrona Interleaving Compatta}
   Assumiamo \(TS_1,\ldots,TS_n\) Transition Systems tali che \(\forall i \in 1\ldots n, TS_i = \langle S_i,A_i,R_i,S_{i0}\rangle \). Il Transition system ottenuto dalla composizione asincrona (interleaving) di questi transition systems è \( TS = TS_1 \parallel \ldots \parallel TS_n = \langle S,A,R,S_0\rangle \) tale che:
   \begin{itemize}
-    \item \( S = S_1 \times \ldots \times S_n \)
+    \item \( S = S_1 \times \cdots \times S_n \)
     \item \( A = \bigcup_{1 \leq i \leq n} A_i \) (oppure l'unione disgiunta \(\uplus\))
-    \item \( S_0 = S_{10} \times \ldots \times S_{n0} \)
+    \item \( S_0 = S_{10} \times \cdots \times S_{n0} \)
     \item \( R \) contiene \( \langle s_1,\ldots,s_n \rangle \xrightarrow{a} \langle s_1,\ldots,s_i',\ldots,s_n \rangle \), se si ha \( s_i \xrightarrow{a}_i s_i' \), per qualche \( 1 \leq i \leq n \).
   \end{itemize}
 \end{definition}
 
 
-Noi avevamo però dei Program Graph per descrivere i componenti, che poi venivano \q{compilati} in LTS. Abbiamo visto come fare composizione di LTS, ma per i program graph dobbiamo modellare la possibilità di poter condividere informazioni, modellare forme di comunicazioni tra processi. Uno dei modi per fare ciò è attraverso la condivisione di variabili, ovvero condividere aree di memoria in cui più processi possono leggere e scrivere.
+Noi avevamo però dei Program Graph per descrivere i componenti, che poi venivano \q{compilati} in LTS\@. Abbiamo visto come fare composizione di LTS, ma per i program graph dobbiamo modellare la possibilità di poter condividere informazioni, modellare forme di comunicazioni tra processi. Uno dei modi per fare ciò è attraverso la condivisione di variabili, ovvero condividere aree di memoria in cui più processi possono leggere e scrivere.
 
 Nel mondo degli LTS però non c'è il concetto di variabile. Quindi l'approccio di tradurre vari PG in LTS separatamente per poi comporli non è necessariamente corretto, poiché nel passaggio da PG a LTS si perde il concetto di variabile e dunque di condivisione di variaibli.
 
@@ -579,7 +579,7 @@ Nel mondo degli LTS però non c'è il concetto di variabile. Quindi l'approccio 
 
 Quindi quello che succede è che quando ottengo l'LTS composto, non vi è nessuna releazione tra le due variabili \(x\) quindi operazioni come incremento o decremento, esse avvengono soltanto sull'oggetto su cui si applicano.
 
-Dunque questa fusione va fatta a livello di PG, ma allora la composizione va fatta a livello di PG, e dunque è necessario definire una composizione di PG.
+Dunque questa fusione va fatta a livello di PG, ma allora la composizione va fatta a livello di PG, e dunque è necessario definire una composizione di PG\@.
 
 \subsection{Interleaving Program Graph}
 
@@ -588,9 +588,9 @@ Dunque questa fusione va fatta a livello di PG, ma allora la composizione va fat
   \[ PG = PG_1 \parallel PG_2 \parallel \ldots \parallel PG_n = (\Loc, \Act, \Eff, \hookrightarrow, \Loc_0, g_0) \]
   definito sull'insieme di variabili globali \(\Var = \bigcup_{1 \leq i \leq n} \Var_i\), dove:
   \begin{itemize}
-    \item \(\Loc = \Loc_1 \times \Loc_2 \times \ldots \times \Loc_n\) è il prodotto cartesiano delle locazioni;
+    \item \(\Loc = \Loc_1 \times \Loc_2 \times \cdots \times \Loc_n\) è il prodotto cartesiano delle locazioni;
     \item \(\Act = \bigcup{1 \leq i \leq n} \Act_i\) è l'unione delle azioni (può essere anche disgiunta);
-    \item \(\Loc_0 = \Loc_{10} \times \Loc_{20} \times \ldots \times \Loc_{n0}\) è l'insieme delle locazioni iniziali;
+    \item \(\Loc_0 = \Loc_{10} \times \Loc_{20} \times \cdots \times \Loc_{n0}\) è l'insieme delle locazioni iniziali;
     \item \(g_0 = g_{10} \land g_{20} \land \ldots \land g_{n0}\) è la condizione (o guardia) iniziale globale.
   \end{itemize}
 \end{definition}
@@ -600,7 +600,7 @@ L'insieme delle variabili globali \(\Var\) è l'unione (non disgiunta) delle var
 In questo modo, il problema riscontrato con l'LTS globale (in cui si perdeva la relazione tra le variabili) non sussiste più: la modifica che un processo opera su una variabile condivisa diventa immediatamente visibile a tutti gli altri processi.
 
 \paragraph{Relazione di Transizione (\(\hookrightarrow\)):}
-Le transizioni vengono definite in modo del tutto analogo all'interleaving degli LTS. Se il processo \(i\)-esimo esegue un'azione locale, la locazione globale si aggiorna modificando solo la componente \(i\)-esima, lasciando inalterate le locazioni di tutti gli altri processi. Formalmente:
+Le transizioni vengono definite in modo del tutto analogo all'interleaving degli LTS\@. Se il processo \(i\)-esimo esegue un'azione locale, la locazione globale si aggiorna modificando solo la componente \(i\)-esima, lasciando inalterate le locazioni di tutti gli altri processi. Formalmente:
 \[
   \text{Se } l_i \xhookrightarrow{g:a}_i l_i' \text{ in } PG_i \implies \langle l_1, \ldots, l_i, \ldots, l_n \rangle \xhookrightarrow{g:a} \langle l_1, \ldots, l_i', \ldots, l_n \rangle
 \]
@@ -695,7 +695,7 @@ Andiamo adesso ad analizzare le transizioni per il processo A
 \begin{itemize}
   \item \(\mathbf{nc_a \xrightarrow{\text{True: } flag_1 := \text{True}} wt_a}\): Dalla sezione non critica, il processo può decidere in qualsiasi momento (guardia \texttt{True}) di avviare il protocollo di ingresso, impostando il proprio flag a \texttt{True} e portandosi nello stato di attesa.
   \item \(\mathbf{wt_a \xrightarrow{flag_2} wt_a}\): Se il flag del processo avversario è \texttt{True}, il processo rimane bloccato nello stato d'attesa (attesa attiva).
-  \item \(\mathbf{wt_a \xrightarrow{\neg flag_2} cr_a}\): Se il flag avversario è \texttt{False}, la sezione critica è libera e il processo vi accede. \textit{Nota:} questa guardia e la precedente sono ovviamente mutuamente esclusive.
+  \item \(\mathbf{wt_a \xrightarrow{\neg flag_2} cr_a}\): Se il flag avversario è \texttt{False}, la sezione critica è libera e il processo vi accede.\ \textit{Nota:} questa guardia e la precedente sono ovviamente mutuamente esclusive.
   \item \(\mathbf{cr_a \xrightarrow{\text{True}} ex_a}\): L'uscita dalla sezione critica può avvenire in qualsiasi momento, portando il sistema nella fase di exit.
   \item \(\mathbf{ex_a \xrightarrow{\text{True: } flag_1 := \text{False}} nc_a}\): Il processo rilascia la risorsa impostando il proprio flag a \texttt{False} e ritorna in esecuzione non critica.
 \end{itemize}
@@ -769,3 +769,388 @@ L'intuizione è la seguente: l'algoritmo di analisi non deve considerare tutti i
 
 
 Nel caso del protocollo di mutua esclusione analizzato precedentemente, uno qualsiasi di questi tre vincoli sarebbe sufficiente per escludere il ciclo infinito in cui solo il Processo A accede alla risorsa. Infatti, mentre A cicla, il Processo B si trova in una locazione (come \(nc_b\)) dove ha sempre almeno un'azione abilitata (avendo guardia \texttt{true}).
+
+% NEW_LESSON
+Resta però il problema di Deadlock per questo prtocollo. Poiché, se il sistema esegue un interleaving tale per cui entrambi i processi impostano il proprio flag a \code{true} prima che uno dei due riesca a valutare la condizione di ingresso, si genera uno stato dal quale nessuno dei due può più procedere. Entrambi rimarranno bloccati nei rispettivi cicli di attesa.
+
+\begin{figure}{H}
+  \centering
+  \includegraphics[width=\textwidth]{_images/lts_fragment_deadlock_for_mutual_exclusion}
+  \caption{Deadlock nell'LTS dell'esempio di protocollo di Mutua Esclusione}\label{fig:lts_deadlock_mutual_exclusion_protocol_example}
+\end{figure}
+
+
+Per superare i limiti e le vulnerabilità al \keyword{deadlock} di un protocollo rudimentale basato solo sui flag, si possono impiegare soluzioni più sofisticate, come l'algoritmo di Peterson.
+
+
+\subsection{Astrazione Temporale e Generalizzazione del Modello}
+
+Tralasciando però questo problema che si può dunque risolvere adottando un algoritmo più furbo, un'altro problema è che il modello costruito è piuttosto limitativo poiché stiamo modellando processi in cui il codice critico e non critico è compattato in un'unica istruzione, e dunque il tempo che intercorre tra le varie sezioni è unitaria.
+
+Questo infatti potrebbe portare ad una violazione di qualche proprietà se il processo resta più di un instante di tempo in una particolare sezione.
+
+Tuttavia, l'obiettivo della verifica formale non è modellare l'esatta esecuzione temporale di un'istanza software, bensì validare la robustezza logica del protocollo per \ti{qualsiasi} suo potenziale utilizzatore. L'unica assunzione rigorosa e necessaria affinché proprietà come l'assenza di starvation siano formalmente valide è che ogni processo permanga per un tempo \keyword{finito} nelle proprie sezioni di codice. Se si ammettesse l'eventualità che un processo acquisisca la risorsa per poi trattenersi in un ciclo infinito nella sezione critica, l'insuccesso dell'altro processo dipenderebbe da un difetto semantico del programma utente (che non rilascia la risorsa) e non da una falla del protocollo di sincronizzazione. Sotto la garanzia di permanenza finita, le proprietà verificate sul modello astratto si mantengono inalterate indipendentemente dalla durata reale dei task.
+
+
+Per verificare la correttezza di un protocollo per una classe infinita di potenziali processi, è necessario costruire un modello generalizzato che astragga dai dettagli implementativi del codice utente. In un sistema a transizioni a tempo discreto, l'unità elementare di tempo coincide con l'esecuzione di una singola transizione, che quindi comporta che le azioni siano atomiche, ovvero che l'esecuzione di un'azione non sia scomponibile ulteriormente.
+
+Per modellare il fatto che un processo possa trascorrere una quantità arbitraria di tempo all'interno di una specifica sezione di codice (critica o non critica), introduciamo esplicitamente il \keyword{non determinismo} aggiungendo delle transizioni \q{ciclo} (self-loop) sugli stati di nostro interesse. Ad esempio, possiamo aggiungere transizioni etichettate incondizionatamente con \code{True} sugli stati \(nc_a\) (codice non critico) e \(cr_a\) (sezione critica), permettendo all'automa di permanere nello stesso stato pur facendo evolvere il sistema globale.
+
+Questo è importante soprattutto quando consideriamo la composizione tra più processi, poiché permette ad un altro processo di evolvere anche se il processo che stiamo considerando non modifica il proprio stato.
+
+\subsection{Computazioni Spurie e Generalizzazione della Fairness}
+
+L'introduzione dei self-loop risolve il problema della generalizzazione temporale ma espande eccessivamente i comportamenti possibili del modello, introducendo il rischio di \keyword{computazioni spurie}, come per esempio un ciclo infinito nella sezione critica di un processo.
+
+\begin{definition}{Computazione Spuria}
+  Una computazione è detta \ti{spuria} se è ammessa dal modello, ma non è realizzabile o ammissibile nel sistema concreto reale.
+\end{definition}
+
+Per eliminare le computazioni spurie e ripristinare il corretto funzionamento del modello senza rimuovere il non determinismo, si ricorre ancora una volta ai vincoli di \keyword{fairness}. I concetti di fairness discussi in precedenza per lo scheduling (unconditional, weak, strong) possono essere generalizzati ad ammettere \ti{qualsiasi proprietà di stato}, non solo l'abilitazione di un'azione.
+
+Per mitigare l'anomalia del loop in sezione critica, è sufficiente imporre un vincolo di \keyword{unconditional fairness} basato sugli stati ovvero, che ogni processo debba rispettare il vincolo di non trovarsi in sezione critica per un tempo infinito.
+
+Questo vincolo non impone alcun tetto massimo prefissato al numero di esecuzioni del self-loop (mantenendo quindi l'astrazione e permettendo un tempo arbitrario), ma impone rigorosamente che tale tempo sia finito.
+
+\begin{note}{Applicazioni del non determinismo}
+  Il non determinismo può essere utilizzato per modellare sistemi con informazioni parziali ovvero, permette di rappresentare decisioni interne del sistema che non sono note a priori, o comportamenti imprevedibili dell'ambiente esterno.
+\end{note}
+
+\subsection{Atomicità e Race Conditions}
+
+Un aspetto critico durante la fase di modellazione è l'assunzione relativa all'\keyword{atomicità} delle operazioni. Nei Transition System (e nei Program Graph), una transizione rappresenta l'unità elementare di tempo e di evoluzione del sistema, incapsulando per definizione un'azione atomica (cioè un'operazione non ulteriormente scomponibile o interrompibile).
+
+È fondamentale garantire che il livello di astrazione del modello rifletta accuratamente l'effettiva granularità del sistema concreto che si sta analizzando. In caso contrario, l'analisi potrebbe ignorare l'insorgenza di \keyword{race conditions} (condizioni di corsa), ovvero anomalie in cui l'esito della computazione dipende dall'ordine in cui i processi paralleli vengono schedulati.
+
+\begin{example}{Incremento Concorrente e Race Condition}
+  Si consideri un sistema con una variabile condivisa \(a\), inizializzata a \(0\), su cui operano contemporaneamente due processi eseguendo la medesima istruzione:
+  \begin{center}
+    Processo 1: \code{a = a + 1} \qquad Processo 2: \code{a = a + 1}
+  \end{center}
+  Se l'operazione \code{a = a + 1} è supportata a livello hardware come un'istruzione \ti{atomica}, il risultato finale sarà deterministicamente \(a = 2\), e la modellazione con un'unica transizione per processo risulterebbe corretta.
+
+  Se, al contrario, il sistema reale implementa l'istruzione tramite l'esecuzione sequenziale di tre operazioni a livello macchina, la presunta atomicità viene meno:
+  \begin{itemize}
+    \item \textbf{P1:} \code{load R1, a} \quad \(\rightarrow\) \quad \code{inc R1} \quad \(\rightarrow\) \quad \code{store R1, a}
+    \item \textbf{P2:} \code{load R2, a} \quad \(\rightarrow\) \quad \code{inc R2} \quad \(\rightarrow\) \quad \code{store R2, a}
+  \end{itemize}
+  A causa dell'interleaving in un sistema concorrente, potrebbe verificarsi la seguente esecuzione: P1 carica il valore \(a=0\) in \code{R1}; P2 interrompe P1, carica anch'esso \(a=0\) in \code{R2}, lo incrementa e salva \(a=1\); P1 riprende l'esecuzione, incrementa \code{R1} e salva a sua volta \(a=1\). Il risultato finale è \(1\). Modellare l'incremento come una singola transizione atomica maschererebbe questo comportamento, producendo una verifica formalmente invalida rispetto al sistema reale.
+\end{example}
+
+Per illustrare ulteriormente la criticità dell'atomicità, consideriamo una variante del protocollo di mutua esclusione.
+In questo protocollo, un processo verifica che la sezione critica sia libera ispezionando il flag dell'avversario e, non appena la trova libera, imposta il proprio flag per indicare la sua presenza, per poi entrare.
+
+La variante del protocollo di mutua esclusione è la seguente:
+
+\begin{figure}{H}
+  \centering
+  \includegraphics[width=\textwidth]{_images/variant_mutual_exclusion_protocol_code_example}
+  \caption{Variante del protocollo di mutua esclusione}\label{fig:variant_mutual_exclusion_protocol_example}
+\end{figure}
+
+La correttezza di questo protocollo dipende strettamente da come viene modellata la fase di valutazione e assegnamento.
+
+Possiamo formalizzare il blocco di \code{entry\_protocol} in due modi differenti, ottenendo risultati diametralmente opposti:
+\begin{enumerate}
+  \item \textbf{Modellazione Atomica (Test-and-Set):}
+        Se il sistema dispone di un'istruzione hardware dedicata (come il \keyword{Test-and-Set}), il controllo della guardia e l'assegnamento avvengono in un singolo istante di tempo. Nel Program Graph, ciò si traduce in un'unica transizione dallo stato \(wt_a\) (waiting) allo stato \(cr_a\) (critical), con guardia \(\neg\code{flag}_2\) ed effetto \(\code{flag}_1 := \code{True}\). In questo scenario, il modello è esente da deadlock e garantisce rigorosamente la mutua esclusione.
+
+        \begin{figure}{H}
+          \centering
+          \includegraphics[width=\textwidth]{_images/automata_with_atomic_transaction_example}
+          \caption{Automa per il processo A con transizione atomica}\label{fig:automata_with_atomic_transaction}
+        \end{figure}
+  \item \textbf{Modellazione Non Atomica:}
+        Se il sistema concreto valuta la condizione e aggiorna la variabile in due istruzioni separate, la modellazione deve riflettere questa divisione introducendo uno stato intermedio \(en_a\) (entry). La prima transizione verifica la condizione (\(\neg\code{flag}_2\)) e porta il sistema in \(en_a\); la seconda esegue incondizionatamente l'assegnamento (\(\code{flag}_1 := \code{True}\)) ed entra in \(cr_a\).
+        \begin{figure}{H}
+          \centering
+          \includegraphics[width=\textwidth]{_images/automata_with_non_atomic_transaction_example}
+          \caption{Automa per il processo A con transizione non atomica}\label{fig:automata_with_non_atomic_transaction}
+        \end{figure}
+\end{enumerate}
+
+Nel secondo scenario, la disaggregazione delle azioni genera una vulnerabilità fatale: la \textbf{violazione della mutua esclusione}. È infatti possibile il seguente interleaving (osservabile nel Transition System composto):
+\begin{itemize}
+  \item Il Processo A esegue il test, trova \(\code{flag}_2 = \code{False}\) e transita nello stato \(en_a\).
+  \item Il Processo B viene schedulato \ti{prima} che A imposti il proprio flag. B valuta \(\code{flag}_1 = \code{False}\), transita in \(en_b\).
+  \item A questo punto, entrambi i processi si trovano nei rispettivi stati intermedi (\(en_a, en_b\)) ed entreranno immancabilmente in sezione critica (\(cr_a, cr_b\)) l'uno dopo l'altro.
+\end{itemize}
+
+
+\section{Comunicazione e Sincronizzazione}
+
+Finora abbiamo analizzato meccanismi di composizione parallela prevalentemente asincroni, in cui la comunicazione tra processi avviene tramite l'utilizzo di variabili condivise. Tuttavia, in contesti esecutivi in cui non esiste una memoria globale (come nei sistemi distribuiti), è necessario modellare la comunicazione in modo differente, tipicamente tramite lo scambio di messaggi.
+
+\subsection{Comunicazione e Sincronizzazione via Handshake}
+
+Se ci limitiamo al formalismo dei \keyword{Labeled Transition System} (LTS), non abbiamo a disposizione un concetto esplicito di area di memoria o di canale fisico di rete. L'unica entità strutturale a nostra disposizione per far interagire i componenti sono le etichette delle transizioni (le azioni).
+
+L'intuizione alla base è definire un insieme di azioni comuni, condivise dai processi coinvolti. Quando due processi condividono un'azione, affinché uno dei due possa eseguirla, è strettamente necessario che anche l'altro sia nel medesimo istante pronto a eseguire la stessa azione. Questo genera un \ti{parallelismo reale} sulle azioni condivise, mentre sulle azioni puramente locali, o private, continua a vigere il regime di \keyword{interleaving}. Tale modello formale prende il nome di sincronizzazione via \keyword{handshake}.
+
+\begin{definition}{Sincronizzazione via Handshake}
+  Siano \(TS_1\) e \(TS_2\) due Transition System, tali che \(TS_i = \langle S_i, A_i, R_i, S_{i0} \rangle\) per \(i \in \{1, 2\}\).
+  Definiamo \(H = A_1 \cap A_2\) l'insieme delle \keyword{azioni di sincronizzazione}.
+
+  Il Transition System composto tramite handshake, denotato come \(TS = TS_1 \parallel_H TS_2 = \langle S, A, R, S_0 \rangle\), è così definito:
+  \begin{itemize}
+    \item \(S = S_1 \times S_2\) \ti{(Stati globali)}
+    \item \(A = A_1 \cup A_2\) \ti{(Azioni globali)}
+    \item \(S_0 = S_{10} \times S_{20}\) \ti{(Stati iniziali globali)}
+  \end{itemize}
+
+  La relazione di transizione \(R\) contiene la transizione \(\langle s_1, s_2 \rangle \xrightarrow{a} \langle s_1', s_2' \rangle\) se e solo se si verifica una delle seguenti due condizioni:
+  \begin{enumerate}
+    \item \textbf{Esecuzione Sincrona:} \(a \in H\), e per entrambi i processi vale \(s_1 \xrightarrow{a}_1 s_1'\) e \(s_2 \xrightarrow{a}_2 s_2'\). I due processi evolvono simultaneamente eseguendo l'azione condivisa.
+    \item \textbf{Interleaving (Azione Locale):} \(a \in A_i \setminus H\), il processo \(i\) evolve localmente \(s_i \xrightarrow{a}_i s_i'\) mentre l'altro processo resta inattivo nel suo stato corrente, ovvero \(s_{3-i}' = s_{3-i}\) (con \(i \in \{1, 2\}\)).
+  \end{enumerate}
+\end{definition}
+
+\begin{observation}{Modello Ibrido}
+  La composizione via handshake rappresenta formalmente un modello ibrido. Costituisce un punto di incontro tra il prodotto puramente sincrono (dove tutto evolve in parallelo) e il prodotto puramente asincrono (dove si applica un interleaving stretto), dove il vincolo sincrono si applica solo sulle azioni di sincronizzazioni \(H\).
+\end{observation}
+
+Utilizzando la composizione via handshake, è possibile modellare un protocollo di mutua esclusione che non fa uso di variabili condivise, ma delega il controllo a un processo esterno: un \keyword{Arbitro}.
+
+Consideriamo due processi identici, \(TS_1\) e \(TS_2\), che competono per l'accesso a una risorsa. Ogni processo possiede due stati: \(NC\) (Non Critico) e \(CR\) (Critico). Le transizioni tra questi stati sono etichettate con due azioni: \code{req} (richiesta di accesso) e \code{rel} (rilascio della risorsa).
+
+Se calcolassimo il prodotto puramente asincrono (interleaving puro) tra i due processi (\(TS_1 \parallel TS_2\)), il sistema globale permetterebbe la transizione verso lo stato di errore \(\langle CR_1, CR_2 \rangle\), poiché nessuna entità impedisce ai processi di eseguire l'azione \code{req} in sequenza.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{_images/mutual_exclusion_protocol_without_arbiter}
+  \caption{Esempio di mutua esclusione senza arbitro}\label{fig:mutual_exclusion_protocol_without_arbiter}
+\end{figure}
+
+Per risolvere il problema, introduciamo un terzo automa, l'Arbitro (\(ARB\)), dotato di due stati: \(F\) (Free, risorsa libera) e \(L\) (Locked, risorsa occupata).
+
+Componendo il sistema tramite handshake, imponiamo che le azioni \code{req} e \code{rel} siano \keyword{azioni di sincronizzazione} condivise tra l'interleaving dei due processi e l'arbitro. Formalmente:
+\[TS_{globale} = (TS_1 \parallel TS_2) \parallel_{H} ARB \quad \text{con} \quad H = \{\text{req}, \text{rel}\}\]
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{_images/mutual_exclusion_protocol_with_arbiter}
+  \caption{Esempio di mutua esclusione con arbitro}\label{fig:mutual_exclusion_protocol_with_arbiter}
+\end{figure}
+
+Quando \(TS_1\) esegue \code{req}, forza l'Arbitro a sincronizzarsi e a spostarsi nello stato \(L\). Finché l'Arbitro si trova in \(L\), non possiede transizioni uscenti etichettate con \code{req}. Di conseguenza, se \(TS_2\) tentasse di eseguire \code{req}, rimarrebbe bloccato, poiché l'azione richiede la partecipazione congiunta dell'Arbitro. L'unica azione accettata dall'Arbitro in \(L\) è \code{rel} (da parte di \(TS_1\)). In questo modo, lo stato invalido \(\langle CR_1, CR_2 \rangle\) diviene irraggiungibile e la mutua esclusione è garantita formalmente.
+
+\begin{note}{}
+  L'operatore di composizione parallela \(\parallel_H\) è parametrico rispetto all'insieme di azioni di sincronizzazione \(H\). Questo generalizza i concetti visti in precedenza:
+  \begin{itemize}
+    \item Se \(H = \emptyset\), l'operatore decade nel \keyword{prodotto interleaving} puro (composizione totalmente asincrona).
+    \item Se \(H\) contiene tutte le azioni dell'alfabeto, l'operatore si comporta come un \keyword{prodotto sincrono} puro.
+  \end{itemize}
+\end{note}
+
+% I'm here
+\subsection{Comunicazione via Scambio di Messaggi}
+
+Finora abbiamo applicato la comunicazione via handshake unicamente ai Transition System. Per modellare sistemi software più vicini al codice reale, in cui i processi possiedono variabili ma non condividono uno spazio di memoria (come nei sistemi distribuiti), generalizziamo il concetto ai Program Graph introducendo i \keyword{Channel Systems} (Sistemi a Canali).
+
+Come semplificazione asssumeremo che per questo modello di comunicazione via canali le variabili siano locali e la comunicazione avvenga attraverso \keyword{canali} condivisi.
+
+\begin{definition}{Canali e Capacità}
+  Un \keyword{canale} \(c\) è modellato logicamente come una struttura dati di tipo coda FIFO (First-In, First-Out). Ad ogni canale \(c\) sono associati:
+  \begin{itemize}
+    \item Un dominio \(\text{dom}(c)\), che definisce il tipo di dati dei messaggi trasportabili.
+    \item Una capacità \(\text{cap}(c) \ge 0\), che indica il numero massimo di messaggi che il canale può memorizzare simultaneamente.
+  \end{itemize}
+
+  Il valore della capacità determina la semantica della comunicazione:
+  \begin{itemize}
+    \item \textbf{Sincrona:} Se \(\text{cap}(c) = 0\), il canale non possiede memoria. La comunicazione degenera in un handshake stretto: il mittente e il destinatario devono partecipare contemporaneamente alla comunicazione.
+    \item \textbf{Asincrona:} Se \(\text{cap}(c) > 0\), il canale agisce da buffer. I processi possono scrivere nel canale in modo asincrono, a patto che questo non sia pieno, e leggere in modo asincrono, a patto che non sia vuoto.
+  \end{itemize}
+\end{definition}
+
+L'interazione con i canali avviene attraverso primitive specifiche.
+
+\begin{definition}{Azioni di Comunicazione}
+  Dato un insieme di variabili \(Var\) e un insieme di canali \(Chan\), l'insieme delle azioni di comunicazione \(Com\) è definito come:
+  \[Com = \{c!d, c?x \mid c \in Chan, d \in D, x \in Var \text{ e } \text{dom}(c) \subseteq \text{dom}(x)\}\]
+  dove:
+  \begin{itemize}
+    \item \(c!d\) denota l'operazione di \keyword{scrittura} (send): invio del valore \(d\) sul canale \(c\). L'operazione può essere generalizzata all'invio di un'espressione arbitraria \(\expr \in \Expr\), la quale viene valutata nello stato corrente \(\eta\) prima dell'invio.
+    \item \(c?x\) denota l'operazione di \keyword{lettura} (receive): prelievo del primo messaggio disponibile dal canale \(c\) e assegnamento alla variabile locale \(x\).
+  \end{itemize}
+\end{definition}
+
+\begin{note}{}
+  Affinché le operazioni siano ben definite dal punto di vista semantico e dei tipi, deve valere il seguente vincolo sui domini: il dominio del canale deve essere compatibile e incluso nel dominio della variabile di destinazione, ovvero \(\text{dom}(c) \subseteq \text{dom}(x)\), e ovviamente il messaggio inviato deve rispettare il tipo del canale (\(d \in \text{dom}(c)\)).
+\end{note}
+
+Definiamo adesso il sistema di canali.
+
+\begin{definition}{Sistema di Canali}
+  Un \keyword{Program Graph esteso} su \((Var, Chan)\) è definito come \(PG_i = \langle Loc_i, Act_i, Effect_i, \hookrightarrow_i, Loc_{i0}, g_{i0} \rangle\), dove la relazione di transizione include ora anche le azioni di comunicazione:
+  \[\hookrightarrow_i \subseteq Loc_i \times \text{Cond}(Var_i) \times (Act_i \cup Com) \times Loc_i\]
+
+  Un \keyword{Channel System} \(CS\) su \((Var, Chan)\) è la composizione di più Program Graph operanti in parallelo:
+  \[CS = PG_1 \parallel PG_2 \parallel \dots \parallel PG_n\]
+\end{definition}
+
+
+Per definire l'LTS risultante, dobbiamo definire:
+
+\begin{itemize}
+  \item l'effetto delle azioni nel sistema di comunicazione.
+  \item lo spazio degli stati.
+\end{itemize}
+
+\begin{definition}{Effetto delle azioni di comunicazione}
+  Sia \(c\) un canale. La semantica delle azioni si biforca in base a \(\text{cap}(c)\):
+
+  \textbf{1. Comunicazione Sincrona (\(\text{cap}(c) = 0\)):}
+  \begin{itemize}
+    \item La transizione \(l_i \xrightarrow{c!d}_i l_i'\) di un processo \(P_i\) è eseguibile \ti{solo se} esiste simultaneamente una transizione \(l_j \xrightarrow{c?x}_j l_j'\) eseguibile da un altro processo \(P_j\).
+    \item Le due transizioni avvengono in modo congiunto e l'effetto è l'assegnamento diretto \(x = d\).
+  \end{itemize}
+
+  \textbf{2. Comunicazione Asincrona (\(\text{cap}(c) > 0\)):}
+  \begin{itemize}
+    \item \textbf{Invio (\(c!d\)):} È presente una \keyword{guardia implicita} che richiede che il canale non sia pieno. L'effetto consiste nell'accodare (append) il valore in fondo al buffer FIFO\@:
+          \[c = \langle m_1, \dots, m_k \rangle \implies c = \langle m_1, \dots, m_k, d \rangle\]
+    \item \textbf{Ricezione (\(c?x\)):} È presente una \keyword{guardia implicita} che richiede che il canale non sia vuoto. L'effetto consiste nel prelevare il messaggio in testa alla coda e assegnarlo alla variabile:
+          \[c = \langle m_1, \dots, m_k \rangle \implies c = \langle m_2, \dots, m_k \rangle \text{ e } x = m_1\]
+  \end{itemize}
+\end{definition}
+
+Per lo spazio degli stati invece è necessario generalizzare la nozione di stato globale introdotta per i semplici Program Graph. In precedenza, uno stato era una coppia formata dalle locazioni e dalla valutazione delle variabili. Ora, poiché i canali possiedono memoria e si comportano come particolari entità di stato condivise, dobbiamo includerne il contenuto.
+
+\begin{definition}{Stato Globale di un Channel System}
+  Nel Transition System \(TS(CS)\) risultante dalla composizione, ogni stato è rappresentato da una tupla della forma:
+  \[\langle l_1, \dots, l_n, \eta, \chi \rangle\]
+  dove:
+  \begin{itemize}
+    \item \(l_i \in Loc_i\) rappresenta la locazione corrente per ciascun processo \(P_i\).
+    \item \(\eta \in \Eval(\Var)\) è la funzione di valutazione delle variabili locali (\(\eta: \Var \to D\)).
+    \item \(\chi \in \Eval(Chan)\) è la \keyword{funzione di valutazione dei canali}, che assegna ad ogni canale con \(\text{cap}(c) > 0\) il suo contenuto. Dunque \(\chi\mapsto\text{dom}(c)^*\in \Eval(Chan)\)
+  \end{itemize}
+\end{definition}
+
+Dunque adesso possiamo formalizzare il transition system per il channel system:
+
+\begin{definition}{Formalizzazione di \(TS(CS)\)}
+  Sia \(CS = PG_1 \parallel \dots \parallel PG_n\) un Channel System. Il \keyword{Labeled Transition System} risultante \(TS(CS) = \langle S, Act, \to, S_0, AP, L \rangle\) è formalmente definito come segue:
+
+  \begin{itemize}
+    \item \textbf{Stati (\(S\)):} L'insieme degli stati è \(S = (Loc_1 \times \cdots \times Loc_n) \times \Eval(\Var) \times \Eval(Chan)\).
+    \item \textbf{Azioni (\(Act\)):} L'insieme delle azioni globali è \(Act = \biguplus_{1 \le i \le n} Act_i \uplus \{\tau\}\), dove \(\tau\) è un simbolo di \keyword{azione interna} che viene usata per modellare la sincronizzazione.
+    \item \textbf{Stati Iniziali (\(S_0\)):} Uno stato \(\langle l_1, \dots, l_n, \eta, \chi \rangle\) appartiene a \(S_0\) se:
+          \begin{itemize}
+            \item \(l_i \in Loc_{i0}\) per ogni \(1 \le i \le n\).
+            \item \(\eta \models \bigwedge_{i=1}^n g_{i0}\) (la valutazione iniziale \(\eta\) soddisfa la congiunzione delle guardie iniziali di tutti i processi).
+            \item \(\chi = \chi_0\), ovvero \(\chi(c) = \epsilon\) per ogni canale \(c \in Chan\) (i canali sono inizialmente vuoti).
+          \end{itemize}
+    \item \textbf{Proposizioni Atomiche e Labelling (\(AP, L\)):} L'insieme \(AP\) e la funzione di etichettatura \(L\) rimangono invariati rispetto ai Program Graph standard, includendo locazioni e condizioni sulle variabili.
+    \item \textbf{Relazione di transizione (\(\to\)):} definita come segue.
+  \end{itemize}
+\end{definition}
+
+La relazione di transizione globale \(\to\) descrive come si aggiorna lo stato globale a seguito dell'esecuzione di azioni private o di interazione con i canali. Possiamo suddividere la sua formalizzazione in tre casi distinti.
+
+\begin{itemize}
+  \item \textbf{Azioni Locali:} Se il processo \(P_i\) esegue un'azione locale standard \(a \in Act_i\), il suo stato avanza e si applicano gli effetti sulle variabili, senza toccare i canali.
+        \[ \text{Se } l_i \xrightarrow{g:a}_i l_i' \text{ e } \eta \models g \]
+        \[ \implies \langle l_1, \dots, l_i, \dots, l_n, \eta, \chi \rangle \xrightarrow{a} \langle l_1, \dots, l_i', \dots, l_n, \eta', \chi \rangle \]
+        dove \(\eta' = \text{Effect}(a, \eta)\).
+  \item \textbf{Comunicazione Asincrona:} Le azioni di I/O asincrone aggiornano la valutazione dei canali \(\chi\) (e possibilmente \(\eta\)) ed etichettano la transizione globale con \(\tau\).
+        \begin{itemize}
+          \item \textbf{Azione di Scrittura (Send):} Richiede canale non pieno. L'espressione valutata o il dato \(d\) viene accodato.
+                \[ \text{Se } l_i \xrightarrow{g:c!d}_i l_i', \quad \eta \models g, \quad \text{len}(\chi(c)) = k < \text{cap}(c), \quad \chi(c) = \langle d_1, \dots, d_k \rangle \]
+                \[ \implies \langle l_1, \dots, l_i, \dots, l_n, \eta, \chi \rangle \xrightarrow{\tau} \langle l_1, \dots, l_i', \dots, l_n, \eta, \chi' \rangle \]
+                dove \(\chi' = \chi[c := \langle d_1, \dots, d_k, d \rangle]\). La sintassi \(\chi[c := \sigma]\) indica una funzione identica a \(\chi\) ovunque, tranne che in \(c\), cui associa la sequenza \(\sigma\). La funzione di valutazione delle variabili \(\eta\) rimane invariata.
+
+          \item \textbf{Azione di Lettura (Receive):} Richiede canale non vuoto. Si preleva la testa della coda e si aggiorna una variabile locale.
+                \[ \text{Se } l_i \xrightarrow{g:c?x}_i l_i', \quad \eta \models g, \quad \text{len}(\chi(c)) = k > 0, \quad \chi(c) = \langle d_1, \dots, d_k \rangle \]
+                \[ \implies \langle l_1, \dots, l_i, \dots, l_n, \eta, \chi \rangle \xrightarrow{\tau} \langle l_1, \dots, l_i', \dots, l_n, \eta', \chi' \rangle \]
+                dove \(\chi' = \chi[c := \langle d_2, \dots, d_k \rangle]\) (avanzamento della coda) e \(\eta' = \eta[x := d_1]\) (assegnamento del valore estratto alla variabile \(x\)).
+        \end{itemize}
+  \item \textbf{Comunicazione Sincrona:} L'handshake richiede la presenza simultanea di una scrittura e di una lettura da parte di due processi distinti \(P_i\) e \(P_j\) sullo stesso canale \(c\). Il dato transita in modo sincrono.
+
+        \[ \text{Se } l_i \xrightarrow{g_1:c!d}_i l_i' \text{ e } l_j \xrightarrow{g_2:c?x}_j l_j', \quad \eta \models g_1 \land g_2, \quad \text{cap}(c) = 0, \quad i \neq j \]
+        \[ \implies \langle l_1, \dots, l_i, \dots, l_j, \dots, l_n, \eta, \chi \rangle \xrightarrow{\tau} \langle l_1, \dots, l_i', \dots, l_j', \dots, l_n, \eta', \chi \rangle \]
+        dove \(\eta' = \eta[x := d]\). L'azione globale è ancora \(\tau\). La valutazione dei canali \(\chi\) rimane intoccata, poiché il canale non conserva mai informazione.
+
+\end{itemize}
+
+\subsubsection{1. }
+
+\subsubsection{2. } %(\(\text{cap}(c) > 0\))
+
+\subsubsection{3. } %  (\(\text{cap}(c) = 0\))
+% [TODO: Inserire immagine: Regole di inferenza per la relazione di transizione di TS(CS) / Riferimento slide 53]
+
+\begin{observation}{Approcci alla Composizione}
+  Esiste una differenza strutturale nel modo in cui abbiamo derivato il Transition System composto per i sistemi con memoria condivisa rispetto ai sistemi con comunicazione a canali:
+  \begin{itemize}
+    \item \textbf{Modello a Memoria Condivisa:} L'approccio classico procede per gradi. Prima si esegue la composizione parallela sintattica tra i Program Graph (\(PG_{comp} = PG_1 \parallel \dots \parallel PG_n\)), sfruttando l'interleaving e la gestione condivisa delle variabili. Successivamente, l'unico Program Graph risultante viene \q{srotolato} (unfolded) nel suo LTS corrispondente \(TS(PG_{comp})\).
+    \item \textbf{Modello a Canali (Channel System):} A causa della natura dei canali (che agiscono come code FIFO indipendenti) e delle primitive di I/O asincrone/sincrone, non definiamo un operatore di composizione nativo a livello di Program Graph. L'approccio adottato consiste nel mappare \ti{direttamente} l'insieme dei Program Graph separati, unito all'insieme dei canali, in un unico e grande Transition System globale \(TS(CS)\), applicando una funzione di traduzione diretta che incorpora la semantica dei canali nella definizione della relazione di transizione.
+  \end{itemize}
+  Se il sistema da modellare è \keyword{ibrido} (presenza simultanea di variabili condivise e canali di comunicazione), non si può procedere in due fasi separate. La traduzione in LTS deve necessariamente fondere i due approcci in un'unica definizione monolitica della relazione di transizione globale.
+\end{observation}
+
+\subsection{Verso i Modelli a Tempo Continuo}
+
+La modellazione vista finora si è concentrata su sistemi discreti, in cui il tempo avanza concettualmente a \q{scatti} in corrispondenza dell'esecuzione delle transizioni atomiche. Esiste tuttavia un'ampia classe di sistemi (sistemi cyber-fisici, controllori real-time, circuiti analogico-digitali) la cui correttezza dipende crucialmente dallo scorrere del \keyword{tempo reale} e dall'evoluzione di grandezze fisiche continue.
+
+L'idea fondamentale per modellare tali sistemi è iniettare all'interno del formalismo discreto (es. LTS o Automi) delle variabili che non evolvono in base ad assegnamenti discreti operati dal software, ma in base a leggi matematiche che dipendono dal tempo (es.\ temperatura, velocità, pressione).
+
+\begin{definition}{Variabile Tempo Reale}
+  Introduciamo una singola variabile continua per rappresentare il tempo assoluto, che denoteremo tipicamente con \(t\). A differenza delle variabili di programma classiche, il cui dominio è spesso finito o numerabile (es.\ interi), la variabile tempo varia nel dominio dei numeri reali non negativi:
+  \[ \text{dom}(t) = \R_{\ge 0} \]
+  Questa variabile evolve autonomamente con derivata unitaria (\(\dot{t} = 1\)), misurando il tempo reale trascorso.
+\end{definition}
+
+\begin{observation}{Esplosione dello Spazio degli Stati e Decidibilità}
+  L'introduzione di una variabile a dominio continuo altera drasticamente la trattabilità matematica e computazionale del modello.
+
+  Ricordiamo che in un Transition System generato da variabili, lo spazio degli stati \(S\) è dato (o contiene) l'insieme di tutte le possibili valutazioni delle variabili. Una funzione di valutazione \(\eta\) mappa l'insieme delle variabili \(\Var\) nel loro dominio \(D\):
+  \[ \eta: \Var \to D \]
+  Se l'unica variabile di interesse è il tempo (\(\Var = \{t\}\)) e il dominio è \(D = \R_{\ge 0}\), il numero totale di valutazioni distinte corrisponde al numero di funzioni possibili:
+  \[ \abs{D}^{\abs{\Var}} = \abs{\R_{\ge 0}}^1 = \abs{\R_{\ge 0}} \]
+  Questo significa che lo spazio degli stati del sistema non è più finito, né numerabilmente infinito (come \(\N\)), ma possiede la cardinalità del continuo (non numerabile).
+
+  Dal punto di vista pratico dell'Automated Software Verification, questo genera una barriera computazionale enorme. Gli algoritmi classici di verifica (Model Checking), che si basano sull'esplorazione esaustiva degli stati raggiungibili, falliscono in presenza di uno spazio non numerabile. Il problema della verifica (reachability, model checking) per modelli con variabili continue diviene, in linea di principio, \keyword{indecidibile}. Sarà pertanto necessario introdurre tecniche formali di \keyword{astrazione} avanzate per ricondurre (sotto specifiche condizioni) questo spazio continuo a un sistema finito equivalente ai fini della verifica, tema che verrà esplorato nello studio dei \keyword{Timed Automata}.
+\end{observation}
+
+
+\subsection{Introduzione agli Automi Temporizzati (Timed Automata)}
+
+Per modellare adeguatamente i sistemi \keyword{embedded} ovvero sistemi di controllo immersi in un ambiente analogico in cui le reazioni dipendono strettamente dalle tempistiche del mondo fisico il formalismo puramente discreto degli LTS risulta insufficiente. Si introduce pertanto un nuovo modello matematico: gli \keyword{Automi Temporizzati} (\keyword{Timed Automata}). Questo modello arricchisce la struttura dei classici automi a stati finiti con variabili a dominio continuo che scorrono autonomamente misurando il progresso del tempo reale.
+
+\begin{observation}{Il Problema della Decidibilità}
+  Come discusso in precedenza, l'aggiunta di una variabile a tempo continuo genera uno spazio degli stati denso e non numerabile. Di conseguenza, il problema della verifica formale (model checking) diviene intrinsecamente problematico sotto il profilo della \keyword{decidibilità}.
+
+  Tuttavia, la decidibilità dipende fortemente dalla granularità della proprietà che si intende analizzare: se i requisiti parlano esclusivamente della raggiungibilità delle locazioni o delle variabili di programma senza esplicitare vincoli quantitativi esatti sul tempo, il problema di verifica mantiene spesso la sua trattabilità.
+\end{observation}
+
+\begin{definition}{Rappresentazione Finita e Costruzione del Quoziente}
+  Per aggirare l'ostacolo degli stati infiniti e poter eseguire l'analisi algoritmica, è indispensabile costruire una rappresentazione astratta e finita del sistema temporizzato che preservi la validità delle proprietà logiche di interesse.
+
+  Tale costruzione sfrutta una \keyword{relazione di equivalenza} matematica applicata allo spazio degli stati: situazioni (stati) infinite e continue che risultano indistinguibili rispetto alle evoluzioni temporali critiche per l'ambiente vengono raggruppate in \keyword{classi di equivalenza}. L'insieme finito di queste classi costituisce il \keyword{quoziente} del sistema originario (fondamento teorico di quello che in letteratura è noto come \ti{Region Graph}).
+\end{definition}
+
+\subsection{Specifica Logica e Raggiungibilità: LTL e CTL}
+
+Per interrogare il modello e specificare i requisiti da verificare, ci si avvale delle Logiche Temporali, le quali estendono i connettivi proposizionali standard (AND, OR, \(\implies\)) introducendo operatori in grado di ragionare lungo lo scorrere delle computazioni.
+
+\begin{definition}{Logica LTL (Linear Temporal Logic)}
+  La logica \keyword{LTL} valuta le proprietà su singole tracce di esecuzione (cammini lineari nel tempo). Gli operatori temporali fondamentali sono:
+  \begin{itemize}
+    \item \(\square P\) (\keyword{Globally}): La proprietà \(P\) deve valere sempre, in ogni stato futuro del cammino.
+    \item \(\Diamond P\) (\keyword{Future} o \keyword{Finally}): La proprietà \(P\) dovrà valere in almeno uno stato futuro.
+    \item \(\bigcirc P\) (\keyword{Next}): La proprietà \(P\) sarà vera nello stato immediatamente successivo.
+    \item \(P \;\mathcal{U}\; Q\) (\keyword{Until}): La proprietà \(P\) si mantiene vera ininterrottamente \ti{fino a quando} non si raggiunge uno stato in cui diventa vera \(Q\).
+  \end{itemize}
+\end{definition}
+
+In questo contesto logico, il problema della \keyword{raggiungibilità} si esprime elegantemente mediante l'operatore \(\Diamond\). Chiedersi se una specifica locazione o situazione di errore sia raggiungibile dal sistema equivale a valutare la soddisfacibilità della formula \(\Diamond P\). Se la proprietà non include costrutti quantitativi sul tempo, la raggiungibilità negli Automi Temporizzati è algoritmicamente decidibile tramite l'automa quoziente.
+
+\begin{observation}{Estensioni Temporizzate e Branching Time}
+  Quando i requisiti del sistema divengono più stringenti imponendo limiti di tempo espliciti (ad esempio: \qi{la locazione critica è raggiungibile \ti{entro} 5 unità di tempo?}), l'analisi si complica.
+
+  In questi casi si ricorre a logiche a tempo ramificato (\keyword{Branching Time}), come la \keyword{CTL} (Computation Tree Logic), che permettono di quantificare strutturalmente sui molteplici cammini futuri possibili. Esistono estensioni della CTL sviluppate appositamente per il tempo reale (come la TCTL) che consentono di integrare intervalli temporali rigorosi nelle formule, mantenendo, sotto le opportune astrazioni, il problema del model checking decidibile.
+\end{observation}
+
+Per consolidare queste nozioni teoriche, le prossime lezioni approfondiranno i limiti del modello LTS e la potenza espressiva degli Automi Temporizzati attraverso la modellazione dettagliata e la risoluzione del caso studio di un \keyword{incrocio ferroviario}.
