@@ -436,7 +436,7 @@ Per quelle di passaggio del tempo, invece, è necessario definire \(\Eff(d,\nu) 
 
 \chapter{Lezione 8/04}
 
-Appunti mancanti per computer scarico, recuperare tramite registrazione audio e appunti fabrizio.
+Appunti mancanti per computer scarico, recuperare tramite registrazione audio e appunti fabrizio presenti in _files/_raw/Lezione_ASV_8_aprile_FABRIZIO
 
 \chapter{Lezione 13/04}
 
@@ -858,9 +858,9 @@ Passando alla semantica per \(\psi\) è praticamente a LTL se non per il caso at
 Per i casi base e per i connettivi booleani è abbastanza intuitiva, mentre per i quantificatori sui percorsi si ritorna a \(\psi\).
 
 \begin{definition}{Semantica \(CTL^*\)}
-  Data una struttura \(k = \langle AP, W, R, w_0, r \rangle\) con \(AP\) insieme di proposizioni atomiche, \(W\) insieme dei mondi possibili o stati, \(R \subseteq W\times W\) relazione di transizione, \(w_0\) mondo iniziale e \(r: W \to 2^{AP}\) funzione di etichettatura che associa a ogni stato un insieme di proposizioni atomiche vere in quello stato, e dato uno stato \(w \in W\) di partenza (\(w_0\) se omesso), diremo che:
+  Data una struttura \(k = \langle AP, W, R, w_0, \lambda \rangle\) con \(AP\) insieme di proposizioni atomiche, \(W\) insieme dei mondi possibili o stati, \(R \subseteq W\times W\) relazione di transizione, \(w_0\) mondo iniziale e \(\lambda: W \to 2^{AP}\) funzione di etichettatura che associa a ogni stato un insieme di proposizioni atomiche vere in quello stato, e dato uno stato \(w \in W\) di partenza (\(w_0\) se omesso), diremo che:
   \begin{itemize}
-    \item \(k,w \models p\) se e solo se \(p \in r(w)\)
+    \item \(k,w \models p\) se e solo se \(p \in \lambda(w)\)
     \item \(k,w \models \neg \phi\) se e solo se \(k,w \not\models \phi\)
     \item \(k,w \models \phi_1 \land \phi_2\) se e solo se \(k,w \models \phi_1\) e \(k,w \models \phi_2\)
     \item \(k,w \models \phi_1 \lor \phi_2\) se e solo se \(k,w \models \phi_1\) o \(k,w \models \phi_2\)
@@ -870,7 +870,7 @@ Per i casi base e per i connettivi booleani è abbastanza intuitiva, mentre per 
   Importante notare che fino ai quantificatori sui percorsi la semantica è definita su stati, quindi non ha alcuna nozionne temporale, mentre nei quantificatori si passa alla semantica LTL\@, che è definita sui percorsi, e dunque ha una nozione temporale. Normalmente a LTL basterebbe \(\pi\), ma essendo che in una formula di percorso posso tornare a una formula di stato è necessario mantenere la struttura \(k\) per poter valutare le formule di stato che possono essere presenti in \(\psi\).
 
   In particolare, per la semantica di \(\psi\) abbiamo esattamente la stessa semantica di LTL\@, con l'unica differenza che
-  \[k, \pi, i\models \text{ se e solo se} k,(\pi)_i\models \phi\]
+  \[k, \pi, i\models \text{ se e solo se} k,{(\pi)}_i\models \phi\]
 \end{definition}
 
 Vedimo ora il frammento CTL di \(CTL^*\), che è un sottoinsieme di \(CTL^*\) in cui ogni operatore temporale è preceduto da un quantificatore sui percorsi.
@@ -941,17 +941,17 @@ Iniziamo dalla definizione di chiusura, similmente a quella che abbiamo visto pe
 
 Quello che farà l'algoritmo è etichettare ogni stato con le formule di \(cl(\phi)\) che sono soddisfatte in quello stato andando bottom-up\@, ovvero partendo dalle formule proposizionali e risalendo fino alla formula \(\phi\) che vogliamo verificare.
 
-Per \(EX\) l'algoritmo è il seguente
+Per \(EX\) l'algoritmo è il seguente\footnote{Il tipo \(Unit\) è il tipo che rappresenta l'assenza di un valore, è usato per indicare che la funzione non restituisce nulla di significativo, ma viene eseguita solo per i suoi effetti collaterali.}.
 
 \begin{algorithmdesc}{Checking \(EX\)}
   \begin{algorithmic}[1]
-    \Statex{} \textbf{signature} \(\textsc{CheckEX:} \quad Kripke \times Formula \to Boolean\)
-    \Function{\(\textsc{Resolution}\)}{$(k,\phi)$} % chktex 46
+    \Statex{} \textbf{signature} \(\textsc{CheckEX:} \quad Kripke \times Formula \to Unit\)
+    \Function{\(\textsc{CheckEX}\)}{$(k,\phi)$} % chktex 46
     \State{} \(T \gets \set{w \in W}[k,w\models \phi]\)
     \While{\(T\neq \emptyset\)}
     \State{} \(s \gets\) choose \(T\)
     \For{\(t \in R^{-1}(s)\)}
-    \State{} \(r(t)\gets r(t)\cup{EX p}\)
+    \State{} \(\lambda(t)\gets \lambda(t)\cup{EX p}\)
     \EndFor{}
     \EndWhile{}
     \EndFunction{}
@@ -961,3 +961,143 @@ Per \(EX\) l'algoritmo è il seguente
 \chapter{Lezione 29/04}
 
 ALTRI ESEMPI SU SPIN\@
+
+\chapter{Lezione 4/5}
+
+Proseguiamo con gli algoritmi per il model checking di CTL\@, in particolare vedremo quelli per \(E\phi_1 U \phi_2\).
+
+Sappiamo come detto che \(E \phi_1 U \phi_2 \equiv \phi_2 \lor (\phi_1 \land EX(E \phi_1 U \phi_2))\).
+
+Come anticipato intuitivamente possiamo partire dagli stati che soddisfano \(\phi_2\) che sicuramente soddisfano \(E \phi_1 U \phi_2\), e poi andare a ritroso, poiché gli stati entranti in quelli che soddisfano \(E \phi_1 U \phi_2\) soddisfano \(EX(E \phi_1 U \phi_2)\). Dunque basterà controllare che soddisfino anche \(\phi_1\) per avere l'altro disgiunto.
+
+INSERIRE ESEMPIO FOTO
+
+Vediamo dunque l'algoritmo per \(E\phi_1 U \phi_2\).
+
+\begin{algorithmdesc}{Checking \(EU\)}
+  \begin{algorithmic}[1]
+    \Statex{} \textbf{signature} \(\textsc{CheckEU:} \quad Kripke \times Formula \times Formula \to Unit\)
+    \Function{\(\textsc{CheckEU}\)}{$(k,\phi_1,\phi_2)$} % chktex 46
+      \State{} \(T \gets \set{w \in W}[ \phi_2 \in \lambda(w)]\)
+      \For{\(w \in T\)}
+        \State{} \(\lambda(w) \gets \lambda(w)\cup{E \phi_1 U \phi_2}\) 
+      \EndFor{}
+      \While{\(T\neq \emptyset\)}
+        \State{} \(s \gets\) choose \(T\)
+        \State{} \(T \gets T\setminus\set{s}\)
+        \For{\(t \in R^{-1}(s)\)}
+          \If{\(E(\phi_1 U \phi_2) \notin \lambda(t) \land \phi_1 \in \lambda(t)\)}
+            \State{} \(\lambda(t) \gets \lambda(t)\cup{E \phi_1 U \phi_2}\)
+            \State{} \(T \gets T\cup\set{t}\)
+          \EndIf{}
+        \EndFor{}
+      \EndWhile{}
+    \EndFunction{}
+  \end{algorithmic}
+\end{algorithmdesc}
+
+Come complessità questa è chiaramente lineare nelle dimensioni del grafo (\(\BigO(\abs{V} + \abs{E})\)), che per strutture di kripke è \(\BigO(\abs{W} + \abs{R})\).
+
+Per il caso di \(EG\) invece, sappiamo che \(EG \phi \equiv \phi \land EX (EG \phi)\).
+
+INSERISCI ESEMPIO FOTO
+
+Il modo più facile per farlo è calcolare le CFC nel sottografo formato dagli stati che soddisfano \(\phi\). Le CFC non banali soddisfano \(EG \phi\), e poi basta andare a ritroso per etichettare anche gli stati che soddisfano \(EX(EG \phi)\).
+
+\begin{algorithmdesc}{Checking \(EG\)}
+  \begin{algorithmic}[1]
+    \Statex{} \textbf{signature} \(\textsc{CheckEG:} \quad Kripke \times Formula \to Unit\)
+    \Function{\(\textsc{CheckEG}\)}{$(k,\phi)$} % chktex 46
+      \State{} \(S \gets \set{w \in W}[\phi \in \lambda(w)]\)
+      \State{} \(G \gets (S, R\cap(S\times S))\)
+      \State{} \(SCC^* \gets \set{C \in SCC(G)}[\abs{C} + \abs{R\cap(C\times C)} > 1]\)
+      \State{} \(T \gets \bigcup SCC^*\)
+      \For{\(w \in T\)}
+        \State{} \(\lambda(w) \gets \lambda(w)\cup{E G \phi}\) 
+      \EndFor{}
+      \While{\(T\neq \emptyset\)}
+        \State{} \(s \gets\) choose \(T\)
+        \State{} \(T \gets T\setminus\set{s}\)
+        \For{\(t \in R^{-1}(s)\)}
+          \If{\(EG\phi \notin \lambda(t) \land \phi \in \lambda(t)\)}
+            \State{} \(\lambda(t) \gets \lambda(t)\cup{E G \phi}\)
+            \State{} \(T \gets T\cup\set{t}\)
+          \EndIf{}
+        \EndFor{}
+      \EndWhile{}
+    \EndFunction{}
+  \end{algorithmic}
+\end{algorithmdesc}
+
+Concetto di punto fisso.
+
+Se abbiamo una funzione monotona continua, allora sicuramente deve esistere un punto che hal'immagine uguale a se stesso. In particolare, tale punto è detto punto fisso, ovvero data una funzione \(f\) un punto fisso è un elemento \(x\) tale che \(f(x) = x\). Per le funzioni monotone continue, esiste un punto fisso che è l'interesione della curva con la bisettrice del primo e terzo quadrante, ovvero \(f(x) = x\). 
+
+Quello che avremo noi è molto simile, poiché avremo una funzoine che rappresenta l'insieme degli stati che soddisfano una formula. In particolare per \(U\) partiremo da un insieme minimo di stati che soddisfano la formula, e poi iterativamente aggiungeremo stati finché non raggiungiamo il massimo punto fisso e viceversa per \(G\).
+
+Chiaramente l'esistenza di questo massimo non è garantita, ma se l'insieme è finito si. In particolare con il one-step unfolding di \(U\) e \(G\) abbiamo che ovviamente la funzione sarà monotona.
+
+Consideriamo una struttura d'ordine parziale \(\mathcal{P} = \langle P, \sqsubseteq  \rangle\) con \(P\) insieme e \(\sqsubseteq \) relazione di ordine parziale su \(P\). Un esempio di tale struttura è quella indotta sull'insieme delle parti dalla relazoine di sott'insieme \(\subseteq\), ovvero \(\langle 2^W, \subseteq \rangle\) con \(W\) insieme qualsiasi. 
+
+FOTO ESEMPIO CON \(\set{p,q,r}\).
+
+Prendendo in considerazione \(P'\subseteq P\) diremo che \(p\) è estremo superiore di \(P'\) se \(\forall p' \in P', p' \sqsubseteq  p\). 
+Dualmente \(p\) è estremo inferiore di \(P'\) se \(\forall p' \in P', p \sqsubseteq  p'\).
+
+Diremo inoltre che \(p\) è il minimo estremo superiore di \(P'\) se \(p\) è estremo superiore di \(P'\) e \(\forall p''\) estremo superiore di \(P'\), \(p \sqsubseteq  p''\). Dualmente \(p\) è il massimo estremo inferiore di \(P'\) se \(p\) è estremo inferiore di \(P'\) e \(\forall p''\) estremo inferiore di \(P'\), \(p'' \sqsubseteq  p\).
+
+\begin{note}{}
+  In generale non è detto che esistano estremi superiori o estremi inferiori in ogni struttura d'ordine parziale, in particolare minimi o massimi.
+\end{note}
+
+Definiamo una catena in un ordine parziale un sott'insieme totalmente ordinata, ovvero un insieme \(C\subseteq P\) tale che \(\forall p_1, p_2 \in C\), \(p_1 \sqsubseteq  p_2\) o \(p_2 \sqsubseteq  p_1\). Una relazione d'ordine parziale è completa se ogni catena ha un estremo superiore, indicato con \(\sqcup P'\) e un estremo inferiore, indicato con \(\bigsqcap P'\).
+
+Consideriamo una funzione \(f: P \to P\) su una struttura d'ordine parziale completa. Diremo che \(f\) è monotona se \(\forall p_1, p_2 \in P\), \(p_1 \sqsubseteq  p_2\) implica \(f(p_1) \sqsubseteq  f(p_2)\). Diremo inoltre che \(f\) è anti-monotona se \(\forall p_1, p_2 \in P\), \(p_1 \sqsubseteq  p_2\) implica \(f(p_2) \sqsubseteq  f(p_1)\). 
+
+Esiste un teorema di Tarski che dice che \(\mu x . f(x) = \bigsqcap \set{x\in P'}[f(x) \sqsubseteq  x]\) e \(\nu x . f(x) = \sqcup \set{x\in P'}[x \sqsubseteq  f(x)]\), e che inoltre \(\mu x . f(x)\) e \(\nu x. f(x)\) esistono e sono unici.
+
+Inoltre Kleene dimostrò che definendo una \(f^k\) come
+\[f^k(x) = \begin{cases}
+x & ,k = 0 \\
+f(f^{k-1}(x)) & ,k > 0
+\end{cases}\]
+
+allora \(\mu x . f(x) = \sqcup_{k\in\N} f^k(\bot)\) e \(\nu x . f(x) = \bigsqcap_{k\in\N} f^k(\top)\), dove \(\bot\) è il minimo elemento di \(P\) e \(\top\) è il massimo elemento di \(P\).
+
+Questo è chiaramente un modo più computazionalmente utile poiché è facile costruire un algoritmo generico per trovare minimi o massimi punti fissi.
+
+\begin{algorithmdesc}{Finding \(\mu x. f(x)\)}
+  \begin{algorithmic}[1]
+    \Statex{} \textbf{signature} \(\textsc{LFP:} \quad \mathcal{P} \times \mathcal{P}^{\mathcal{P}} \to 2^\mathcal{P} \)
+    \Function{\(\textsc{LFP}\)}{$((P,\sqsubseteq,\bot,\top), f)$} % chktex 46
+      \State{} \(x_0 \gets \bot\)
+      \State{} \(x_1 \gets f(x_0)\)
+      \State{} \(j \gets 1\)
+      \While{\(x_j \neq x_{j-1}\)}
+        \State{} \(x_{j+1} \gets f(x_j)\) // \(x_j = f^j(\bot)\)
+        \State{} \(j \gets j + 1\)
+      \EndWhile{}
+    \EndFunction{}
+  \end{algorithmic}
+\end{algorithmdesc}
+
+Per il massimo punto fisso, l'algoritmo è identico, se non per l'inizializzazione di \(x_0\) in \(\top\).
+
+Per applicare al nostro contesto ci serve considerare la denotazione di una formula \(\phi\) come l'insieme degli stati che soddisfano \(\phi\), ovvero \(\den{\phi}[][k] = \set{w \in W}[k,w\models \phi]\).
+
+Si può notare che \(\phi_1 \to \phi_2 \implies \den{\phi_1} \subseteq \den{\phi_2}\).
+
+A questo punto andando ad astrarre il one-step unfolding in modo da avere una funzoine monotona.
+
+\[f_U (V) = \den{\phi_2 \lor (\phi_1 \land EX V)} = \den{\phi_2} \cup \den{\phi_1}\cap \den{EX V} \]
+
+Chiaramente \(\den{EX V}\) è la preimmagine di \(V\) indicata con 
+\[pre(V) = \set{w \in W}[\exists v \in V\st (w,v) \in R]\]
+
+Possiamo osservare che questa funzione è monotona poiché con \(V_1 \subseteq V_2\) abbiamo \(pre(V_1) \subseteq pre(V_2)\), che viene intersecato con qualcosa di costante rispetto a \(V\) e poi unito con qualcosa di costante rispetto a \(V\).
+
+Dualmente con \(G\) possiamo ottenere 
+
+\[f_G (V) = \den{\phi} \cap pre(V)\]
+
+che è monotona per lo stesso motivo di \(f_U\). A questo punto per il teorema di Kleene possiamo trovare LFP e GFP e ottenere tutti gli stati che mi interessano.
