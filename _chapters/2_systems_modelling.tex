@@ -1071,15 +1071,7 @@ La relazione di transizione globale \(\to\) descrive come si aggiorna lo stato g
         \[ \text{Se } l_i \xrightarrow{g_1:c!d}_i l_i' \text{ e } l_j \xrightarrow{g_2:c?x}_j l_j', \quad \eta \models g_1 \land g_2, \quad \text{cap}(c) = 0, \quad i \neq j \]
         \[ \implies \langle l_1, \dots, l_i, \dots, l_j, \dots, l_n, \eta, \chi \rangle \xrightarrow{\tau} \langle l_1, \dots, l_i', \dots, l_j', \dots, l_n, \eta', \chi \rangle \]
         dove \(\eta' = \eta[x := d]\). L'azione globale è ancora \(\tau\). La valutazione dei canali \(\chi\) rimane intoccata, poiché il canale non conserva mai informazione.
-
 \end{itemize}
-
-\subsubsection{1. }
-
-\subsubsection{2. } %(\(\text{cap}(c) > 0\))
-
-\subsubsection{3. } %  (\(\text{cap}(c) = 0\))
-% [TODO: Inserire immagine: Regole di inferenza per la relazione di transizione di TS(CS) / Riferimento slide 53]
 
 \begin{observation}{Approcci alla Composizione}
   Esiste una differenza strutturale nel modo in cui abbiamo derivato il Transition System composto per i sistemi con memoria condivisa rispetto ai sistemi con comunicazione a canali:
@@ -1090,14 +1082,16 @@ La relazione di transizione globale \(\to\) descrive come si aggiorna lo stato g
   Se il sistema da modellare è \keyword{ibrido} (presenza simultanea di variabili condivise e canali di comunicazione), non si può procedere in due fasi separate. La traduzione in LTS deve necessariamente fondere i due approcci in un'unica definizione monolitica della relazione di transizione globale.
 \end{observation}
 
-\subsection{Verso i Modelli a Tempo Continuo}
 
-La modellazione vista finora si è concentrata su sistemi discreti, in cui il tempo avanza concettualmente a \q{scatti} in corrispondenza dell'esecuzione delle transizioni atomiche. Esiste tuttavia un'ampia classe di sistemi (sistemi cyber-fisici, controllori real-time, circuiti analogico-digitali) la cui correttezza dipende crucialmente dallo scorrere del \keyword{tempo reale} e dall'evoluzione di grandezze fisiche continue.
 
-L'idea fondamentale per modellare tali sistemi è iniettare all'interno del formalismo discreto (es. LTS o Automi) delle variabili che non evolvono in base ad assegnamenti discreti operati dal software, ma in base a leggi matematiche che dipendono dal tempo (es.\ temperatura, velocità, pressione).
+\section{Verso i Modelli a Tempo Continuo}
+
+La modellazione vista finora si è concentrata su sistemi discreti, in cui il tempo avanza concettualmente a \q{scatti} in corrispondenza dell'esecuzione delle transizioni atomiche. Esiste tuttavia un'ampia classe di sistemi la cui correttezza dipende crucialmente dallo scorrere del \keyword{tempo reale} e dall'evoluzione di grandezze fisiche continue.
+
+L'idea fondamentale per modellare tali sistemi è iniettare all'interno del formalismo discreto delle variabili che non evolvono in base ad assegnamenti discreti operati dal software, ma in base a leggi matematiche che dipendono dal tempo (es.\ temperatura, velocità, pressione).
 
 \begin{definition}{Variabile Tempo Reale}
-  Introduciamo una singola variabile continua per rappresentare il tempo assoluto, che denoteremo tipicamente con \(t\). A differenza delle variabili di programma classiche, il cui dominio è spesso finito o numerabile (es.\ interi), la variabile tempo varia nel dominio dei numeri reali non negativi:
+  Introduciamo una singola variabile continua per rappresentare il tempo assoluto, che denoteremo tipicamente con \(t\). A differenza delle variabili di programma classiche, il cui dominio è spesso finito o numerabile, la variabile tempo varia nel dominio dei numeri reali non negativi:
   \[ \text{dom}(t) = \R_{\ge 0} \]
   Questa variabile evolve autonomamente con derivata unitaria (\(\dot{t} = 1\)), misurando il tempo reale trascorso.
 \end{definition}
@@ -1111,46 +1105,5 @@ L'idea fondamentale per modellare tali sistemi è iniettare all'interno del form
   \[ \abs{D}^{\abs{\Var}} = \abs{\R_{\ge 0}}^1 = \abs{\R_{\ge 0}} \]
   Questo significa che lo spazio degli stati del sistema non è più finito, né numerabilmente infinito (come \(\N\)), ma possiede la cardinalità del continuo (non numerabile).
 
-  Dal punto di vista pratico dell'Automated Software Verification, questo genera una barriera computazionale enorme. Gli algoritmi classici di verifica (Model Checking), che si basano sull'esplorazione esaustiva degli stati raggiungibili, falliscono in presenza di uno spazio non numerabile. Il problema della verifica (reachability, model checking) per modelli con variabili continue diviene, in linea di principio, \keyword{indecidibile}. Sarà pertanto necessario introdurre tecniche formali di \keyword{astrazione} avanzate per ricondurre (sotto specifiche condizioni) questo spazio continuo a un sistema finito equivalente ai fini della verifica, tema che verrà esplorato nello studio dei \keyword{Timed Automata}.
+  Dal punto di vista pratico dell'Automated Software Verification, questo genera una barriera computazionale enorme. Gli algoritmi classici di verifica (Model Checking), che si basano sull'esplorazione esaustiva degli stati raggiungibili, falliscono in presenza di uno spazio non numerabile. Il problema della verifica per modelli con variabili continue diviene, in linea di principio, \keyword{indecidibile}. Sarà pertanto necessario introdurre tecniche formali di \keyword{astrazione} avanzate per ricondurre questo spazio continuo a un sistema finito equivalente ai fini della verifica, tema che verrà esplorato nello studio dei \keyword{Timed Automata}.
 \end{observation}
-
-
-\subsection{Introduzione agli Automi Temporizzati (Timed Automata)}
-
-Per modellare adeguatamente i sistemi \keyword{embedded} ovvero sistemi di controllo immersi in un ambiente analogico in cui le reazioni dipendono strettamente dalle tempistiche del mondo fisico il formalismo puramente discreto degli LTS risulta insufficiente. Si introduce pertanto un nuovo modello matematico: gli \keyword{Automi Temporizzati} (\keyword{Timed Automata}). Questo modello arricchisce la struttura dei classici automi a stati finiti con variabili a dominio continuo che scorrono autonomamente misurando il progresso del tempo reale.
-
-\begin{observation}{Il Problema della Decidibilità}
-  Come discusso in precedenza, l'aggiunta di una variabile a tempo continuo genera uno spazio degli stati denso e non numerabile. Di conseguenza, il problema della verifica formale (model checking) diviene intrinsecamente problematico sotto il profilo della \keyword{decidibilità}.
-
-  Tuttavia, la decidibilità dipende fortemente dalla granularità della proprietà che si intende analizzare: se i requisiti parlano esclusivamente della raggiungibilità delle locazioni o delle variabili di programma senza esplicitare vincoli quantitativi esatti sul tempo, il problema di verifica mantiene spesso la sua trattabilità.
-\end{observation}
-
-\begin{definition}{Rappresentazione Finita e Costruzione del Quoziente}
-  Per aggirare l'ostacolo degli stati infiniti e poter eseguire l'analisi algoritmica, è indispensabile costruire una rappresentazione astratta e finita del sistema temporizzato che preservi la validità delle proprietà logiche di interesse.
-
-  Tale costruzione sfrutta una \keyword{relazione di equivalenza} matematica applicata allo spazio degli stati: situazioni (stati) infinite e continue che risultano indistinguibili rispetto alle evoluzioni temporali critiche per l'ambiente vengono raggruppate in \keyword{classi di equivalenza}. L'insieme finito di queste classi costituisce il \keyword{quoziente} del sistema originario (fondamento teorico di quello che in letteratura è noto come \ti{Region Graph}).
-\end{definition}
-
-\subsection{Specifica Logica e Raggiungibilità: LTL e CTL}
-
-Per interrogare il modello e specificare i requisiti da verificare, ci si avvale delle Logiche Temporali, le quali estendono i connettivi proposizionali standard (AND, OR, \(\implies\)) introducendo operatori in grado di ragionare lungo lo scorrere delle computazioni.
-
-\begin{definition}{Logica LTL (Linear Temporal Logic)}
-  La logica \keyword{LTL} valuta le proprietà su singole tracce di esecuzione (cammini lineari nel tempo). Gli operatori temporali fondamentali sono:
-  \begin{itemize}
-    \item \(\square P\) (\keyword{Globally}): La proprietà \(P\) deve valere sempre, in ogni stato futuro del cammino.
-    \item \(\Diamond P\) (\keyword{Future} o \keyword{Finally}): La proprietà \(P\) dovrà valere in almeno uno stato futuro.
-    \item \(\bigcirc P\) (\keyword{Next}): La proprietà \(P\) sarà vera nello stato immediatamente successivo.
-    \item \(P \;\mathcal{U}\; Q\) (\keyword{Until}): La proprietà \(P\) si mantiene vera ininterrottamente \ti{fino a quando} non si raggiunge uno stato in cui diventa vera \(Q\).
-  \end{itemize}
-\end{definition}
-
-In questo contesto logico, il problema della \keyword{raggiungibilità} si esprime elegantemente mediante l'operatore \(\Diamond\). Chiedersi se una specifica locazione o situazione di errore sia raggiungibile dal sistema equivale a valutare la soddisfacibilità della formula \(\Diamond P\). Se la proprietà non include costrutti quantitativi sul tempo, la raggiungibilità negli Automi Temporizzati è algoritmicamente decidibile tramite l'automa quoziente.
-
-\begin{observation}{Estensioni Temporizzate e Branching Time}
-  Quando i requisiti del sistema divengono più stringenti imponendo limiti di tempo espliciti (ad esempio: \qi{la locazione critica è raggiungibile \ti{entro} 5 unità di tempo?}), l'analisi si complica.
-
-  In questi casi si ricorre a logiche a tempo ramificato (\keyword{Branching Time}), come la \keyword{CTL} (Computation Tree Logic), che permettono di quantificare strutturalmente sui molteplici cammini futuri possibili. Esistono estensioni della CTL sviluppate appositamente per il tempo reale (come la TCTL) che consentono di integrare intervalli temporali rigorosi nelle formule, mantenendo, sotto le opportune astrazioni, il problema del model checking decidibile.
-\end{observation}
-
-Per consolidare queste nozioni teoriche, le prossime lezioni approfondiranno i limiti del modello LTS e la potenza espressiva degli Automi Temporizzati attraverso la modellazione dettagliata e la risoluzione del caso studio di un \keyword{incrocio ferroviario}.
