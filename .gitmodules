@@ -1,3 +1,4 @@
 [submodule "template"]
 	path = template
 	url = git@github.com:RiccardoElena/UniNotes_Template.git
+	branch = master
