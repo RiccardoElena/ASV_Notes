@@ -21,6 +21,19 @@
       {\llbracket#1\rrbracket^{#2}_{#3}}}
 }
 
+\NewDocumentCommand{\GDia}{o}{
+  \IfNoValueTF{#1}
+    {\left\langle\cdot\right\rangle}
+    {\left\langle#1\right\rangle}
+}
+
+\NewDocumentCommand{\GBox}{o}{
+  \IfNoValueTF{#1}
+    {\left[\cdot\right]}
+    {\left[#1\right]}
+}
+
+
 \newcommand{\expr}{\operatorname{exp}}
 \newcommand{\Expr}{\operatorname{Expr}}
 \newcommand{\Act}{\operatorname{Act}}
@@ -30,6 +43,9 @@
 \newcommand{\Var}{\operatorname{Var}}
 \newcommand{\Loc}{\operatorname{Loc}}
 \newcommand{\Eff}{\operatorname{Effect}}
+
+\newcommand\vplus{\mathbin{\raisebox{0.125ex}{%
+   \rotatebox[origin=c]{180}{\(\uplus\)}}}}
 
 % ---------------------------- END CUSTOMIZATIONS ------------------------------
 

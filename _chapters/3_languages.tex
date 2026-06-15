@@ -15,10 +15,10 @@ Prendiamo in considerazione il seguente automa:
 \begin{figure}[h]
   \centering
   \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
-    \node[state,initial]  (q_0)                 {$q_0$};
-    \node[state]          (q_1) [below =of q_0] {$q_1$};
-    \node[state]          (q_2) [right=of q_0]  {$q_2$};
-    \node[state]          (q_3) [right=of q_1]  {$q_3$};
+    \node[state,initial]  (q_0)                 {\(q_0\)};
+    \node[state]          (q_1) [below =of q_0] {\(q_1\)};
+    \node[state]          (q_2) [right=of q_0]  {\(q_2\)};
+    \node[state]          (q_3) [right=of q_1]  {\(q_3\)};
 
     \path[->] (q_0) edge              node        {} (q_1)
     edge              node        {} (q_2)
@@ -97,7 +97,7 @@ Queste proprietà per quanto siamo molto generali, riescono solo a esprimere cos
   Le proprietà di fairness possono essere viste come una forma più debole di proprietà esistenziali.
 \end{note}
 
-Tutto questo però è un insieme di proprietà ragionevoli che, per il momento, sono espresse a parole, in linguaggio naturale informale. In quanto tali, queste descrizioni possono essere ambigue o indecidibili. Io voglio capire come faccio ad applicare queste definizioni allo spazio sintattico di un linguaggio formale, che è poi possibile elaborare in modo preciso e con una semantica matematica ben chiara.
+Tutto questo però è un insieme di proprietà ragionevoli che, per il momento, sono espresse a parole, in linguaggio naturale informale. In quanto tali, queste descrizioni possono essere ambigue o indecidibili. Dobbiamo dunque capire come applicare queste definizioni allo spazio sintattico di un linguaggio formale, che è poi possibile elaborare in modo preciso e con una semantica matematica ben chiara.
 
 \section{Espressioni e Linguaggi Regolari}
 
@@ -166,9 +166,9 @@ Per esprimere invece la non raggiungibilità di uno stato negativo \(B\) possiam
 Tuttavia, questo linguaggio non ci permette di descrivere comportamenti infiniti (come per esempio descrivere proprietà di reattività continue nel tempo di un server), poiché
 una qualsiasi espressione regolare ha una lunghezza finita, ma per descrivere quel tipo di proprietà abbiamo bisogno di espressione con lunghezza infinita.
 
-Dobbiamo dunque estendere il concetto di linguaggio regolare a linguaggio \(\omega\)-regolare, dove \(\omega\) è il primo ordinale limite.
+Dobbiamo dunque estendere il concetto di linguaggio regolare a linguaggio \(\omega\)-regolare, dove \(\omega\) è il primo ordinale limite, ovvero intuitivamente, è l'ordinale che rappresenta la sequenza infinita \(0,1,2,\ldots\) e il primo punto oltre tutti i naturali, senza un predecessore immediato.
 
-In primo luogo, è necessario estendere \(\Sigma^*\) a \(\Sigma^\omega\). Già questa modifica ci fa passare da un insieme numerabile a un insieme non numerabile, poiché \(\Sigma^\omega\) è equipotente ai reali.
+In primo luogo quindi è necessario estendere \(\Sigma^*\) a \(\Sigma^\omega\) ovvero passare da parole finite a parole infinite. Già questa modifica ci fa passare da un insieme numerabile a un insieme non numerabile, poiché \(\Sigma^\omega\) è equipotente ai reali.
 
 Infatti se \(A\) è un linguaggio regolare, \(A^\omega\) rappresenta la giustapposizione infinita di stringhe finite estratte da \(A\).
 Formalmente, una parola in \(A^\omega\) può essere spezzettata in infiniti frammenti, ciascuno appartenente al linguaggio \(A\).
@@ -179,7 +179,7 @@ Formalmente, una parola in \(A^\omega\) può essere spezzettata in infiniti fram
     \item \(\emptyset\) è un linguaggio \(\omega\)-regolare
     \item Se \(A\) e \(B\) sono linguaggi \(\omega\)-regolari, allora \(A \cup B\) è un linguaggio \(\omega\)-regolare
     \item Se \(A\) è regolare, \(A^\omega \) è \(\omega\)-regolare
-    \item Se \(A\) è regolare e \(B\) è \(\omega\)-regolare, allora \(A \cdot B = \set{w_1 \cdot w_2}{w_1 \in A, w_2 \in B}\) è un linguaggio \(\omega\)-regolare
+    \item Se \(A\) è regolare e \(B\) è \(\omega\)-regolare, allora \(A \cdot B = \set{w_1 \cdot w_2}[w_1 \in A, w_2 \in B]\) è un linguaggio \(\omega\)-regolare
   \end{itemize}
 \end{definition}
 
@@ -228,7 +228,7 @@ Vedremo che esistono invece linguaggi come la \keyword{Logica Temporale Lineare}
 \section{Logica del prim'ordine}
 Passiamo quindi alla logica del prim'ordine, per poi passare alla logica temporale, che cerca di nascondere all'interno di operatori logici dei pattern ricorrenti in logica del prim'ordine.
 
-Quali sono gli oggetti che ci interessano? L'universo, o oggetti del discorso, sono le parole finite \(w: \lbrack 0,n\rparen\to \Sigma\) oppure infinite \(w: \N \to \Sigma\).
+Quali sono gli oggetti che ci interessano? L'universo, o oggetti del discorso, sono le parole finite, che possiamo rappresentare come una funzione \(w: \lbrack 0,n\rparen\to \Sigma\) che associa a ogni punto tra \(0\) e la lunghezza della parola meno uno un simbolo di alfabeto, oppure infinite, rappresentate come una funzione \(w: \N \to \Sigma\) che associa a ogni punto del tempo un simbolo di alfabeto.
 
 Immaginiamo di voler esprimere la proprietà \qi{Prima o poi il sistema ha stampato ed è in attesa del nuovo input}. Quindi deve esistere un punto nel futuro, non necessariamente stretto, in cui il sistema ha stampato e allo stesso tempo si trova in attesa.
 Poiché questa proprietà non è atomica, dobbiamo assumere come insieme di modelli \(\Sigma = 2^{AP}\), con \(AP\) l'insieme delle proposizioni atomiche.
@@ -265,7 +265,7 @@ Partiamo dal definire com'è composta la formula, ovvero fornire la grammatica d
 
 \begin{definition}{Grammatica del prim'ordine}
   Per il prim'ordine avremo una grammatica di questo tipo, con \(p \in AP\):
-  \[\phi ::= p(x) \mid \neg \phi \mid \phi \land \phi \mid \phi \lor \phi\mid \forall x \,\phi \mid \exists x\, \phi\]
+  \[\phi ::= p(x) \mid \neg \phi \mid \phi \land \phi \mid \phi \lor \phi\mid \forall x \phi \mid \exists x \phi\]
 \end{definition}
 
 Se \(x\) è l'istante di tempo che ci interessa, dire che \(p(x)\) è vera significa dire che all'istante \(x\) il modello \(w\) ha come immagine dell'istante \(x\) un insieme \(Y\subseteq AP\) tale che \(p\in Y\).
@@ -288,9 +288,9 @@ Quindi dato ad esempio \(\chi(x)\), possiamo dire che \(w \models p(x)\) è vero
     \item \(w,\chi \models \neg \phi\) se \(w,\chi \not\models \phi\).
     \item \(w,\chi \models \phi_1 \land \phi_2\) se \(w,\chi \models \phi_1\) e \(w,\chi \models \phi_2\).
     \item \(w,\chi \models \phi_1 \lor \phi_2\) se \(w,\chi \models \phi_1\) o \(w,\chi \models \phi_2\).
-    \item \(w,\chi \models \forall x.\,\phi\) se per ogni \(n \in \N\), vale \(w,\chi[x \to n] \models \phi\).
+    \item \(w,\chi \models \forall x.\phi\) se per ogni \(n \in \N\), vale \(w,\chi[x \mapsfrom n] \models \phi\).
           Ovvero sostituendo a \(x\) ogni possibile istante temporale, la formula \(\phi\) è soddisfatta.
-    \item \(w,\chi \models \exists x.\,\phi\) se esiste \(n \in \N\) tale che \(w,\chi[x \to n] \models \phi\).
+    \item \(w,\chi \models \exists x.\phi\) se esiste \(n \in \N\) tale che \(w,\chi[x \mapsfrom n] \models \phi\).
           Ovvero sostituendo a \(x\) almeno un istante temporale, la formula \(\phi\) è soddisfatta.
   \end{itemize}
 \end{definition}
@@ -308,9 +308,9 @@ Quindi dato ad esempio \(\chi(x)\), possiamo dire che \(w \models p(x)\) è vero
 
 Vediamo se questo linguaggio è utile per esprimere proprietà sul futuro.
 
-Ad esempio, \qi{Prima o poi il sistema ha stampato ed è in attesa del nuovo input} può essere scritto nel seguente modo: \(\exists x.\, i(x) \land p(x)\).
+Ad esempio, \qi{Prima o poi il sistema ha stampato ed è in attesa del nuovo input} può essere scritto nel seguente modo: \(\exists x. i(x) \land p(x)\).
 
-Un altro esempio, \qi{Non ho mai due processi in una sezione critica} può essere scritto nel seguente modo: \(\forall x.\, \neg (p_1(x) \land p_2(x))\).
+Un altro esempio, \qi{Non ho mai due processi in una sezione critica} può essere scritto nel seguente modo: \(\forall x. \neg (p_1(x) \land p_2(x))\).
 
 Se invece voglio dire che infinitamente spesso valga la proprietà \(i\), ovvero che vada \textit{infinitamente spesso} in stato di attesa, qui ho una difficoltà, perché mi serve poter esprimere una relazione tra istanti temporali.
 Ci serve quindi poter esprimere il concetto di \qi{dopo}, ed è dunque necessario introdurre una relazione d'ordine tra istanti temporali.
@@ -330,7 +330,7 @@ Se voglio esprimere che arriva un punto dopo il quale sarò sempre in idle posso
 
 In generale però possiamo osservare che quando parliamo di proprietà temporali ci troviamo sempre in uno di questi due casi:
 \begin{itemize}
-  \item \qi{Prima o poi} \(p\) è vero, ovvero \(\forall x.\exists y. x \leq y \land p(y)\)
+  \item \qi{Infinitamente spesso} \(p\) è vero, ovvero \(\forall x.\exists y. x \leq y \land p(y)\)
   \item \qi{Dopo un certo punto} \(p\) è sempre vero, ovvero \(\exists x. \forall y. x \leq y \to p(y)\)
 \end{itemize}
 
@@ -364,14 +364,14 @@ Invece, per la semantica, utilizzeremo un indice \(i\) che rappresenta l'istante
     \item \(w,i\models\phi_1 \land \phi_2\) se \(w,i\models\phi_1\) e \(w,i\models\phi_2\).
     \item \(w,i\models\phi_1 \lor \phi_2\) se \(w,i\models\phi_1\) o \(w,i\models\phi_2\).
     \item \(w,i\models F\phi\) se \(\exists j \geq i \st w, j \models \phi\), ovvero se \(\exists j\st j \geq i \land w,j\models\phi\).
-    \item \(w,i\models G\phi\) se \(\forall j \geq i.\, w, j \models \phi\), ovvero se \(\forall j\st j \geq i \to w,j\models\phi\).
+    \item \(w,i\models G\phi\) se \(\forall j \geq i. w, j \models \phi\), ovvero se \(\forall j\st j \geq i \to w,j\models\phi\).
   \end{itemize}
 \end{definition}
 
 \subsection{Esempi di formalizzazione di proprietà in LTL '79}
 Con questa sintassi abbiamo operatori per descrivere formalmente se esiste un punto nel futuro in cui mi troverò sia in uno stato di attesa, sia in uno stato di stampa (\(F(i\land p)\)).
 
-Possiamo ancora descrivere \q{l'infinitamente spesso}? Sì, tramite la concatenazione degli operatori \(G\) ed \(F\), ovvero \(G(F(\phi))\), che può essere tradotta in: \(\forall j \geq i.\,\exists j'\geq j \st w, j' \models \phi\), dove \(\phi\) può essere la proprietà di essere in attesa.
+Possiamo ancora descrivere \q{l'infinitamente spesso}? Sì, tramite la concatenazione degli operatori \(G\) ed \(F\), ovvero \(G(F(\phi))\), che può essere tradotta in: \(\forall j \geq i.\exists j'\geq j \st w, j' \models \phi\), dove \(\phi\) può essere la proprietà di essere in attesa.
 
 Se invece vogliamo esprimere una proprietà che \q{da un certo punto} in poi il sistema è sempre in attesa, allora basta concatenare \(G\) ed \(F\) in questo modo: \(F(G(\phi))\),
 che può essere tradotta in: \(\exists j \geq i\st \forall j'\geq j. w,j' \models\phi\), dove \(\phi\) è la proprietà di essere in attesa.
@@ -409,7 +409,7 @@ Intuitivamente \(U\) esprime che una proprietà \(p\) è vera fino a quando non 
 
 Questo nuovo linguaggio ci permette di esprimere praticamente tutto ciò che è esprimibile con le espressioni \(\omega\)-regolari, a meno di proprietà di counting, in cui vogliamo che una certa proprietà \(p\) sia vera almeno in posizioni multiplo di \(n\).
 
-Esprimere una proprietà di questo tipo, con ad esempio \(n=2\), è facilmente esprimibile con \({((\Sigma\Sigma)*(p\Sigma))}^\omega\), in cui l'unica cosa che è garantita è che \(p\) è vera \(0,2,4,\ldots\).
+Esprimere una proprietà di questo tipo, con ad esempio \(n=2\), è facilmente esprimibile con \({((\Sigma\Sigma)*(p\Sigma))}^\omega\), in cui l'unica cosa che è garantita è che \(p\) è vera in \(0,2,4,\ldots\).
 
 Vedremo che però sarà esprimibile il concetto di una proprietà \(p\) che è vera \textbf{esclusivamente} in posizioni multiplo di \(n\), ovvero ad esempio vera solo sui pari.
 
@@ -428,7 +428,7 @@ Ma andando a sviluppare questa formula, otteniamo:
 \[w,0\models G(p\land X \neg p) \iff \forall j \geq 0. w,j \models (p\land X \neg p) \iff \forall j \geq 0. (w,j \models p \land w,j+1 \models \neg p)\]
 
 Che è chiaramente insoddisfacibile. Il problema è che questa formula pretende che \(p\) sia vero in ogni punto.
-Un modo più corretto per esprimere questa proprietà è \(G((p \leftrightarrow X \neg p) )\).
+Un modo più corretto per esprimere questa proprietà è \(G(p \leftrightarrow X \neg p) \).
 
 Ad essere precisi questa ci dice che \(p\) è vera o solo sui pari o solo sui dispari.
 
@@ -470,29 +470,41 @@ Ognuno di questi passaggi risulta un'equivalenza, poiché non abbiamo usato null
 
 Grazie a questa definizione possiamo mostrare come LTL '79 sia sussunta da quella dell'81, infatti \(F\phi \equiv \top U \phi\) e \(G\phi \equiv \bot R \phi\), dove \(\top\) e \(\bot\) sono simboli sintattici assunti presenti nella grammatica, con semantica \(w,i \models \top\) sempre vero e \(w,i \models \bot\) sempre falso. Questo era facile da intuire, poiché la semantica di \(F\) e \(G\) è parte di quella di \(U\) e \(R\), che non fanno altro che aggiungere ulteriori vincoli, i quali vengono ignorati se si usano \(\top\) e \(\bot\). Ovviamente questo mostra una proprietà di dualità tra \(F\) e \(G\), che è la stessa dualità tra \(U\) e \(R\).
 
-Molto spesso, comunque, quello che mi interessa non è usare il counting, quindi il fatto che LTL non sia in grado di esprimere proprietà di counting non è un grosso problema. Inoltre, l'operatore \(X\) non è qualcosa di assoluto, poiché dipende dalla granularità della discretizzazione del tempo. Molto spesso a livello di proprietà pratiche non si usa proprio.
+Molto spesso, comunque, quello che mi interessa non è usare il counting, quindi il fatto che LTL non sia in grado di esprimere proprietà di counting non è un grosso problema. Inoltre, l'operatore \(X\) non è qualcosa di assoluto, poiché dipende dalla granularità della discretizzazione del tempo. Molto spesso a livello di proprietà pratiche non è utilizzato.
 
-Omettendolo ottengo il frammento stattering free di LTL, che non è espressivamente equivalente a LTL intero, poichè non è possibile distinguere tra parole in cui c'è \qi{idle} in una posizione. Ad esempio le due parole \(ppp\neg p \neg p pp\) e \(p\neg p p\) sono indistinguibili in questo frammento, ma distinguibili in LTL\@. In un certo senso non importa \qi{quanto tempo} sto in uno stato, ma solo i cambiamenti di stato. La cosa importante di questa cosa è che questo operatore porta quasi sempre ad un aumento della complessità da \(NP\) a \(PSPACE\), quindi è un operatore che è meglio evitare se non è necessario.
+Omettendolo ottengo il frammento stattering free di LTL, che non è espressivamente equivalente a LTL intero, poichè non è possibile distinguere tra parole in cui c'è \qi{idle} in una posizione. Ad esempio le due parole \(ppp\neg p \neg p pp\) e \(p\neg p p\) sono indistinguibili in questo frammento, ma distinguibili in LTL\@. In un certo senso non importa \qi{quanto tempo} si rimane in uno stato, ma solo i cambiamenti di stato. La cosa importante di questa cosa è che questo operatore porta quasi sempre ad un aumento della complessità da \(NP\) a \(PSPACE\), quindi è un operatore che è meglio evitare se non è necessario.
 
-Proprietà di one-step unfolding. Si può facilmente vedere che vale \(F\phi\equiv \phi \lor X F \phi\). Ho preso la mia formula e l'ho \qi{srotolata} di un passo. In teoria posso srotolarla di un numero qualsiasi di passi, ma srotolarla di un passo è sufficiente per poter costruire un automa. Vale lo stesso per \(G\phi\equiv\phi\land XG\phi\). Dunque saranno vere le opportune generalizzazioni per \(U\) e \(R\). In particolare
+\subsubsection{Proprietà di one-step unfolding e NNF}
+Si può facilmente vedere che vale \(F\phi\equiv \phi \lor X F \phi\). In un certo senso è possibile \qi{srotolare} una formula con \(F\) di un passo.
+
+Il one-step unfolding è una proprietà molto importante, che ci permette di passare da una formula che parla di un intera sequenza a una formula che parla della testa della sequenza e della coda della sequenza, esplicitando così le proprietà della testa e fornendo un carattere ricorsivo al model checking. Infatti, in teoria è possibile \q{ srotolarla} di un numero qualsiasi di passi, ma srotolarla di un passo è sufficiente per poter costruire un automa. Ciò è vero per tutti gli operatori LTL, infatti vale lo stesso per \(G\phi\equiv\phi\land XG\phi\). Dunque saranno vere le opportune generalizzazioni per \(U\) e \(R\). In particolare
 
 \[\phi_1 U \phi_2 \equiv \phi_2 \lor (\phi_1 \land X(\phi_1 U \phi_2 ))\]
 \[\phi_1 R \phi_2 \equiv \phi_2 \land (\phi_1 \lor X(\phi_1 R \phi_2 ))\]
 
-NNF ugale a logica classica usando dualità tra \(U\) e \(R\) e tra \(F\) e \(G\). Per quanto riguarda \(X\) invece, è un operatore self-dual, ovvero \(\neg X \phi \equiv X \neg \phi\).
+È possibile inoltre portare ogni formula in \(NNF\), ovvero negated normal form che, come per le logiche classiche, consiste nell'avere le negazioni solo adiacenti alle formule atomice nel comporre i letterali. Ciò è fatto sfruttando la dualità degli operatori, ad esempio \(F\phi \equiv \neg G \neg \phi\) e \(G\phi \equiv \neg F \neg \phi\). Per quanto riguarda \(X\) invece, si può facilmente vedere che è un operatore self-dual, ovvero \(\neg X \phi \equiv X \neg \phi\).
 
-Scrivi algoritmo formale (banale).
+La funzione di trasformazione in \(NNF\), dato una formula \(\phi\) e un valore booleano \(pol\) che indica se siamo in un contesto positivo o negativo, è definita come segue:
+\[NNF(\phi, pol) = \begin{cases}
+  p & \phi = p \in AP \text{ e } pol = true \\
+  \neg p & \phi = p \in AP \text{ e } pol = false \\
+  NNF(\phi', \neg pol) & \phi = \neg \phi'\\
+  X (NNF(\phi', pol)) & \phi = X\phi' \\
+  NNF(\phi_1, pol) \overline{\circ} NNF(\phi_2, pol) & \phi = \phi_1 \circ \phi_2 \text{ e } pol = false, \text{ con } \circ \in \set{\land, \lor, U, R}\\
+  NNF(\phi_1, pol) \circ NNF(\phi_2, pol) & \phi = \phi_1 \circ \phi_2 \text{ e } pol = true, \text{ con } \circ \in \set{\land, \lor, U, R} 
+\end{cases}\]
+dove con \(\overline{\circ}\) si intende l'operatore duale di \(\circ\), ovvero \(\overline{\land} = \lor\) e \(\overline{\lor} = \land\) e \(\overline{U} = R\) e \(\overline{R} = U\).
 
 \begin{definition}{Lunghezza}
   la lunghezza di una formula \(\phi\) è una funzione che rispetta le seguenti regole:
   \begin{itemize}
     \item \(len(p) = 1\) per \(p \in AP\)
-    \item \(len(Op \phi) = 1 + len(\phi)\) per \(Op \in \set{\neg,X}\)
-    \item \(len(\phi_1 Op \phi_2) = 1 + len(\phi_1) + len(\phi_2)\) per \(Op \in \set{\land, \lor, U, R}\)
+    \item \(len(\circ \phi) = 1 + len(\phi)\) per \(\circ \in \set{\neg,X}\)
+    \item \(len(\phi_1 \circ \phi_2) = 1 + len(\phi_1) + len(\phi_2)\) per \(\circ \in \set{\land, \lor, U, R}\)
   \end{itemize}
 \end{definition}
 
-Chiaramente alla peggio portare in NNF mi raddoppia la lunghezza della formula, quindi se la formula originale è di lunghezza \(n\) allora la formula in NNF è di lunghezza al più \(2n\). Questo perché il peggior caso e qullo in cui abbiamo \(\neg\) come opertaore più esterno e tutti i letterali positivi. In questo caso infatti considerando l'albero sintattico andiamo a togliere il nodo in radice e aggiungere un nodo per ogni foglia. Essendo che il numero di foglie è lineare rispetto alla lunghezza della formula, allora la lunghezza della formula in NNF è al più \(2n\).
+Chiaramente alla peggio portare in NNF raddoppia la lunghezza della formula, quindi se la formula originale è di lunghezza \(n\) allora la formula in NNF è di lunghezza al più \(2n\). Questo perché il peggior caso e quello in cui abbiamo \(\neg\) come opertatore più esterno e tutti i letterali positivi. In questo caso infatti considerando l'albero sintattico andiamo a togliere il nodo in radice e aggiungere un nodo per ogni foglia. Essendo che il numero di foglie è lineare rispetto alla lunghezza della formula, allora la lunghezza della formula in NNF è al più \(2n\).
 
 Vediamo ora qualche esempio di proprietà espressa di modellazione di sistema espressa in LTL\@.
 
@@ -505,10 +517,171 @@ Queste invece sono esprimibili con \(G\phi\), dove \(\phi\) è una formula che e
 
 La cosa non è così semplice però, perché come abbiamo già visto, è possibile avere delle tracce spurie, ovvero percorsi nel grafo di computazione che sono ammesse solo perché nell'astrazione del modello si è perso qualche dettaglio, ma che in realtà non sono percorsi realizzabili nel sistema concreto.
 
-Se voglio esprimere una proprietà una proprietà che voglio sia vera infinitamente spesso posso usare \(G F \phi\).
+Se voglio esprimere una proprietà vera infinitamente spesso posso usare \(G F \phi\).
 
 In questo modo posso filtrare tracce che non rispettano un vincolo di fairness. Una proprietà di \(G F \phi \to \psi\) è detta di strong fairness.
 
-I problemi di decisione si basano sul modello di computazione, che abbiamo formalizzato tramite una struttura di kirpke \(K\) il cui linguaggio \(L(K)\) è l'insieme di tutte le parole che rappresentano esecuzioni del sistema concreto. Ora, dato un formula \(\phi\) di LTL\@, vogliamo decidere se \(K \models \phi\), ovvero se tutte le parole in \(L(K)\) soddisfano \(\phi\). Quindi se definiamo il linguaggio \(L(\phi) = \set{w \st w,0 \models \phi}\), allora il problema di verifica è decidere se \(L(K) \subseteq L(\phi)\).\footnote{Per brevità se sto iniziando da indice \(0\), posso scrivere \(w,0\models \phi\) come \(w\models \phi\).}
+I problemi di decisione si basano sul modello di computazione, che abbiamo formalizzato tramite una struttura di kripke \(K = \langle AP, W, w_0, R, \lambda\rangle\) il cui linguaggio \(L(K) = \set{\lambda{\pi}}[\pi \in Path(K)]\) è l'insieme di tutte le parole che rappresentano esecuzioni del sistema concreto. Ora, dato un formula \(\phi\) di LTL\@, vogliamo decidere se \(K \models \phi\), ovvero se tutte le parole in \(L(K)\) soddisfano \(\phi\). Quindi se definiamo il linguaggio \(L(\phi) = \set{w \in {(2^{AP})}^\omega }[ w,0 \models \phi]\), allora il problema di verifica equivale a decidere se \(L(K) \subseteq L(\phi)\).\footnote{Per brevità se l'indice iniziale è \(0\), è possibile scrivere \(w,0\models \phi\) come \(w\models \phi\).}
 
-La negazione di questa proprietà è \(L(K) \cap \overline{L(\phi)} \neq \emptyset\), ovvero \(L(K) \cap L(\neg \phi) \neq \emptyset\). Quindi se un comportamento del sistema soddisfa la negata dalla formula, ho trovato un controesempio. Determinare se dato un sistema \(K\) esiste un suo comportamento che soddisfa la negata è il problema di model checking.
+La negazione di questa proprietà è \(L(K) \cap \overline{L(\phi)} \neq \emptyset\), ovvero \(L(K) \cap L(\neg \phi) \neq \emptyset\).\footnote{Seppure sia un'equivalenza, partire da un linguaggio e costruirne il complemento è molto più complesso che negare la formula che lo genera e costruire il linguaggio della negata} Quindi se un comportamento del sistema soddisfa la negata dalla formula, ho trovato un controesempio. Determinare se dato un sistema \(K\) esiste un suo comportamento che soddisfa la negata è il problema di model checking, che in questo caso è equivalente a decidere il vuoto di un linguaggio, ovvero se un dato linguaggio, in questo caso \(L(K) \cap L(\neg \phi)\), è vuoto o meno. 
+
+Inoltre, con questa costruzione è possibile ricondurre al vuoto anche il problema di soddisfacibilità e validità, ovvero se esiste una parola che soddisfa una formula \(\phi\), poiché \(L(\phi) \neq \emptyset\) se e solo se \(\phi\) è soddisfacibile, e \(L(\neg \phi) = \emptyset\) se e solo se \(\phi\) è valida.
+
+Per risolvere il problema di model checking però è necessario avere una rappresentazione di \(L(K)\), che essendo però un insieme infinito di parole infinite, non sono trivialmente rappresentabili, e necessitano quindi di una rappresentazione più succinta, e in particolare finita.
+Fortunatamente, come è possibile rappresentare le espressioni regolari tramite automi a stati finiti, è possibile rappresentare anche i linguaggi \(\omega\)-regolari tramite una classe di automi più espressivi, ovvero gli automi di Büchi. Intuitivamente, avendo come sostanziale differenza la lunghezza delle parole, che è infinita, è necessario modificare la condizione di accettazione, che non può più essere quella di raggiungere uno stato accettante, ma deve essere una condizione più complessa, ad esempio quella di visitare uno stato accettante infinite volte. Questo poiché il semplice raggiungimento di uno stato mi dice solo che la parola corrispondente al percorso fino a quel punto nel tempo è accettata, ma per operatori come \(F\) e \(G\) ciò è del tutto insufficiente.
+
+Prima però vediamo cosa i semplici automi a stati finiti riescono a fare. Tali automi riescono a catturare i linguaggi di proprietà di safety, reachability e di co-safety, ovvero proprietà esprimibili tramite l'uso esclusivo di \(F\) o \(G\), ma non dell'alternanza tra i due.
+
+Iniziamo prima da un esempio per mostrare come gli automi possono essere d'aiuto. Consideriamo \(AP = \set{p_1, p_2, p_3}\) e la formula \(\phi =  Fp_1 \land Fp_2 \land G \neg p_3\).
+L'idea è di verificare che un percorso soddisfi questa formula costruendo la parola che rappresenta quel percorso, e verificando che un automa che accetta esattamente \(L(\phi)\) accetta quella parola. In primo luogo, per semantica del \(\land\), avremo che \(L(\phi) = L(Fp_1) \cap L(Fp_2) \cap L(G \neg p_3)\). Quindi, possiamo iniziare con la costruzione di \(3\) automi indipendenti per poi farne l'intersezione.
+Siccome \(\abs{AP} = 3\) si avrà un alfabeto di \(2^3 = 8\) simboli. Per questioni di brevità indichiamo con \(\sigma\) un generico simbolo dell'alfabeto, in modo da non dover indicare esplicitamente tutti gli archi, bensì poterli dividere semplicemente tra quelli che contengono una data proposizione atomica e quelli che non la contengono. Inoltre, l'assenza di un arco per un dato simbolo indica che quando tale simbolo è letto l'automa rigetta immediatamente.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[shorten >=1pt,node distance=3cm,on grid,auto,initial text=]
+    \node[state,initial,label=\(Fp_2\)] (s_0)                {\(s_0\)};
+    \node[state,accepting]              (s_1) [below=of s_0] {\(s_1\)};
+
+    \path[->] (s_0) edge              node[swap]  {\(p_1 \in \sigma\)}    (s_1)
+                    edge [loop right] node        {\(p_1 \notin \sigma\)} ()
+              (s_1) edge [loop right] node        {\(\sigma\)}            ();
+
+    \node[state, initial, label=\(Fp_2\)] (s_2) [right=4cm of s_0]  {\(s_2\)};
+    \node[state, accepting]               (s_3)   [below=of s_2]    {\(s_3\)};
+
+    \path[->] (s_2) edge              node[swap]  {\(p_2 \in \sigma\)}       (s_3)
+                    edge [loop right] node        {\(p_2 \notin \sigma\)}    ()
+              (s_3) edge [loop right] node        {\(\sigma\)}               ();
+
+    \node[state, initial,accepting, label=\(G\neg p_3\)]  (s_4) [right=4cm of s_2]  {\(s_4\)};
+
+    \path[->] (s_4) edge [loop right] node  {\(p_3 \not\in \sigma\)}  ();
+  \end{tikzpicture}
+  \caption{Automa di \(\phi\)}\label{fig:formula_automata}
+\end{figure}
+
+Ottenuti questi tre automi, è possibile fare l'intersezione mediante costruzione a sott'insiemi o costruzione prodotto: ogni stato del nuovo automa è una tupla che raccoglie lo stato corrente in ciascun componente. Nel nostro caso gli automi componenti hanno insiemi di stati rispettivamente \(\{s_0,s_1\}\), \(\{s_2,s_3\}\) e \(\{s_4\}\), quindi uno stato del prodotto è una tripla \((q_1,q_2,q_3)\).
+
+Lo stato iniziale del prodotto è \((s_0,s_2,s_4)\). Le transizioni si costruiscono combinando le transizioni dei singoli automi: per esempio, leggendo un simbolo \(\sigma\) con \(p_1\in\sigma\) ma non \(p_2\) né \(p_3\) (che indicheremo con \(\overline{p_2}\) e \(\overline{p_3}\)), il primo componente passa da \(s_0\) a \(s_1\), il secondo resta in \(s_2\) se \(\overline{p_2}\), e il terzo resta in \(s_4\) se \(\overline{p_3}\).
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[shorten >=1pt,node distance=2.8cm,on grid,auto]
+    % product states (circular) matching photo: include all four tuples
+    \node[state,initial]    (t0)                      {\((s_0,s_2,s_4)\)};
+    \node[state]            (t1) [above right=3.6cm of t0]  {\((s_1,s_2,s_4)\)};
+    \node[state,accepting]  (t2) [right=4.5cm of t0]  {\((s_1,s_3,s_4)\)};
+    \node[state]            (tA) [below right=3.6cm of t0]  {\((s_0,s_3,s_4)\)};
+
+    \path[->]
+      (t0) edge               node[pos=0.18, right,swap]  {\(\overline{p_1}, p_2, \overline{p_3}\)}           (tA)
+           edge [loop below]  node                        {\(\overline{p_1},\overline{p_2},\overline{p_3}\)}  ()
+           edge               node                        {\(p_1,\overline{p_2},\overline{p_3}\)}             (t1)
+      (t1) edge               node[swap, right]           {\(p_2,\overline{p_3}\)}                            (t2)
+      (tA) edge               node[right]                 {\(p_1,p_2,\overline{p_3}\)}                        (t2)
+      (t2) edge [loop right]  node[right]                 {\(\overline{p_3}\)}                                (t2);
+  \end{tikzpicture}
+  \caption{Esempio di automa prodotto per \(L(Fp_1)\cap L(Fp_2)\cap L(G\neg p_3)\)}\label{fig:product_example}
+\end{figure}
+
+Possiamo notare come questo modello di computazioni sia sufficiente anche in caso di operatori annidati, purché siano dello stesso tipo, ad esempio \(F\) annidato in \(F\), o \(G\) annidato in \(G\). Se prendiamo ad esempio \(F(p_1 \land XF p_2)\) possiamo costruire il seguente automa:
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[shorten >=1pt,node distance=3cm,on grid,auto,initial text=]
+    \node[state,initial] (s_0)                {\(s_0\)};
+    \node[state]        (s_1) [right=of s_0] {\(s_1\)};
+    \node[state,accepting] (s_2) [right=of s_1] {\(s_2\)};
+
+    \path[->] (s_0) edge              node[swap]  {\(p_1 \in \sigma\)}    (s_1)
+                    edge [loop above] node        {\(p_1 \notin \sigma\)} ()
+              (s_1) edge              node[swap]  {\(p_2 \in \sigma\)}    (s_2)
+                    edge [loop above] node        {\(p_2 \notin \sigma\)} ()
+              (s_2) edge [loop above] node        {\(\sigma\)}            ();
+  \end{tikzpicture}
+  \caption{Automa di \(F(p_1 \land XF p_2)\)}\label{fig:example_nested}
+\end{figure}
+
+Ciò che rende queste proprietà, come anticipato dette di \keyword{safety} e \keyword{co-safety}, è che una volta raggiunto uno stato accettante o rifiutante, la parola è accettata, e dunque sono verificabili al finito. Per verificare una proprietà di co-safety, ovvero che ha solo \(F\) come operatore temporale annidati, è sufficiente raggiungere il primo stato che soddisfa la proprietà, perché una volta raggiunto una prima volta, è sempre soddisfatta. Per verificare una proprietà di safety, ovvero che ha solo \(G\) come operatore temporale annidati, è sufficiente non raggiungere mai uno stato che non soddisfa la proprietà, ovvero dualmente rigettare appena ne si raggiunge uno. Anche in questo caso, una volta raggiunto uno stato che non soddisfa la proprietà, è sempre insoddisfatta. In entrambi i casi, dunque, è sufficiente verificare un prefisso finito della parola, e dunque sono verificabili al finito. Al contrario, se abbiamo una formula con \(F\) annidato in \(G\) o viceversa, allora non è possibile decidere se la parola è accettata o meno finché non si osserva tutta la parola, e dunque sono verificabili solo all'infinito.
+
+Proviamo dunque con un automa a stati finiti classico a verificare la formula \(GF p\). Come abbiamo già detto, questa formula richiede che \(p\) si verifichi infinitamente spesso o, più formalmente, che per ogni punto del tempo \(i\) esiste un punto \(j\) pari o successivo a \(i\) in cui \(p\) è vera. Se proviamo a verificare questa proprietà al finito, ci rendiamo conto che ogni prefisso finito di una parola che soddisfa \(GF p\) è indistinguibile da un prefisso finito di una parola che non soddisfa \(GF p\), poiché anche se in quel prefisso la formula fosse soddisfatta, se la parola continua con \(p\) sempre falsa la proprietà non è soddisfatta, e viceversa, anche se in quel prefisso la formula non fosse soddisfatta, se la parola continua con \(p\) sempre vera la proprietà è soddisfatta.
+
+Per arrivare quindi alla formalizzazione di questa nuova classe di automi, riprendiamo la definizione formale degli automi già osservati in corsi passati, ovvero i DFA, deterministc finite automata, e i NFA, nondeterministic finite automata, poiché la definizione di automi di Büchi deriverà direttamente da queste. Oltre a queste due classi in realtà ce ne sono altre due molto simili, ovvero quella degli UFA, universal finite automata, e quella degli AFA, alternating finite automata. Gli UFA sono macchine non deterministiche che, invece di richiedere l'esistenza di un run accettante per accettare, come negli NFA, che infatti sono anche detti automi esistenziali, richiede che \textbf{ogni} run sia accettante. Sono universali in questo senso, ovvero l'accettazione è una proprietà universale sui run. Chiaramente questi sono i duali degli NFA. Gli AFA invece sono una generalizzazione di entrambi, in cui è possibile avere sia stati esistenziali che stati universali, e dunque è possibile esprimere sia la disgiunzione che la congiunzione tra i run. Questi automi verranno approfonditi alla fine del corso.
+
+\begin{definition}{DFA}
+  Un DFA è una tupla \(A = \langle Q, \Sigma, \delta, q_0, F\rangle\) in cui:
+  \begin{itemize}
+    \item \(Q\) è un insieme finito di stati
+    \item \(\Sigma\) è un alfabeto finito
+    \item \(\delta: Q \times \Sigma \to Q\) è la funzione di transizione
+    \item \(q_0 \in Q\) è lo stato iniziale
+    \item \(F \subseteq Q\) è l'insieme degli stati accettanti
+  \end{itemize}
+\end{definition}
+
+\begin{definition}{NFA}
+  Un NFA è una tupla \(A = \langle Q, \Sigma, \Delta, Q_0, F\rangle\) in cui:
+  \begin{itemize}
+    \item \(Q\) è un insieme finito di stati
+    \item \(\Sigma\) è un alfabeto finito
+    \item \(\Delta: Q \times \Sigma \to 2^Q\) è la funzione di transizione
+    \item \(Q_0 \subseteq Q\) è l'insieme degli stati iniziali
+    \item \(F \subseteq Q\) è l'insieme degli stati accettanti
+  \end{itemize}
+\end{definition}
+
+La differenza tra i due risiede solo nella funzione di transizione, che nei DFA è deterministica, ovvero da ogni stato visto un certo simbolo si può passare a un solo stato, mentre negli NFA è non deterministica, ovvero da ogni stato visto un certo simbolo si può passare a diversi stati.
+
+Come anticipato la differenza tra NFA e UFA non è topologica, ma solo semantica. Negli NFA infatti devo trovare un run testimone, o \keyword{witness}, mentre negli UFA rigetto se trovo un run testimone del controesempio.
+
+Ottenuti queste classi di automi possiamo chiederci quali proprietà soddisfano e, in particolare, rispetto a queli operazioni sono chiuse. Chiaramente per essere chiuso rispetto a un operazione si intende la possibilità di costruire un nuovo atoma partendo da altri in modo che i linguaggi corrispondenti seguano la semantica intesa dell'operatore. Ad esempio per l'unione tra automi \(A_1 \uplus A_2\) si deve avere \(L(A_1 \uplus A_2) = L(A_1) \cup L(A_2)\). Similmente vorremmo che \(A_1 \vplus A_2\) sia tale che \(L(A_1 \vplus A_2) = L(A_1) \cap L(A_2)\), e così via per tutte le operazioni che ci interessano, ad esempio anche il complemento \(\overline{A}\) tale che \(L(\overline{A}) = \overline{L(A)}\) e la concatenazione \(A_1 \cdot A_2\) tale che \(L(A_1 \cdot A_2) = L(A_1) \cdot L(A_2)\).
+
+Queste operazioni risultano immediate nel caso di automi deterministici; diventano più complicate per automi non deterministici o universali, mentre nel caso di automi alternanti la costruzione si semplifica nuovamente.
+
+Costruiamo ora l'automa che riconosce l'unione di due automi, cioè \(A_1 \uplus A_2\). Assumiamo che \(A_1\) e \(A_2\) siano definiti sullo stesso alfabeto: ciascuno ha il proprio insieme di stati, la propria funzione di transizione, uno o più stati iniziali e un insieme di stati finali. L'automa dell'unione si ottiene prendendo l'unione disgiunta degli insiemi di stati dei due componenti e definendo le transizioni in modo coerente con quelle componenti.
+
+Per evitare sovrapposizioni si assume solitamente che \(Q_1\cap Q_2=\emptyset\); se non fosse così, si può forzare la disgiunzione ridenominando gli stati (ad esempio prendendo \(Q_1\times\{1\}\) e \(Q_2\times\{2\}\)). Se si preferisce un unico stato iniziale, si introduce uno stato nuovo \(q_0\notin Q_1\cup Q_2\) con transizioni appropriate verso gli stati iniziali di \(A_1\) e \(A_2\); in alternativa si può mantenere l'insieme dei due stati iniziali.
+
+L'insieme degli stati finali del nuovo automa è tipicamente \(F_1\cup F_2\). Le transizioni, infine, sono definite in modo compositivo: quando il nuovo automa si trova in uno stato che originariamente apparteneva a \(A_i\), la sua funzione di transizione coincide con quella di \(A_i\). In questo modo si ottiene un automa il cui linguaggio è esattamente \(L(A_1)\cup L(A_2)\).
+
+
+Semplicemente, l'automa non deterministico \(A_1 \uplus A_2\) ha la \(\delta\) che è l'unione delle due \(\delta\), a meno del primo passo dallo stato iniziale \(q_0\) in cui c'è del non determinismo. Leggendo \(\sigma\), si proseguirà sia in \(\delta_1(q_0^1, \sigma)\) che in \(\delta_2(q_0^2, \sigma)\). L'unico caso in cui non è deterministico è questo. A questo punto volendo un automa deterministico sarà sufficiente determinizzare tramite la costruzione a sottinsiemi, in cui ogni sott'insieme di stati diventa uno stato dell'automa deterministico. Esiste anche un modo di costruire l'automa unione direttamente deterministico, tramite il prodotto cartesiano. La costruzione è simile a a quella per l'intersezione, usando come stati accettanti quelli in cui \textbf{almeno uno} accetta, invece che quelli in cui \textbf{entrambi} accettano. 
+
+In particolare la costruzione cartesiana prevede che come stato iniziale la tupla \((q^1_0, q^2_0)\) e la funzione di transizione \(\delta((q^1_i, q^2_j), \sigma) = (\delta_1(q^1_i, \sigma), \delta_2(q^2_j, \sigma))\). L'insieme degli stati accettanti dipende dall'automa che si vuole costruire e sarà per l'unione \(F_1\times Q_2 \cup Q_1\times F_2\), mentre per l'intersezione \(F_1 \times F_2\).
+
+Passiamo ora al complemento. Se \(A=(Q,\Sigma,\delta,q_0,F)\) è un DFA che riconosce \(L(A)\), il DFA complementare \(\overline{A}=(Q,\Sigma,\delta,q_0,Q\setminus F)\) accetta il linguaggio complementare \(\overline{L(A)}\). La correttezza di questa costruzione si basa sul fatto che, in un DFA, il run su una parola \(w\) è unico: pertanto \(w\in L(A)\) se e solo se lo stato raggiunto da \(q_0\) leggendo \(w\) appartiene a \(F\); di conseguenza \(w\in\overline{L(A)}\) se e solo se lo stato raggiunto appartiene a \(Q\setminus F\).
+
+Questa semplice operazione non è in generale valida per NFA senza passare prima alla determinizzazione, poiché negli NFA l'accettazione è definita dall'esistenza di un run accettante e non dalla singola traiettoria deterministica.
+
+Infatti, in un NFA l'accettazione è una proprietà esistenziale sui run: \qi{esiste un run accettante}. Il complemento richiederebbe invece una proprietà universale: \qi{non esiste alcun run accettante} (equivalente a \qi{tutti i run non sono accettanti}). Per questo, per ottenere il complemento restando nella classe dei DFA si procede tipicamente in due fasi:
+
+\begin{enumerate}
+  \item determinizzazione dell'NFA mediante la costruzione a sottinsiemi (ogni stato del DFA corrisponde a un insieme di stati dell'NFA);
+  \item complemento del DFA ottenuto (si scambiano gli stati finali con il loro complementare rispetto a \(Q\)).
+\end{enumerate}
+
+In alternativa è possibile passare alla classe degli automi universali: dato un NFA esistenziale, il corrispondente automa universale accetta se tutte le ramificazioni soddisfano la condizione desiderata, e quindi il complemento può essere espresso scambiando il criterio esistenziale con quello universale. Entrambe le trasformazioni (determinizzazione o passaggio a universale) possono però comportare un aumento esponenziale del numero di stati, ed è per questo che il complemento su NFA non è \qi{diretto} come nel caso dei DFA\@.
+
+La costruzione a sottinsiemi (subset construction) permette di trasformare un NFA in un DFA simulando in parallelo tutte le possibili esecuzioni dell'NFA\@. Uno stato del DFA corrisponde a un sottoinsieme degli stati dell'NFA\@: in questo modo si rappresenta, in modo finito, l'insieme delle configurazioni possibili dopo la lettura di un prefisso.
+
+Se l'NFA ha insieme di stati \(Q\), il DFA risultante ha al più \(2^{\abs{Q}}\) stati, ciascuno elemento di \(2^{Q}\). Lo stato iniziale è il singoletto \(\{q_0\}\) (o \(Q_0\) se l'NFA ammette più stati iniziali). La funzione di transizione si estende agli insiemi: per ogni \(S\subseteq Q\) e \(\sigma\in\Sigma\)
+\[
+  \hat{\delta}(S,\sigma)=\bigcup_{q\in S}\Delta(q,\sigma),
+\]
+cioè l'insieme di stati raggiungibili dalle configurazioni in \(S\) leggendo \(\sigma\).
+
+Gli stati accettanti del DFA sono quegli insiemi \(S\subseteq Q\) tali che \(S\cap F\neq\emptyset\); con questa costruzione il DFA riconosce esattamente le parole per le quali l'NFA ammette un run accettante.
+
+Dal punto di vista operativo: nelle NFA la nondeterministicità rende immediata l'unione dei linguaggi (si combinano le transizioni), mentre nelle UFA la struttura universale rende immediata l'intersezione (tutti i run devono accettare). Per ottenere le operazioni duali si ricorre a trasformazioni come il prodotto cartesiano o la determinizzazione, che possono però comportare un aumento esponenziale del numero di stati.
+
+Queste osservazioni valgono finché la condizione di accettazione rimane \qi{raggiungo uno stato accettante}.
+
+Quando si lavora con modelli più complessi, alcune proprietà si mantengono, altre richiedono formulazioni diverse e altre ancora non si conservano più direttamente. In particolare, la subset construction non è più sufficiente a preservare il linguaggio riconosciuto: applicarla meccanicamente a un automa di Büchi produce in generale un automa che non riconosce il linguaggio originario. A differenza degli automi a stati finiti classici, gli automi di Büchi non sono quindi chiusi per determinizzazione. I Büchi deterministici riconoscono soltanto una sottoclasse stretta dei linguaggi \(\omega\)-regolari; per ottenere una costruzione deterministica è necessario cambiare la condizione di accettazione. Di conseguenza, è utile considerare più condizioni di accettazione per parole infinite.
+
+La prima condizione di accettazione proposta per parole infinite è quella di Büchi, dal nome del suo ideatore. In seguito Rabin introdusse una condizione più articolata, ma sufficiente alla determinizzazione. A questa seguirono la condizione di Streett, duale di quella di Rabin, e la condizione di Müller. Queste condizioni, con l'eccezione dei Büchi deterministici, sono equivalenti dal punto di vista espressivo, anche se le trasformazioni tra loro possono essere complesse. In particolare, la condizione di Müller si comporta in modo molto vicino alla *subset construction* e il complemento si ottiene per dualizzazione.
+
+Prima di arrivare a queste costruzioni, conviene chiarire l'idea alla base degli automi di Büchi. L'intuizione di Büchi è quella di modificare il meno possibile la struttura già nota degli automi finiti: l'insieme \(F\) resta l'insieme degli stati di accettazione, ma cambia il suo significato semantico. Non si richiede più di \qi{raggiungere \(F\)} o di \qi{passarci attraverso} una volta sola; occorre invece visitare infinite volte uno stato di \(F\).
+
+Occorre quindi fissare una notazione precisa per il concetto di run. Un run è una sequenza infinita di stati, vista come una parola su \(Q\), ma non una sequenza arbitraria: deve rispettare le transizioni dell'automa. Per esempio, una successione del tipo \(q_0, q_1, q_0\) non è un run se non esiste l'arco da \(q_1\) a \(q_0\).
+
+Nel caso non deterministico, un run su una parola \(w\) deve soddisfare due condizioni. Se esiste un unico stato iniziale, allora \(r_0 = q_0\); se invece gli stati iniziali sono molteplici, allora \(r_0 \in Q_0\). Inoltre, per ogni posizione \(i\), il passo successivo deve essere compatibile con la lettera letta in quella posizione, cioè \(r_{i+1} \in \delta(r_i, w_i)\). In altre parole, \(r_{i+1}\) appartiene all'insieme degli stati raggiungibili da \(r_i\) leggendo l'iesima lettera della parola di input. Nel caso deterministico la scelta è univoca e si scrive \(r_{i+1} = \delta(r_i, w_i)\); nel caso non deterministico, invece, si usa l'appartenenza \(\in\), perché il run non è unico.
