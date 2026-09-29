@@ -30,12 +30,21 @@
     },
     {
       "login": "ViMen23",
-      "name": "ViMen23",
+      "name": "Vincenzo Mennillo",
       "avatar_url": "https://avatars.githubusercontent.com/u/145158818?v=4",
       "profile": "https://github.com/ViMen23",
       "contributions": [
         "content",
         "maintenance"
+      ]
+    },
+    {
+      "login": "PrimeLogic0",
+      "name": "Rodolfo Diana",
+      "avatar_url": "https://avatars.githubusercontent.com/u/133133675?v=4",
+      "profile": "https://github.com/PrimeLogic0",
+      "contributions": [
+        "content"
       ]
     }
   ],

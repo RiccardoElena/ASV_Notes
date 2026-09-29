@@ -394,7 +394,7 @@ La \keyword{composizione parallela sincrona} è facile da definire.
   \begin{itemize}
     \item \(S = S_1 \times \cdots \times S_n\), stati globali
     \item \(S_0 = S_{01} \times \cdots \times S_{0n}\),
-    \item \(A = A_1 \cup \ldots \cup A_n\), azioni globali
+    \item \(A = A_1 \times \ldots \times A_n\), azioni globali
     \item \(R \subseteq S \times A \times S\) è tale che, dati \(\langle s_1, \ldots, s_n\rangle, \langle s_1', \ldots, s_n'\rangle \in S\) e \(\langle a_1,\ldots, a_n \rangle \in A\) contiene \(\langle s_1,\ldots,s_n \rangle \xrightarrow{\langle a_1,\ldots,a_n \rangle} \langle s_1',\ldots,s_n'\rangle\) se \(s_i \xrightarrow{a_i} s_i'\,, \forall i \in \set{1,\ldots,n}\).
   \end{itemize}
 \end{definition}
@@ -557,9 +557,9 @@ Una formulazione equivalente del modello asincrono con interleaving più compatt
   Assumiamo \(TS_1,\ldots,TS_n\) Transition Systems tali che \(\forall i \in 1\ldots n, TS_i = \langle S_i,A_i,R_i,S_{i0}\rangle \). Il Transition system ottenuto dalla composizione asincrona (interleaving) di questi transition systems è \( TS = TS_1 \parallel \ldots \parallel TS_n = \langle S,A,R,S_0\rangle \) tale che:
   \begin{itemize}
     \item \( S = S_1 \times \cdots \times S_n \)
-    \item \( A = \bigcup_{1 \leq i \leq n} A_i \) (oppure l'unione disgiunta \(\uplus\))
+    \item \( A = \biguplus_{1 \leq i \leq n} A_i \) 
     \item \( S_0 = S_{10} \times \cdots \times S_{n0} \)
-    \item \( R \) contiene \( \langle s_1,\ldots,s_n \rangle \xrightarrow{a} \langle s_1,\ldots,s_i',\ldots,s_n \rangle \), se si ha \( s_i \xrightarrow{a}_i s_i' \), per qualche \( 1 \leq i \leq n \).
+    \item \( R \) contiene \( \langle s_1,\ldots,s_i\ldots,s_n \rangle \xrightarrow{a} \langle s_1,\ldots,s_i',\ldots,s_n \rangle \), se si ha \( s_i \xrightarrow{a}_i s_i' \), per qualche \( 1 \leq i \leq n \).
   \end{itemize}
 \end{definition}
 
@@ -589,7 +589,7 @@ Dunque questa fusione va fatta a livello di PG, ma allora la composizione va fat
   definito sull'insieme di variabili globali \(\Var = \bigcup_{1 \leq i \leq n} \Var_i\), dove:
   \begin{itemize}
     \item \(\Loc = \Loc_1 \times \Loc_2 \times \cdots \times \Loc_n\) è il prodotto cartesiano delle locazioni;
-    \item \(\Act = \bigcup{1 \leq i \leq n} \Act_i\) è l'unione delle azioni (può essere anche disgiunta);
+    \item \(\Act = \biguplus_{1 \leq i \leq n} \Act_i\) è l'unione delle azioni;
     \item \(\Loc_0 = \Loc_{10} \times \Loc_{20} \times \cdots \times \Loc_{n0}\) è l'insieme delle locazioni iniziali;
     \item \(g_0 = g_{10} \land g_{20} \land \ldots \land g_{n0}\) è la condizione (o guardia) iniziale globale.
   \end{itemize}
@@ -967,7 +967,7 @@ L'interazione con i canali avviene attraverso primitive specifiche.
 
 \begin{definition}{Azioni di Comunicazione}
   Dato un insieme di variabili \(Var\) e un insieme di canali \(Chan\), l'insieme delle azioni di comunicazione \(Com\) è definito come:
-  \[Com = \{c!d, c?x \mid c \in Chan, d \in D, x \in Var \text{ e } \text{dom}(c) \subseteq \text{dom}(x)\}\]
+  \[Com = \{c!d, c?x \mid c \in Chan, d \in \text{dom}(c), x \in Var \text{ e } \text{dom}(c) \subseteq \text{dom}(x)\}\]
   dove:
   \begin{itemize}
     \item \(c!d\) denota l'operazione di \keyword{scrittura} (send): invio del valore \(d\) sul canale \(c\). L'operazione può essere generalizzata all'invio di un'espressione arbitraria \(\expr \in \Expr\), la quale viene valutata nello stato corrente \(\eta\) prima dell'invio.
@@ -982,7 +982,10 @@ L'interazione con i canali avviene attraverso primitive specifiche.
 Definiamo adesso il sistema di canali.
 
 \begin{definition}{Sistema di Canali}
-  Un \keyword{Program Graph esteso} su \((Var, Chan)\) è definito come \(PG_i = \langle Loc_i, Act_i, Effect_i, \hookrightarrow_i, Loc_{i0}, g_{i0} \rangle\), dove la relazione di transizione include ora anche le azioni di comunicazione:
+  Un \keyword{Program Graph esteso} su \((Var, Chan)\) è definito come
+  \[PG_i = \langle Loc_i, Act_i, Effect_i, \hookrightarrow_i, Loc_{i0}, g_{i0} \rangle\]
+  
+  dove la relazione di transizione include ora anche le azioni di comunicazione:
   \[\hookrightarrow_i \subseteq Loc_i \times \text{Cond}(Var_i) \times (Act_i \cup Com) \times Loc_i\]
 
   Un \keyword{Channel System} \(CS\) su \((Var, Chan)\) è la composizione di più Program Graph operanti in parallelo:
@@ -1024,7 +1027,7 @@ Per lo spazio degli stati invece è necessario generalizzare la nozione di stato
   \begin{itemize}
     \item \(l_i \in Loc_i\) rappresenta la locazione corrente per ciascun processo \(P_i\).
     \item \(\eta \in \Eval(\Var)\) è la funzione di valutazione delle variabili locali (\(\eta: \Var \to D\)).
-    \item \(\chi \in \Eval(Chan)\) è la \keyword{funzione di valutazione dei canali}, che assegna ad ogni canale con \(\text{cap}(c) > 0\) il suo contenuto. Dunque \(\chi\mapsto\text{dom}(c)^*\in \Eval(Chan)\)
+    \item \(\chi \in \Eval(Chan)\) è la \keyword{funzione di valutazione dei canali}, che assegna ad ogni canale con \(\text{cap}(c) > 0\) il suo contenuto. 
   \end{itemize}
 \end{definition}
 
@@ -1035,7 +1038,7 @@ Dunque adesso possiamo formalizzare il transition system per il channel system:
 
   \begin{itemize}
     \item \textbf{Stati (\(S\)):} L'insieme degli stati è \(S = (Loc_1 \times \cdots \times Loc_n) \times \Eval(\Var) \times \Eval(Chan)\).
-    \item \textbf{Azioni (\(Act\)):} L'insieme delle azioni globali è \(Act = \biguplus_{1 \le i \le n} Act_i \uplus \{\tau\}\), dove \(\tau\) è un simbolo di \keyword{azione interna} che viene usata per modellare la sincronizzazione.
+    \item \textbf{Azioni (\(Act\)):} L'insieme delle azioni globali è \(Act = \left(\biguplus_{1 \le i \le n} Act_i\right) \uplus \{\tau\}\), dove \(\tau\) è un simbolo di \keyword{azione interna} che viene usata per modellare la sincronizzazione.
     \item \textbf{Stati Iniziali (\(S_0\)):} Uno stato \(\langle l_1, \dots, l_n, \eta, \chi \rangle\) appartiene a \(S_0\) se:
           \begin{itemize}
             \item \(l_i \in Loc_{i0}\) per ogni \(1 \le i \le n\).
@@ -1080,30 +1083,4 @@ La relazione di transizione globale \(\to\) descrive come si aggiorna lo stato g
     \item \textbf{Modello a Canali (Channel System):} A causa della natura dei canali (che agiscono come code FIFO indipendenti) e delle primitive di I/O asincrone/sincrone, non definiamo un operatore di composizione nativo a livello di Program Graph. L'approccio adottato consiste nel mappare \ti{direttamente} l'insieme dei Program Graph separati, unito all'insieme dei canali, in un unico e grande Transition System globale \(TS(CS)\), applicando una funzione di traduzione diretta che incorpora la semantica dei canali nella definizione della relazione di transizione.
   \end{itemize}
   Se il sistema da modellare è \keyword{ibrido} (presenza simultanea di variabili condivise e canali di comunicazione), non si può procedere in due fasi separate. La traduzione in LTS deve necessariamente fondere i due approcci in un'unica definizione monolitica della relazione di transizione globale.
-\end{observation}
-
-
-
-\section{Verso i Modelli a Tempo Continuo}
-
-La modellazione vista finora si è concentrata su sistemi discreti, in cui il tempo avanza concettualmente a \q{scatti} in corrispondenza dell'esecuzione delle transizioni atomiche. Esiste tuttavia un'ampia classe di sistemi la cui correttezza dipende crucialmente dallo scorrere del \keyword{tempo reale} e dall'evoluzione di grandezze fisiche continue.
-
-L'idea fondamentale per modellare tali sistemi è iniettare all'interno del formalismo discreto delle variabili che non evolvono in base ad assegnamenti discreti operati dal software, ma in base a leggi matematiche che dipendono dal tempo (es.\ temperatura, velocità, pressione).
-
-\begin{definition}{Variabile Tempo Reale}
-  Introduciamo una singola variabile continua per rappresentare il tempo assoluto, che denoteremo tipicamente con \(t\). A differenza delle variabili di programma classiche, il cui dominio è spesso finito o numerabile, la variabile tempo varia nel dominio dei numeri reali non negativi:
-  \[ \text{dom}(t) = \R_{\ge 0} \]
-  Questa variabile evolve autonomamente con derivata unitaria (\(\dot{t} = 1\)), misurando il tempo reale trascorso.
-\end{definition}
-
-\begin{observation}{Esplosione dello Spazio degli Stati e Decidibilità}
-  L'introduzione di una variabile a dominio continuo altera drasticamente la trattabilità matematica e computazionale del modello.
-
-  Ricordiamo che in un Transition System generato da variabili, lo spazio degli stati \(S\) è dato (o contiene) l'insieme di tutte le possibili valutazioni delle variabili. Una funzione di valutazione \(\eta\) mappa l'insieme delle variabili \(\Var\) nel loro dominio \(D\):
-  \[ \eta: \Var \to D \]
-  Se l'unica variabile di interesse è il tempo (\(\Var = \{t\}\)) e il dominio è \(D = \R_{\ge 0}\), il numero totale di valutazioni distinte corrisponde al numero di funzioni possibili:
-  \[ \abs{D}^{\abs{\Var}} = \abs{\R_{\ge 0}}^1 = \abs{\R_{\ge 0}} \]
-  Questo significa che lo spazio degli stati del sistema non è più finito, né numerabilmente infinito (come \(\N\)), ma possiede la cardinalità del continuo (non numerabile).
-
-  Dal punto di vista pratico dell'Automated Software Verification, questo genera una barriera computazionale enorme. Gli algoritmi classici di verifica (Model Checking), che si basano sull'esplorazione esaustiva degli stati raggiungibili, falliscono in presenza di uno spazio non numerabile. Il problema della verifica per modelli con variabili continue diviene, in linea di principio, \keyword{indecidibile}. Sarà pertanto necessario introdurre tecniche formali di \keyword{astrazione} avanzate per ricondurre questo spazio continuo a un sistema finito equivalente ai fini della verifica, tema che verrà esplorato nello studio dei \keyword{Timed Automata}.
 \end{observation}

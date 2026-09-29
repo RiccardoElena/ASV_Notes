@@ -1,0 +1,240 @@
+\chapter{Giochi e Logiche per Strategie}\label{ch:atl}
+
+Le strutture di Kripke modellano tutto ciò che non è il sistema come un'unica entità inglobata dal non determinismo. In molti contesti, però, il sistema evolve per effetto di più \emph{agenti} che interagiscono, con obiettivi antagonisti, collaborativi o misti: processi in un sistema distribuito, robot in un ambiente condiviso, o letteralmente giocatori in un gioco. In questo capitolo introduciamo le \keyword{concurrent game structure} per modellare queste interazioni, e la logica \keyword{ATL} (\textit{Alternating-time Temporal Logic}), un'estensione di CTL per parlare di \emph{strategie}.
+
+\section{Concurrent Game Structures}
+
+\begin{definition}{Concurrent Game Structure}
+  Una \keyword{concurrent game structure} è una tupla \(G=\langle AP, Ag, Ac, Ps, p_0, \delta, \lambda \rangle\) con:
+  \begin{itemize}
+    \item \(AP\) insieme di proposizioni atomiche
+    \item \(Ag\) insieme di agenti o giocatori
+    \item \(Ac\) insieme di azioni che gli agenti possono compiere\footnote{È possibile anche avere un insieme di azioni per ogni agente, ma per semplicità consideriamo un unico insieme condiviso.}
+    \item \(Ps\) insieme delle \keyword{posizioni} del gioco, analoghe agli stati di una struttura di Kripke
+    \item \(p_0 \in Ps\) posizione iniziale
+    \item \(\delta: Ps \times Ac^{Ag} \to Ps\) funzione di transizione
+    \item \(\lambda: Ps \to 2^{AP}\) funzione di etichettatura
+  \end{itemize}
+\end{definition}
+
+La struttura è molto vicina a una struttura di Kripke \(K=\langle AP,W,w_0,R,\lambda\rangle\). La differenza principale è che \(\delta\) non è una relazione ma una \emph{funzione}: l'evoluzione è deterministica \emph{a valle delle azioni degli agenti}. Stiamo modellando giochi concorrenti (non a turni): \(Ac^{Ag}\) è l'insieme delle funzioni che associano a ogni agente un'azione, ed è questo insieme a catturare il non determinismo, che nelle strutture di Kripke era anonimo e qui è invece attribuito alle scelte dei giocatori.
+
+\begin{note}{}
+  Rappresentando gli agenti con numeri, una funzione \(d \in Ac^{Ag}\) si può esprimere come tupla in cui la posizione \(i\)-esima è l'azione dell'agente \(i\): ad esempio \(\delta(p,(S,C))\) equivale a \(\delta(p, d)\) con \(d(1) = S\) e \(d(2) = C\). Tali funzioni sono dette \keyword{decisioni collettive}.
+\end{note}
+
+\begin{example}{Sasso-carta-forbice}
+  Modelliamo sasso-carta-forbice come gioco giocato una sola volta:
+  \begin{itemize}
+    \item \(Ag = \set{1,2}\)
+    \item \(Ac = \set{S,C,F}\)
+    \item \(Ps = \set{p_0, p_1, p_2}\), con \(p_0\) posizione iniziale senza vincitore, \(p_1\) vittoria del giocatore 1 e \(p_2\) vittoria del giocatore 2
+  \end{itemize}
+  La funzione di transizione è:
+  \[\delta(p,(a_1,a_2)) = \begin{cases}
+      p_0 & \text{se } a_1 = a_2 \land p = p_0                                 \\
+      p_1 & \text{se } (a_1,a_2) \in \set{(S,F),(C,S),(F,C)} \land p = p_0     \\
+      p_2 & \text{se } (a_1,a_2) \in \set{(S,C),(C,F),(F,S)} \land p = p_0     \\
+      p   & \text{se } p \in \set{p_1,p_2}
+    \end{cases}\]
+  Le posizioni di vittoria sono assorbenti perché il gioco si gioca una volta sola. Per verificare proprietà sulla vittoria si può prendere \(AP = \set{{win}_1, {win}_2}\), con \(\lambda(p_0) = \emptyset\), \(\lambda(p_1) = \set{{win}_1}\) e \(\lambda(p_2) = \set{{win}_2}\).
+  \begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        node distance=3.2cm,
+        >=Stealth,
+        every node/.style={font=\small},
+        state/.style={circle, draw, thick, minimum size=1.1cm, align=center},
+        outcome/.style={state, minimum size=1.35cm},
+        transition/.style={->, thick}
+      ]
+      \node[state] (rps_p0) {\(p_0\)};
+      \node[outcome, right=of rps_p0, yshift=1.65cm] (rps_p1)
+        {\(p_1\)};
+      \node[outcome, right=of rps_p0, yshift=-1.65cm] (rps_p2)
+        {\(p_2\)};
+
+      \path[transition]
+        (rps_p0) edge[loop above] node[align=center]
+          {\((A,A), A\in Ac\)} ()
+        (rps_p0) edge[bend left=12] node[above, align=center]
+          {\(\substack{(S,F)\\(C,S)\\(F,C)}\)} (rps_p1)
+        (rps_p0) edge[bend right=12] node[below, align=center]
+          {\(\substack{(S,C)\\(C,F)\\(F,S)}\)} (rps_p2)
+        (rps_p1) edge[loop above] node {\(\forall d\in Ac^{Ag}\)} ()
+        (rps_p2) edge[loop below] node {\(\forall d\in Ac^{Ag}\)} ();
+
+      \node[right=0.15cm of rps_p1] {vittoria del giocatore 1};
+      \node[right=0.15cm of rps_p2] {vittoria del giocatore 2};
+      \node[left=0.55cm of rps_p0] {pareggio};
+    \end{tikzpicture}
+    \caption{Automa delle transizioni per il gioco del sasso-carta-forbice.}\label{fig:atl-rock-paper-scissors}
+  \end{figure}
+\end{example}
+
+La modellazione è sufficientemente generale da catturare anche giochi \emph{a turni}, semplicemente ignorando nella funzione di transizione le azioni dei giocatori di cui non è il turno.
+
+\begin{example}{Tris}
+  Per il tris abbiamo \(Ag = \set{\times, \circ}\) e possiamo codificare le caselle (e dunque le azioni, essendo che ogni giocatore può solo riempire una casella col proprio simbolo) con i numeri da \(1\) a \(9\). Enumerare esplicitamente gli stati è impraticabile: il modo migliore è descrivere le posizioni come funzioni \(\set{1,\ldots,9} \to \set{\square, \times, \circ}\) che associano a ogni cella il suo contenuto (vuota, croce, cerchio), più due posizioni \(\bot_{\times}, \bot_{\circ}\) per le mosse non valide, modellate come sconfitta automatica di chi le compie.
+
+  La posizione iniziale è la funzione costante \(p_0: n \mapsto \square\). La codifica del turno avviene nella funzione di transizione, che ignora l'azione del giocatore a cui non tocca: ad esempio, per la prima mossa (turno di \(\times\)),
+  \[\delta(p_0, d) = p_i \quad\text{con }\quad i = d(\times), p_i: \begin{cases}
+    i \mapsto \times,\\
+    n \mapsto \square\quad\forall n\neq i
+  \end{cases}\]
+  e per la risposta di \(\circ\) alla mossa in cella 5:
+  \[\delta(p_5, d) = p_{5i} \quad\text{con } i = d(\circ), p_{5i}: \begin{cases}
+    5 \mapsto \times,\\
+    i \mapsto \circ,\\
+    n \mapsto \square\quad\forall n\notin \set{i,5}
+  \end{cases}\]
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{_images/Tris_states}
+    \caption{Grafo degli stati del tris. I numeri  la quantità di posizioni simmetricamente equivalenti.}\label{fig:atl-tic-tac-toe-states}
+  \end{figure}
+\end{example}
+
+\section{Strategie, storie e play}
+
+Ci serve ora un linguaggio per esprimere proprietà di questi sistemi. Prima però formalizziamo i concetti di percorso e strategia.
+
+\begin{definition}{Percorsi e storie}
+  Diremo che \(\pi \in {Ps}^\omega\) è un \keyword{percorso} della struttura di gioco \(G\) (denotato \(\pi \in Path(G)\)) se per ogni \(i\in\N\) esiste \(d \in Ac^{Ag}\) tale che \(\pi_{i+1} = \delta(\pi_i,d)\).\footnote{ è equivalente a vedere i percorsi nella struttura di Kripke sottostante.}
+  
+  Una \keyword{storia} è un sottopercorso finito, l'insieme delle storie è denotato \(Hst\):
+  \[Hst = \set{\pi \in Path(G)}[\abs{\pi} < \omega]\]
+\end{definition}
+
+\begin{definition}{Strategie}
+  Una \keyword{strategia} per un agente è una funzione
+  \[\sigma: Hst \to Ac\]
+  che associa a ogni storia l'azione da compiere.
+  
+  Una strategia per una coalizione \(A\subseteq Ag\) è una famiglia \(\sigma_A = \set{\sigma_a}_{a \in A}\) di strategie, una per ogni agente della coalizione.
+\end{definition}
+
+Le strategie dipendono in generale dall'intera storia, non solo dall'ultima posizione. Questo fenomeno esisteva già nelle strutture di Kripke e nelle logiche temporali: la struttura in \Cref{fig:kripke-history} verifica \(F(p\land Fq)\), ma per testimoniarlo è necessario fare scelte \emph{diverse} nello stesso stato \(w_0\) in momenti diversi, ricordando le scelte passate. Con scelte basate solo sullo stato corrente si possono realizzare solo percorsi a \keyword{lasso} (un prefisso seguito da un ciclo ripetuto per sempre).
+
+\begin{figure}[H]
+    \begin{minipage}{0.48\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{_images/kripke_history}
+      \caption{Struttra di Kripke con memoria.}\label{fig:kripke-history}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{_images/kripke_lasso}
+      \caption{Struttra di Kripke a lasso.}\label{fig:kripke-lasso}
+    \end{minipage}
+  \end{figure}
+
+
+Si dimostra però che la memoria è indispensabile solo per proprietà con operatori temporali \emph{annidati}: rimanendo in CTL, o come vedremo in ATL, la memoria non è necessaria.
+
+\begin{definition}{Play}
+  Una coppia di strategie di due coalizioni complementari (\(A\) e \(Ag\setminus A\)) identifica un unico percorso, detto \keyword{play}:
+  \[\pi = play(\sigma_A,\sigma_{Ag\setminus A}, p_0) \in Path(G,p_0)\]
+  definito da \(\pi_{i+1} = \delta(\pi_i, d_i)\) per ogni \(i \in \N\), con
+  \[d_i(a) = \begin{cases}
+      \sigma_A^a(\pi_{\leq i})            & a \in A            \\
+      \sigma_{Ag\setminus A}^a(\pi_{\leq i}) & a \in Ag\setminus A
+    \end{cases}\]
+  ovvero a ogni passo la posizione successiva è determinata dalle azioni scelte dalle strategie, che dipendono dalla storia fino a quel punto.
+\end{definition}
+
+\section{\texorpdfstring{\(ATL\)}{ATL} e \texorpdfstring{\(ATL^*\)}{ATL*}}
+
+Le logiche \(ATL\) e \(ATL^*\) estendono CTL e \(CTL^*\) sostituendo i quantificatori di percorso con \keyword{quantificatori strategici} sulle coalizioni. Il nome \textit{alternating} viene dalle macchine alternanti: a differenza delle macchine non deterministiche (esistenziali) o universali, qui si ha un'\emph{alternanza} di esistenzialità e universalità.
+
+\begin{definition}{Grammatica di \(ATL^*\)}
+  \[\phi ::= p \mid \neg \phi \mid \phi \land \phi \mid \phi \lor \phi \mid \GDia[A]\psi \mid \GBox[A] \psi\]
+  \[\psi ::= \phi \mid \neg \psi \mid \psi \land \psi \mid \psi \lor \psi \mid X\psi \mid \psi U\psi \mid \psi R \psi\]
+  con \(A \subseteq Ag\) coalizione. \(ATL\) è il frammento in cui, come in CTL, ogni operatore temporale è immediatamente preceduto da un quantificatore strategico:
+  \[\psi ::= X\phi \mid \phi U\phi \mid \phi R \phi\]
+  
+  La semantica dei quantificatori strategici in \(ATL\), data una struttura di Kripke \(G\) e uno stato \(p\), è:
+  \[G,p\models \GDia[A] \psi \text{ se } \exists \sigma_A \in Str(A)\ \forall \sigma_{\overline{A}} \in Str(\overline{A}).\ G,play(\sigma_A,\sigma_{\overline{A}},p)\models \psi \]
+  \[G,p\models \GBox[A] \psi \text{ se } \forall \sigma_A \in Str(A)\ \exists \sigma_{\overline{A}} \in Str(\overline{A}).\ G,play(\sigma_A,\sigma_{\overline{A}},p)\models \psi \]
+\end{definition}
+Intuitivamente:
+\begin{itemize}
+\item \(\GDia[A] \psi\) è vera se \emph{esiste} una strategia \(\sigma_A\) per la coalizione \(A\) tale che, \emph{per ogni} strategia \(\sigma_{\overline{A}}\) della coalizione complementare \(\overline{A} = Ag\setminus A\), il play risultante soddisfa \(\psi\): la coalizione \(A\) può \emph{garantire} \(\psi\);
+\item \(\GBox[A] \psi\) è vera se \emph{per ogni} strategia \(\sigma_A\) di \(A\) \emph{esiste} una strategia \(\sigma_{\overline{A}}\) di \(\overline{A}\) tale che il play soddisfa \(\psi\): la coalizione \(A\) non può \emph{evitare} \(\psi\).
+\end{itemize}
+
+I due operatori sono duali, dalla dualità semantica dei quantificatori: \(\neg \GDia[A]\psi \equiv \GBox[A] \neg \psi\).
+
+\subsection{Relazione con CTL}
+
+La struttura di Kripke indotta da una concurrent game structure ha \(R\) tale che \((s_1,s_2) \in R\) se e solo se \(\exists d \in Ac^{Ag}.\ s_2 = \delta(s_1,d)\). Questo giustifica il vedere ATL come estensione di CTL, e in particolare \(\GDia\) e \(\GBox\) come generalizzazioni di \(E\) e \(A\):
+
+\begin{proposition}{}
+  \(\GDia[Ag] \psi\equiv E\psi\) e \(\GBox[Ag] \psi \equiv A\psi\), dove \(Ag\) è la \keyword{grand coalition} di tutti gli agenti.
+\end{proposition}
+\begin{proof}
+  \begin{description}
+    \item[{\(\GDia[Ag] \psi \equiv E\psi\):}] Si ha che \(\GDia[Ag] \psi\) è vera se \(\exists \sigma_{Ag} \forall \sigma_{\emptyset}.G,play(\sigma_{Ag},\sigma_{\emptyset},s)\models \psi\). Di conseguenza la quantificazione universale è vacua, e quindi \(\GDia[Ag] \psi\) se e solo se \(\exists \sigma_{Ag}.G,play(\sigma_{Ag},\sigma_{\emptyset},s)\models \psi\). Essendoci però un unica coalizione, la strategia \(\sigma_{Ag}\) determina un unico play, e quindi da sola definisce un unico percorso \(\pi\) che soddisfa \(\psi\). Dunque \(\GDia[Ag] \psi\) se e solo se \(E\psi\).
+    
+    \item[{\(\GBox[Ag] \psi \equiv A\psi\):}] Si dimostra similmente.
+  \end{description}
+\end{proof}
+
+CTL è dunque semanticamente il frammento di ATL in cui si scelgono solo le coalizioni \(A=\emptyset\) o \(A = Ag\), rendendo vacuo uno dei due quantificatori. ATL è strettamente più espressiva: gli operatori \(\GDia\) e \(\GBox\) nascondono una quantificazione \emph{alternata} (\(\exists\forall\), \(\forall\exists\)) che CTL non può esprimere.
+
+\begin{example}{Strategie in sasso-carta-forbice}
+  Nel gioco del sasso-carta-forbice esistono \q{weak strategy}: per ogni agente c'è una strategia dell'avversario che lo fa vincere,
+  \[\GBox[\set{1}] F\, s_1\land \GBox[\set{2}] F\, s_2\]
+  ma non esistono strategie vincenti garantite:
+  \[\neg \GDia[\set{1}] F\, s_1 \land \neg \GDia[\set{2}] F\, s_2\]
+\end{example}
+
+\subsection{Strategie memoryless}
+
+Ci concentreremo su ATL (non \(ATL^*\)) perché gode di una proprietà fondamentale: può essere soddisfatta da strategie \keyword{memoryless}, ovvero funzioni \(\sigma: Ps\to Ac\) in cui conta solo l'ultima posizione. Non vedremo la dimostrazione, ma l'idea è che, come per CTL, le proprietà che richiedono memoria richiedono nesting di operatori temporali, assente in ATL: se una formula è soddisfatta da percorsi con cicli non semplici, si possono sempre accorpare i cicli ottenendo la struttura a lasso.
+
+Le strategie memoryless di fatto selezionano archi: un play identifica un \emph{sottografo} in cui si mantengono solo gli archi effettivamente percorribili. Tale sottografo è oltretutto deterministico (dalla posizione iniziale esiste un solo percorso), e la verifica di proprietà si riduce a raggiungibilità sui sottografi indotti.
+
+\section{Model checking di ATL}
+
+Per il model checking di CTL abbiamo sfruttato il one-step unfolding, che ci ha permesso di costruire funzioni monotone e usare i punti fissi. Facciamo lo stesso per ATL\@. Vogliamo mostrare:
+\[\GDia[A] (\phi_1 U\phi_2) \equiv \phi_2 \lor (\phi_1\land \GDia[A] X\, \GDia[A] (\phi_1 U\phi_2))\]
+
+È facile vedere che \(\GDia[A] (\phi_1 U\phi_2) \equiv \phi_2 \lor (\phi_1\land \GDia[A] X (\phi_1 U\phi_2))\): basta usare la stessa strategia. La parte delicata è \emph{spezzare} l'operatore temporale inserendo il secondo \(\GDia[A]\). In CTL spezzare un percorso era immediato: il next è la testa, l'until il resto. Qui invece c'è un'alternanza di quantificatori: a sinistra una singola strategia scelta a priori garantisce l'intero until, a destra abbiamo una \emph{doppia} alternanza:
+\[\exists \sigma_A \forall \sigma_{\overline{A}}\ \exists \sigma_{A}' \forall \sigma_{\overline{A}}'.\ play\left(\sigma_{A}',\sigma_{\overline{A}}',{\left(play(\sigma_A,\sigma_{\overline{A}},s)\right)}_1\right) \models \phi_1 U \phi_2\]
+
+Quello che vogliamo mostrare è che questa doppia alternanza è irrilevante, e che bastano i primi due quantificatori. Ci sono due strade.
+
+La prima passa per il teorema di Zermelo: per i giochi a turni, finiti e a somma zero, il cui goal è un'istanza di reachability, almeno un giocatore ha una strategia vincente:
+\[\exists \sigma_1 \forall \sigma_2.\ Win_1(\sigma_1,\sigma_2)\ \lor\ \exists \sigma_2 \forall \sigma_1.\ Win_2(\sigma_1,\sigma_2) \]
+Si noti che al prim'ordine questa struttura è falsificabile (basta un modello a grafo senza elementi minimi né massimi), ma per i giochi finiti a somma zero è sempre verificata. Si costruisce quindi un gioco a somma zero tra un \emph{verificatore} e un \emph{falsificatore} della formula e si sfrutta Zermelo per mostrare che uno dei due ha una strategia vincente.
+
+La seconda strada è costruttiva: si usano le strategie della formula assunta vera per costruire quelle della formula da mostrare equivalente. Per \(\GDia[A] X (\phi_1 U\phi_2) \implies \GDia[A] X\, \GDia[A] (\phi_1 U\phi_2)\) si copia la strategia; nell'altro verso se ne hanno due, quella del next e quella dell'until: si usa la prima per il primo passo, e poi la seconda \emph{dimenticando} il primo stato dalla storia. Si passa temporaneamente per strategie con memoria, che si possono però sempre riportare a memoria zero.
+
+Lo stesso vale per il release:
+\[\GDia[A] (\phi_1 R \phi_2) \equiv \phi_2 \land (\phi_1 \lor \GDia[A] X\, \GDia[A] (\phi_1 R\phi_2))\]
+
+\begin{warning}{}
+  A differenza di CTL, non è possibile ridurre il release a \(G\), perché il quantificatore strategico \emph{non distribuisce} sulla disgiunzione:
+  \[\GDia[A] (\phi_1 R \phi_2) \equiv \GDia[A] \left((\phi_2 U (\phi_1 \land \phi_2)) \lor G \phi_2\right) \not\equiv \GDia[A] (\phi_2 U (\phi_1 \land \phi_2)) \lor \GDia[A] G \phi_2\]
+  La strategia che garantisce la disgiunzione può realizzare disgiunti diversi contro avversari diversi, senza garantirne nessuno singolarmente.
+\end{warning}
+
+Con la stessa identica dimostrazione vista per CTL, queste equazioni caratterizzano rispettivamente minimo e massimo punto fisso; l'unica differenza è che l'induzione è completa su un albero di percorsi, piuttosto che lineare su un singolo percorso.
+
+\subsection{La preimmagine alternante}
+
+Ciò che resta da adattare è l'operatore \(X\), ovvero, in forma denotazionale, la funzione \(pre\). Questa è la vera differenza sostanziale: con più giocatori il concetto di preimmagine è più fine. Prima \(pre\) catturava \(EX\); ora dobbiamo catturare \(\GDia[A]X\). Lavorando su un solo passo, delle strategie interessa solo l'azione nella posizione corrente:
+\[\exists \sigma_A \forall \sigma_{\overline{A}}.\ play(\sigma_A,\sigma_{\overline{A}},s) \models X\phi
+  \quad\text{diventa}\quad
+  \exists {ac}_{A} \forall {ac}_{\overline{A}}.\ \delta(s, ({ac}_A, {ac}_{\overline{A}})) \models \phi\]
+
+La definizione di \(pre\) va dunque aggiornata per trattare l'universale interno:
+\[pre_A(V) = \set{s\in Ps}[\exists {ac}_{A} \in Ac^A\ \forall {ac}_{\overline{A}} \in Ac^{\overline{A}}.\ \delta(s, ({ac}_A, {ac}_{\overline{A}})) \in V]\]
+
+A livello algoritmico, l'unica cosa effettivamente usata dal model checking di CTL è il punto fisso (che rimane identico) e \(pre\): per il model checking di ATL basta sostituire il \(pre\) di CTL con questa versione a grana più fine.
+
+\begin{observation}{Complessità}
+  L'algoritmo rimane polinomiale negli archi, ma è esponenziale nel numero di giocatori: per ogni posizione e ogni azione collettiva della coalizione \(A\) bisogna verificare tutte le azioni collettive della coalizione complementare. Se il numero di giocatori è piccolo, o le azioni sono limitate, l'algoritmo resta comunque efficiente.
+\end{observation}

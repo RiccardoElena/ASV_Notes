@@ -1,0 +1,480 @@
+\chapter{Modellazione di Sistemi a Tempo Continuo}
+
+La modellazione vista finora si è concentrata su sistemi discreti, in cui il tempo avanza concettualmente a \q{scatti} in corrispondenza dell'esecuzione delle transizioni atomiche. Esiste tuttavia un'ampia classe di sistemi la cui correttezza dipende crucialmente dallo scorrere del \keyword{tempo reale} e dall'evoluzione di grandezze fisiche continue.
+
+L'idea fondamentale per modellare tali sistemi è iniettare all'interno del formalismo discreto delle variabili che non evolvono in base ad assegnamenti discreti operati dal software, ma in base a leggi matematiche che dipendono dal tempo (es.\ temperatura, velocità, pressione).
+
+\begin{definition}{Variabile Tempo Reale}
+  Introduciamo una singola variabile continua per rappresentare il tempo assoluto, che denoteremo tipicamente con \(t\). A differenza delle variabili di programma classiche, il cui dominio è spesso finito o numerabile, la variabile tempo varia nel dominio dei numeri reali non negativi:
+  \[ \text{dom}(t) = \R_{\ge 0} \]
+  Questa variabile evolve autonomamente con derivata unitaria (\(\dot{t} = 1\)), misurando il tempo reale trascorso.
+\end{definition}
+
+\begin{observation}{Esplosione dello Spazio degli Stati e Decidibilità}
+  L'introduzione di una variabile a dominio continuo altera drasticamente la trattabilità matematica e computazionale del modello.
+
+  Ricordiamo che in un Transition System generato da variabili, lo spazio degli stati \(S\) è dato (o contiene) l'insieme di tutte le possibili valutazioni delle variabili. Una funzione di valutazione \(\eta\) mappa l'insieme delle variabili \(\Var\) nel loro dominio \(D\):
+  \[ \eta: \Var \to D \]
+  Se l'unica variabile di interesse è il tempo (\(\Var = \{t\}\)) e il dominio è \(D = \R_{\ge 0}\), il numero totale di valutazioni distinte corrisponde al numero di funzioni possibili:
+  \[ \abs{D}^{\abs{\Var}} = \abs{\R_{\ge 0}}^1 = \abs{\R_{\ge 0}} \]
+  Questo significa che lo spazio degli stati del sistema non è più finito, né numerabilmente infinito (come \(\N\)), ma possiede la cardinalità del continuo (non numerabile).
+
+  Dal punto di vista pratico dell'Automated Software Verification, questo genera una barriera computazionale enorme. Gli algoritmi classici di verifica (Model Checking), che si basano sull'esplorazione esaustiva degli stati raggiungibili, falliscono in presenza di uno spazio non numerabile. Il problema della verifica per modelli con variabili continue diviene, in linea di principio, \keyword{indecidibile}. Sarà pertanto necessario introdurre tecniche formali di \keyword{astrazione} avanzate per ricondurre questo spazio continuo a un sistema finito equivalente ai fini della verifica, tema che verrà esplorato nello studio dei \keyword{Timed Automata}.
+\end{observation}
+
+Per modellare adeguatamente i sistemi \keyword{embedded} ovvero sistemi di controllo immersi in un ambiente analogico in cui le reazioni dipendono strettamente dalle tempistiche del mondo fisico il formalismo puramente discreto degli LTS risulta insufficiente. Si introduce pertanto un nuovo modello matematico: gli \keyword{Automi Temporizzati}. Questo modello arricchisce la struttura dei classici automi a stati finiti con variabili a dominio continuo che scorrono autonomamente misurando il progresso del tempo reale.
+
+Supponiamo di voler progettare un controllore per un passaggio a livello. Questo sistema ha una parte digitale, il controllore, e una parte analogica, gli attuatori e i sensori (il treno, le sbarre).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{_images/railroad_crossing_example.png}
+  \caption{Componenti digitali e analogiche di un passaggio a livello.}
+\end{figure}
+
+Se usassimo il modello classico, la composizione sarebbe semplicemente asincrona con interleaving, ma questo porterebbe a comportamenti ammessi dal modello ma non desiderabili: ad esempio, il treno che attraversa il passaggio a livello prima che le sbarre si siano abbassate.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{_images/railroad_bad_computation_tree.png}
+  \caption{Computation tree con il comportamento indesiderato.}
+\end{figure}
+
+Quello che vorremmo è che il treno mandi il segnale di avvicinamento sufficientemente prima di arrivare al passaggio a livello: è quindi necessario poter specificare che le azioni impieghino un certo tempo per essere eseguite, che certe azioni possano essere abilitate solo dopo un certo tempo, o che debbano avvenire entro un certo tempo. Se queste tempistiche vengono garantite, il comportamento indesiderato non è più ammesso, e il modello è più fedele.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{_images/railroad_crossing_rudimental_timing.png}
+  \caption{Modellazione rudimentale di tempistiche per il passaggio a livello.}
+\end{figure}
+
+\begin{note}{}
+  Anche quando due vincoli temporali riguardano una stessa transizione sincronizzante, a livello di modellazione è importante che restino due vincoli distinti su sottomodelli diversi, piuttosto che accorparli in un unico vincolo. Nella fase di modellazione ogni sottomodello deve occuparsi di descrivere il sottocomponente specifico e le sue caratteristiche: il comportamento complessivo del sistema dev'essere corretto grazie a proprietà \emph{emergenti} dalla composizione dei sottomodelli.
+\end{note}
+
+\section{Sintassi degli Automi Temporizzati}
+
+Il problema della modellazione e della verifica di sistemi embedded è che il tempo è intrinsecamente denso, e quindi non è possibile modellarlo come un insieme discreto di stati.
+
+Come per passare da automi a stati finiti ad automi a pila, partiremo quindi da un automa a stati finiti e aggiungiamo una struttura dati: in questo caso dei \keyword{clock} (cronometri), variabili a valori reali non negativi che possono essere scritte solo in un modo molto limitato, ovvero resettate a zero, ma mai assegnate a valori arbitrari.
+
+Matematicamente possiamo vedere un clock come una funzione \(x: \R^+ \to \R^+\) del tempo reale, tale che \(\frac{d x(t)}{dt} = 1\).\footnote{Ciò che conta è che la derivata sia una costante positiva uguale per tutti i clock, ovvero che tutti i clock crescano alla stessa velocità: tale costante può essere presa come unità di misura del tempo, e dunque assunta pari a \(1\) senza perdita di generalità.} Le transizioni possono avere guardie costituite da vincoli sui clock, e come unica azione sui clock possono resettarne alcuni a zero. Per semplicità di trattazione consideriamo solo guardie sui clock, sebbene in linea di principio le guardie su variabili viste in precedenza restino ammesse.
+
+\begin{definition}{Vincoli sui clock}
+  Dato un insieme di clock \(C\), i vincoli \(\Phi(C)\) sono generati dalla grammatica:
+  \[\phi ::= \top \mid x<c\mid x\leq c\mid x > c \mid x \geq c \mid \phi \land \phi\]
+  con \(x \in C\) e \(c\) costante in un dominio numerabile, ad esempio \(c \in \N\) o \(c \in \Q\).
+\end{definition}
+
+\begin{observation}{}
+  Non è ammessa la negazione (per questo sono inclusi tutti i confronti di disuguaglianza) e non è presente la disgiunzione, che viene modellata tramite più transizioni parallele aventi come guardie i diversi disgiunti. Le costanti non possono essere in \(\R\), poiché ciò porterebbe a problemi di rappresentazione e computazione.
+\end{observation}
+
+\begin{note}{}
+  Il modello è aperto a diverse estensioni:
+  \begin{itemize}
+    \item vincoli \q{triangolari} come \(x-y \leq c\): non cambiano l'espressività;
+    \item vincoli con somme o prodotti come \(x+y \leq c\): aumentano l'espressività e la complessità dei problemi di decisione;
+    \item reset a un valore costante diverso da zero, \(x := c\): non aumenta espressività né complessità;
+    \item reset al valore di un altro clock, \(x := y\): aumenta espressività e complessità.
+  \end{itemize}
+  In generale, i vincoli scelti sono rilassabili per guadagnare succintezza, ma non espressività, senza esplosione della complessità.
+\end{note}
+
+\begin{definition}{Automa Temporizzato}
+  Un \keyword{automa temporizzato} è una tupla
+  \[TA = \langle\Sigma, \Loc, \Loc_0, C, \delta, F\rangle\]
+  dove:
+  \begin{itemize}
+    \item \(\Sigma\) è l'alfabeto;
+    \item \(\Loc\) è l'insieme delle locazioni;
+    \item \(\Loc_0 \subseteq \Loc\) è l'insieme delle locazioni iniziali;
+    \item \(C\) è l'insieme dei clock;
+    \item \(F\subseteq \Loc\) è l'insieme delle locazioni finali;
+    \item \(\delta \subseteq \Loc \times \Sigma \times \Phi(C) \times 2^C \times \Loc\) è la relazione di transizione
+  \end{itemize}
+  In particolare, si ha che se \((\ell, a, \phi, C',\ell') \in \delta\) allora esiste una transizione da \(\ell\) a \(\ell'\) etichettata con \(a\), abilitata solo se la guardia \(\phi\) è soddisfatta, e che resettando i clock in \(C'\).
+\end{definition}
+
+\begin{example}{Automa Temporizzato per un interruttore}
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{_images/lightswitch_1}
+    \caption{Automa a stati finiti per un interruttore.}
+  \end{figure}
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{_images/lightswitch_2}
+    \caption{Automa temporizzato per un interruttore.}
+  \end{figure}
+\end{example}
+
+\section{Semantica degli Automi Temporizzati}
+
+Come per i program graphs, per dare una semantica agli automi temporizzati faremo affidamento ai transition system, in particolare in questo caso ai \keyword{timed transition system}, che ci permetteranno facilmente di definire le strutture di Kripke e quindi di applicare le tecniche di model checking viste negli scorsi capitoli.
+
+Gli stati di un timed transition system sono coppie \((\ell, \nu)\) dove \(\ell\) è una locazione e \(\nu\) è una funzione di valutazione dei clock \(\nu: C \to \R_{\ge 0}\).
+
+La relazione di transizione tra stati può essere dovuta sia alla lettura di un simbolo che al passare del tempo: le azioni sono dunque \(\Act = \Sigma \cup \R^+\), e le transizioni sono di due tipi:
+\begin{itemize}
+  \item \keyword{transizioni discrete}, etichettate con simboli di \(\Sigma\), da \((\ell,\nu)\) a \((\ell',\nu')\): cambiano locazione e possono azzerare alcuni clock;
+  \item \keyword{transizioni di scorrimento del tempo}, etichettate con \(d \in \R^+\), da \((\ell,\nu)\) a \((\ell,\nu + d)\): la locazione resta invariata e tutti i clock avanzano di \(d\).
+\end{itemize}
+
+In particolare avremo che \((\ell,\nu) \xrightarrow{a} (\ell',\nu')\) se e sono se \((\ell, a,\phi, C',\ell') \in \delta\) per qualche \(\phi \in \Phi(C)\) e \(C'\subseteq C\) tali che \(\nu \models \phi\) e \(\nu' = \nu[C' \gets 0]\), ovvero \(\nu'\) è la funzione di valutazione dei clock ottenuta da \(\nu\) resettando a zero i clock in \(C'\) e la relazione \(\nu \models \phi\) è definita nel modo ovvio.
+
+Per quanto riguarda le transizioni di scorrimento del tempo, avremo che \((\ell,\nu) \xrightarrow{d} (\ell,\nu + d)\) dove \(\nu + d: C \to \R_{\ge 0}\) è la funzione di valutazione dei clock definita da \((\nu + d)(x) = \nu(x) + d\) per ogni \(x \in C\).
+
+\section{Linguaggi temporizzati e \texorpdfstring{\(\tau\)}{tau}-transizioni}
+
+In termini di teoria dei linguaggi, questi automi riconoscono \keyword{linguaggi temporizzati}, in cui gli elementi delle parole sono detti \keyword{segnali}: coppie di un simbolo di alfabeto e dell'istante di tempo in cui viene emesso.
+
+Una \keyword{traccia temporizzata} è una sequenza (potenzialmente infinita) di segnali \(\sigma = (a_1,t_1)(a_2,t_2)\ldots\) con \(a_i \in \Sigma\) e \(t_i \in \R^+\) tali che \(t_i \leq t_{i+1}\) per ogni \(i\in\N\). 
+
+Un run di un automa temporizzato con stato iniziale \((\ell_0,\nu_0)\) su una traccia temporizzata \(\sigma=(a_1,t_1)(a_2,t_2)\ldots\) è una sequenza di transizioni del timed transition system:
+\[(\ell_0,\nu_0) \xrightarrow{d_1}\xrightarrow{a_1} (\ell_1,\nu_1) \xrightarrow{t_2}\xrightarrow{a_1} (\ell_2,\nu_2) \ldots\]
+tale che \(t_{i+1} - t_i = d_{i+1}\) per ogni \(i\in\N\).
+
+\begin{note}{}
+  Nei percorsi temporizzati, per ogni transizione temporale di ritardo \(d\) esistono infiniti modi equivalenti di sezionarla in sotto-transizioni: per ogni coppia \(d_1, d_2\) con \(d=d_1+d_2\), la transizione di ritardo \(d\) equivale alla sequenza delle due transizioni di ritardo \(d_1\) e \(d_2\).
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{_images/temporal_traces.png}
+    \caption{Tracce temporizzate equivalenti, con transizioni di ritardo sezionate in modi diversi. La sezione tra barre rosse evidenzia le transizioni discrete}
+  \end{figure}
+\end{note}
+
+In questo modello le transizioni discrete avvengono solo in risposta a stimoli esterni (lettura di un simbolo). Per modellare transizioni \emph{spontanee} aggiungiamo le \keyword{\(\tau\)-transizioni}: un simbolo speciale \(\tau\) che indica una transizione senza stimolo esterno.
+
+\begin{warning}{}
+  A differenza delle \(\epsilon\)-transizioni negli automi a stati finiti, le \(\tau\)-transizioni \emph{aumentano} il potere espressivo degli automi temporizzati.
+\end{warning}
+
+\begin{example}{}
+  Consideriamo un automa con una \(\tau\)-transizione con guardia \(x = 1\) e reset di \(x\), che quindi può azzerare spontaneamente il clock a ogni istante intero. Tale automa può riconoscere il linguaggio delle parole \((a,t_1)(a,t_2)\ldots\) con tutti i \(t_i \in \N\): a ogni istante intero il clock può essere azzerato, permettendo di \q{scandire} tutti gli interi. Nessun automa temporizzato senza \(\tau\)-transizioni può riconoscere lo stesso linguaggio: senza la possibilità di azzerare spontaneamente il clock, si può solo verificare che tra due simboli letti ci sia una specifica distanza, non scandire tutti gli interi.
+  
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{_images/tau-timed_automata_counting_naturals.png}
+    \caption{Automa temporizzato con \(\tau\)-transizione che riconosce il linguaggio delle parole con simboli letti a istanti interi.}
+  \end{figure}
+\end{example}
+
+\section{Invarianti, timelock e zenoness}
+
+Il modello manca ancora di qualcosa: possiamo impedire che una transizione avvenga prima o dopo un certo tempo (abilitarla in un intervallo), ma non possiamo \emph{forzare} che una transizione avvenga entro un certo tempo. Le \(\tau\)-transizioni danno la possibilità che qualcosa accada spontaneamente, ma non l'obbligo.
+
+Consideriamo ad esempio l'automa in figura:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth]{_images/exceding_time_example.png}
+  \caption{Automa temporizzato con transizione che deve avvenire entro un certo tempo.}
+\end{figure}
+
+Dal grafico ad esso affiancato, che rappresenta una possibile evoluzione del clock \(x\) nel tempo, è facile vedere che non è possibile in alcun modo garantire che la transizione avvenga in tempo: se il sistema resta nello stato iniziale per più di \(3\) unità di tempo, la guardia della transizione non sarà più soddisfatta e il sistema si bloccherà.
+
+\begin{definition}{Invarianti}
+  Una funzione di \keyword{invariante} \(Inv: \Loc \to \Phi(C)\) associa un vincolo sui clock a ogni locazione, con la semantica di limitare il tempo che è possibile trascorrervi: se \(Inv(l) = x \leq c\), è possibile rimanere in \(l\) solo finché \(x \leq c\).
+\end{definition}
+
+Il senso è considerare \emph{spurio} (e dunque escludere) ogni percorso che violerebbe un'invariante. La semantica va aggiornata di conseguenza:
+\begin{itemize}
+  \item le transizioni di scorrimento del tempo sono ammesse solo se il passaggio soddisfa l'invariante: \(\nu + d \models Inv(l)\);\footnote{Più precisamente, l'invariante deve valere lungo tutto lo scorrimento; per vincoli convessi come i nostri è sufficiente verificarla all'istante finale.}
+  \item le transizioni discrete devono garantire che la valutazione risultante soddisfi l'invariante della locazione di arrivo: \(\nu' \models Inv(l')\).
+\end{itemize}
+
+L'aggiunta delle invarianti permette di modellare le \emph{durate} delle azioni, oltre ai ritardi già esprimibili con le guardie.
+
+Per quanto riguarda la composizione di automi temporizzati, avendo considerato il caso senza variabili, si utilizza il modello di sincronizzazione con handshaking: le transizioni sincronizzanti sono quelle con lo stesso simbolo di alfabeto, le altre sono asincrone.
+
+\subsection{Problemi di modellazione}
+
+L'introduzione del tempo continuo porta con sé alcuni fenomeni patologici da conoscere:
+\begin{itemize}
+  \item la \keyword{time convergence}, inevitabile, ma gestibile in fase di verifica;
+  \item il \keyword{timelock}, introdotto dalle invarianti;
+  \item la \keyword{zenoness}, in cui infinite azioni avvengono in un intervallo di tempo finito.
+\end{itemize}
+
+\begin{definition}{Percorsi convergenti e divergenti}
+  Dato un percorso infinito \(\pi\) con ritardi \(d_1, d_2, \ldots\), il suo tempo di esecuzione è \(ExecTime(\pi) = \sum_{i \geq 1} d_i\). Il percorso è \keyword{convergente} se \(ExecTime(\pi)<\infty\), \keyword{divergente} altrimenti. Dato uno stato \(s\), indichiamo i percorsi divergenti da \(s\) con
+  \[Paths_{div}(s) = \set{\pi}[\pi_0 = s \land ExecTime(\pi) =\infty]\]
+\end{definition}
+
+\begin{example}{}
+  Un percorso che a ogni passo lascia scorrere ritardi \(d_i = \frac{1}{2^i}\) ha \(ExecTime(\pi) = \sum_{i \geq 1} \frac{1}{2^i} = 1\): il tempo del percorso converge a un valore finito nonostante il percorso sia infinito.
+\end{example}
+
+I percorsi convergenti con un numero \emph{finito} di transizioni discrete possono essere ignorati senza perdita: le infinite transizioni temporali si accorpano in un'unica transizione con ritardo pari al limite della somma. Nella verifica ci interesseremo dunque solo dei percorsi divergenti.
+
+\begin{definition}{Timelock}
+  Uno stato \(s\) è un \keyword{timelock} se \(Paths_{div}(s) = \emptyset\), ovvero se non esiste alcun percorso divergente che parte da \(s\).
+\end{definition}
+
+Un timelock non significa che da \(s\) non parta alcun percorso o che il sistema non evolva, ma che tutti i percorsi da \(s\) sono convergenti: il tempo non può più procedere oltre un certo limite. È la controparte temporale del deadlock: il sistema deve evolvere perché sta per raggiungere una deadline dovuta a un'invariante, ma tutte le transizioni sono disabilitate.
+
+\begin{definition}{Zenoness}
+  Un percorso \(\pi\) è \keyword{zeno} se \(ExecTime(\pi)<\infty\) e il numero di transizioni discrete in \(\pi\) è infinito. Un automa temporizzato è \keyword{non-zeno} se non ammette percorsi zeno.
+\end{definition}
+
+I percorsi zeno rappresentano un sistema con velocità di esecuzione arbitrariamente alta, fisicamente irrealizzabile: sono possibili perché le transizioni discrete sono istantanee, e quelle spontanee non necessitano nemmeno di uno stimolo esterno. Verificare l'assenza di zenoness è un problema difficile, ma esiste una comoda condizione sufficiente.
+
+\begin{proposition}{Condizione sufficiente per la non-zenoness}
+  Se in ogni ciclo semplice dell'automa temporizzato esiste un clock \(x\) tale che:
+  \begin{itemize}
+    \item \(x\) è resettato in almeno una transizione del ciclo;
+    \item esiste un intero positivo \(c\) tale che \(x \geq c\) compare come guardia (o congiunto di guardia) di almeno una transizione del ciclo;
+  \end{itemize}
+  allora l'automa è non-zeno.
+\end{proposition}
+\begin{proof}
+  Ogni attraversamento di un tale ciclo richiede un tempo di almeno \(c\). Un percorso con infinite transizioni discrete, proiettato sulle sole locazioni, deve attraversare infinitamente spesso cicli semplici dell'automa (essendo questi in numero finito): il tempo di esecuzione è dunque almeno \(c\) per ogni attraversamento, e quindi infinito, per cui il percorso è divergente e non zeno.
+\end{proof}
+
+\section{Decidibilità e teoria delle regioni}
+
+Vogliamo ora verificare proprietà sugli automi temporizzati, a partire dalla più semplice: la \keyword{reachability}. Formalmente: dato un TA \(A\) e una locazione \(l_f \in \Loc\), esiste un run divergente \(\pi = s_0 s_1 \ldots\) con \(s_0\) iniziale e un indice \(i\) tale che \(s_i = (l_f, \nu)\) per qualche \(\nu\)?
+
+\begin{observation}{Il problema della decidibilità}
+  L'aggiunta di variabili a tempo continuo genera uno spazio degli stati denso e non numerabile: il model checking diviene intrinsecamente problematico sotto il profilo della decidibilità. Tuttavia, la decidibilità dipende dalla granularità della proprietà: la raggiungibilità di una \emph{locazione} è decidibile, mentre la raggiungibilità di uno specifico stato \((l_f,\nu_f)\), con una precisa valutazione dei clock, non lo è.
+\end{observation}
+
+Essendo lo spazio degli stati infinito, la raggiungibilità non è banale. Tipicamente, l'esplorazione di uno spazio infinito è decidibile se lo spazio può essere partizionato in un numero \emph{finito} di classi di equivalenza rilevanti per il problema, tali che ogni elemento di una classe sia equivalente agli altri rispetto al problema considerato. Non basta però un'equivalenza qualsiasi: serve una proprietà di \emph{simulazione}, nel senso che ogni stato in una classe deve poter fare, a livello di classi, tutto ciò che fanno gli altri: se uno stato di una classe \(C_1\) può raggiungere uno stato di \(C_2\), ogni altro elemento di \(C_1\) deve poter raggiungere \(C_2\). L'insieme finito di queste classi costituisce il \keyword{quoziente} del sistema originario, fondamento teorico di quello che in letteratura è noto come \keyword{Region Graph}.
+
+Essendo le locazioni finite, il punto è definire un'equivalenza tra le valutazioni \(\nu\): le classi di equivalenza risultanti sono dette \keyword{regioni}. In un TA i comportamenti sono determinati dalle guardie e dalle invarianti, che sono in numero finito. I criteri per la definizione sono:
+\begin{itemize}
+  \item due valutazioni equivalenti devono soddisfare gli stessi vincoli di clock;
+  \item due valutazioni equivalenti devono dar luogo a run simili;
+  \item le classi devono essere in numero finito.
+\end{itemize}
+
+\subsection{Costruzione delle regioni}
+
+Analizziamo i vincoli \(x \sim c\) con \(c \in \N\) e \(\sim \in \set{<, >, =, \leq, \geq}\).\footnote{Abbiamo ammesso costanti razionali, ma è sempre possibile ricondursi agli interi moltiplicando tutte le costanti per il minimo comune multiplo dei denominatori.} Per \(x<c\), la soddisfazione dipende solo da \(\lfloor \nu(x) \rfloor < c\); per quanto riguarda \(x \leq c\), la soddisfazione dipende da \(\lfloor \nu(x) \rfloor < c\lor (\lfloor \nu(x) \rfloor=0 \land frac(x) = 0)\).
+
+Dunque per valutare l'equivalenza di due valutazioni \(\nu_1\) e \(\nu_2\) rispetto a vincoli su un clock è sufficiente confrontare le loro parti intere e se la parte frazionaria è nulla o meno. 
+
+Consideriamo lo spazio euclideo delle valutazioni su due clock \(x\) e \(y\): i vincoli lo partizionano in \textbf{riquadri aperti} (vincoli con sole disuguaglianze strette), \textbf{punti di intersezione} o \textbf{vertici} (vincoli di sola uguaglianza) e \textbf{segmenti aperti} (un'uguaglianza e una disuguaglianza). Per un numero arbitrario di clock la partizione è su ipercubi.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{_images/first_space_partition.png}
+  \caption{Idea intuitiva del partizionamento dello spazio delle valutazioni dei clock in regioni.}
+\end{figure}
+
+Da un punto di vista \q{statico} questo partizionamento è sufficiente, ma non lo è da un punto di vista \q{dinamico}, ovvero non soddisfano il vincolo intuitivo che due valutazioni equivalenti debbano evolvere nello stesso modo. L'esempio in figura mostra l'evidente problema.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{_images/problem_first_space_partition.png}
+  \caption{Problema del partizionamento intuitivo dello spazio delle valutazioni dei clock in regioni.}
+\end{figure}
+
+La differenza è nella parte frazionaria: due valutazioni nello stesso riquadro ma con ordine diverso tra le parti frazionarie dei clock raggiungono i bordi del riquadro in ordine diverso, e hanno dunque futuri potenziali diversi. È sufficiente tagliare i riquadri lungo la diagonale, che corrisponde all'uguaglianza delle parti frazionarie: oltre al valore intero di ogni clock e all'annullarsi o meno della sua parte frazionaria, la regione registra l'\emph{ordinamento} delle parti frazionarie di tutti i clock. La diagonale stessa è una classe a sé, dove le parti frazionarie coincidono.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{_images/second_space_partition.png}
+  \caption{Spazio partizionato con regioni diagonali.}
+\end{figure}
+
+In questo modo, due valutazioni equivalenti ammettono percorsi divergenti simili, ovvero che evolvono attraversando le stesse regioni in ordine. La costruzione delle regioni è dunque completata: due valutazioni \(\nu_1\) e \(\nu_2\) sono equivalenti se:
+\begin{itemize}
+  \item per ogni clock \(x\), \(\lfloor \nu_1(x) \rfloor = \lfloor \nu_2(x) \rfloor\);
+  \item per ogni clock \(x\), \(frac(\nu_1(x)) = 0 \iff frac(\nu_2(x)) = 0\);
+  \item per ogni coppia di clock \(x,y\), \(frac(\nu_1(x)) \le frac(\nu_1(y)) \iff frac(\nu_2(x)) \le frac(\nu_2(y))\).
+\end{itemize}
+
+Rimane un ultimo problema da risolvere: le classi sono ancora in quantità infinita (una famiglia di triangoli per ogni cella intera del piano). Il problema si risolve osservando che, detta \(c_x\) la massima costante con cui \(x\) è confrontato nell'automa, tutte le valutazioni con \(\nu(x) > c_x\) sono indistinguibili per l'automa rispetto a \(x\): le classi in cui \emph{tutti} i clock superano la propria costante massima collassano in un'unica classe, mentre quelle in cui solo alcuni la superano restano distinguibili solo rispetto ai clock rimanenti.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{_images/final_space_partition.png}
+  \caption{Spazio partizionato con regioni diagonali e regioni di collasso. Le costanti massime dei clock sono \(c_x = c_y = 3\).}
+\end{figure}
+
+Possiamo dunque finalmente definire formalmente e pienamente questa equivalenza.
+
+\begin{definition}{Equivalenza tra valutazioni dei clock}
+  Dato un automa temporizzato \(TA\) tale che \(\forall x \in C\), sia \(c_x\) la massima costante con cui \(x\) è confrontato in un vincolo presente in \(TA\), due valutazioni \(\nu_1\) e \(\nu_2\) sono equivalenti, denotato \(\nu_1 \sim \nu_2\), se vale una delle seguenti condizioni:
+  \begin{enumerate}
+    \item Per ogni clock \(x\), \(\nu_1(x) > c_x\) e \(\nu_2(x) > c_x\);
+    \item Per ogni clock \(x,y\), con \(\nu_1(x), \nu_2(x) \le c_x\) e \(\nu_1(y), \nu_2(y) \le c_y\):
+    \begin{enumerate}
+      \item \(\lfloor \nu_1(x) \rfloor = \lfloor \nu_2(x) \rfloor\land \lfloor \nu_1(x) \rfloor = \lfloor \nu_2(x) \rfloor \land frac(x) = 0 \iff frac(y) = 0\);
+      \item \(frac(\nu_1(x)) \leq frac(\nu_1(y)) \iff frac(\nu_2(x)) \leq frac(\nu_2(y))\);
+    \end{enumerate}
+  \end{enumerate}
+
+  Una \keyword{regione} è una classe di equivalenza di \(\sim\). Due stati \((\ell_1, \nu_1)\) e \((\ell_2, \nu_2)\) del transition system associato a \(TA\) sono equivalenti se \(\ell_1 = \ell_2\) e \(\nu_1 \sim \nu_2\).
+\end{definition}
+
+\begin{proposition}{Numero delle regioni}
+  Dato un automa temporizzato \(TA\) con insieme di clock \(C\), il numero di regioni in cui può essere partizionato \(n_{TA}\) è tale che:
+  \[\abs{C} \cdot \prod_{x\in C} c_x \leq n_{TA} \leq \abs{C}! \cdot 2^{\abs{C}-1}\cdot\prod_{x \in C} (2c_x+2)\]
+  con \(c_x\) massima costante presente in un vincolo per \(x\).
+\end{proposition}
+
+\begin{proof}
+  Intuitivamente, ogni regione è identificata da una tripla \(\langle I, \pi, D \rangle\) dove:
+  \begin{itemize}
+    \item \(I\) è una famiglia di intervalli, con per ogni \(x \in C\) un \(I_x \in \set{[0,0],\ ]0,1[,\ [1,1],\ ]1,2[,\ldots,\ ]c_x-1,c_x[,\ [c_x,c_x],\ ]c_x,\infty[}\): per ogni clock con costante massima \(c_x\), ogni intero \(n \leq c_x\) appare in esattamente due intervalli come estremo inferiore, per un totale di \(2c_x+2\) intervalli;\footnote{È fondamentale contare solo gli intervalli in cui un certo numero appare come estremo inferiore e non tutti gli intervalli in cui appare per evitare di contare due vole uno stesso intervallo. Ad esempio l'intervallo \(]1,2[\) potrebbe essere contato sia come intervallo in cui appare \(1\) che come intervallo in cui appare \(2\).}
+    \item \(\pi\) è una permutazione dei clock che rappresenta l'ordine delle parti frazionarie (\(\abs{C}!\) possibilità);
+    \item \(D\subseteq C\) indica tra quali clock consecutivi nella permutazione vale l'uguaglianza delle parti frazionarie (\(\abs{D}\leq\abs{C}-1\), dunque \(2^{\abs{C}-1}\) possibilità).
+  \end{itemize}
+\end{proof}
+
+Definite queste regioni, andiamo ad evidenziarne alcune di particolare rilevanza per la simulazione del comportamento dell'automa temporizzato.
+
+\begin{definition}{Regioni di reset}
+  Sia \(r \in \R_{\geq 0}^{\abs{C}}/\sim\) una regione e \(C' \subseteq C\). La \keyword{regione di reset} di \(r\) rispetto a \(C'\) è la regione \(r[C' \gets 0] = \set{\nu[C'\gets 0]}[\nu \in r]\).
+
+  È immediato verificare che, fissato un \(C'\subseteq C\), \(\nu_1 \sim \nu_2 \implies \nu_1[C'\gets 0] \sim \nu_2[C'\gets 0]\), e dunque che la regione di reset è ben definita.
+\end{definition}
+
+\begin{definition}{Regione Successiva}
+  Sia \(r \in \R_{\geq 0}^{\abs{C}}/\sim\) una regione, definiamo la \keyword{regione successiva} \(Succ(r)\) come la \q{prima} regione raggiungibile da ogni valutazione \(\nu \in r\) facendo esclusivamente avanzare il tempo, ovvero senza resettare alcun clock. 
+  
+  È facile notare che:
+  \begin{itemize}
+    \item Se \(r\) non è vincolata, ovvero se per ogni \(x \in C\) vale \(\nu(x) > c_x\), allora \(Succ(r) = r\);
+    \item Se \(r\) è vincolata, allora \(Succ(r) = r' \iff \forall \nu \in r(\exists d \in \R_{\geq 0}\st (\nu+d)\in r' \land \forall d' < d: (\nu+d') \in r \cup r')\).
+  \end{itemize}
+\end{definition}
+
+Per quanto possa sembrare matematicamente densa, questa definizione cattura l'intuizione che abbiamo dato precedentemente: la prima parte garantisce che \(r'\) sia raggiungibile da \(r\) facendo avanzare il tempo, mentre la seconda parte garantisce che non esista alcuna regione intermedia tra \(r\) e \(r'\).
+
+\subsection{L'automa delle regioni}
+
+Avendo partizionato lo spazio delle valutazioni, partizioniamo in modo finito lo spazio degli stati considerando equivalenti stati con la stessa locazione e valutazioni equivalenti, rappresentati dalla coppia \((\ell, r)\) con \(r\) regione. Le transizioni si definiscono per sollevamento: \((\ell,r)\to(\ell',r')\) se per ogni \(\nu \in r\) esiste \(\nu' \in r'\) tale che \((\ell,\nu)\to (\ell',\nu')\) nel transition system originario.
+
+Per le transizioni discrete serve capire come si comportano i reset: dal punto di vista geometrico, il reset di un clock equivale a una \emph{proiezione} della regione sull'asse corrispondente (per più reset si applicano più proiezioni in successione). Per le transizioni temporali si definisce invece la \keyword{regione successore} di una regione come la prima regione raggiunta facendo esclusivamente scorrere il tempo.
+
+\begin{definition}{Automa delle regioni}
+  Dato un TA, il suo \keyword{automa delle regioni} è il transition system
+  \[RTS =\langle S,\ \Sigma\cup\set{\tau},\ \to',\ Init,\ AP',\ \lambda'\rangle\]
+  dove:
+  \begin{itemize}
+    \item \(S = \set{(\ell,r)}[l \in \Loc,\ r \text{ regione}]\)
+    \item \(Init = \set{(\ell_0, r_0)}[\ell_0 \in \Loc_0,\ r_0 = \set{\nu = 0}]\)
+    \item \(AP' = AP\cup \Phi(C)\)
+    \item \(\lambda'((\ell,r)) = \lambda(\ell)\cup \set{\phi \in \Phi(C)}[r \models \phi]\)
+    \item \(\to'\) contiene le transizioni discrete (via proiezioni di reset) e temporali (via regioni successore) sollevate alle regioni.
+  \end{itemize}
+\end{definition}
+
+L'automa delle regioni è finito, e su di esso la raggiungibilità di una locazione (o di una regione) si decide con i classici algoritmi sui grafi. Questo giustifica anche il limite di decidibilità osservato all'inizio: l'informazione sulle singole valutazioni scompare nell'automa delle regioni, e dunque possiamo decidere la raggiungibilità di una regione, ma non di una specifica valutazione al suo interno.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth]{_images/region_automata_example.png}
+  \caption{Automa delle regioni per l'automa temporizzato fornito.}
+\end{figure}
+
+\section{Timed CTL}
+
+Come visto per la logica alternante, per poter catturare le proprietà a tempo continuo di un sistema sarà necessario estendere la logica temporale \(CTL\) con operatori temporizzati. In particolare, per ogni operatore temporale esistente, aggiungeremo un vincolo di tempo \(I\) che indica l'intervallo di tempo in cui la proprietà deve valere.
+
+\begin{definition}{Sintassi della Timed CTL}
+  La logica temporizata su alberi di computazione \(TCTL\) è definita dalla seguente grammatica:
+  \[\phi ::= p \mid g \mid \neg \phi \mid \phi_1 \land \phi_2 \mid E\phi_1 U_I \phi_2 \mid A\phi_1 U_I \phi_2\]
+  dove \(p \in AP\) e \(g \in \Phi(C)\) sono rispettivamente un atomo di proposizione e una guardia sui clock, e \(I\), detto parametro temporale, è un intervallo (aperto, chiuso o semi-aperto) di \(\R_{\geq 0}\).
+\end{definition}
+
+\begin{example}{Esempio di formula in TCTL}
+  La formula \(E(p U_{[2,3]} q)\) indica che è possibile (esiste un percorso) in cui \(q\) vale in un istante compreso tra l'istante \(2\) e \(3\), e che fino a quel momento \(p\) vale.
+  La formula \(A(p U_{[1,\infty[} q)\) indica che è necessario (per ogni percorso) che \(q\) valga in un istante successivo o a pari a \(1\), e che fino a quel momento \(p\) vale.
+\end{example}
+
+\begin{note}{}
+  Per facilità di notazione, gli intervalli temporali \(I\) con estremo superiore infinito o stremo inferiore compreso nullo verranno indicati rispettivamente con \(\geq d\) e \(\leq d\) al posto di \([d,\infty[\) e \([0,d]\).
+
+  Inoltre, gli operatori \(CTL\) omessi, come \(EF\), \(AF\), \(EG\) e \(AG\) verranno utilizzati come abbreviati di \(E(true U_I \phi)\), \(A(true U_I \phi)\), \(E(\phi U_I true)\) e \(A(\phi U_I true)\).
+\end{note}
+
+\begin{warning}{}
+  Come già sottolineato nella \Cref{def:next}, l'operatore \(X\) non è definito in \(TCTL\): la sua semantica è ben definita solo in contesti a tempo discreto.
+\end{warning}
+
+L'unica differenza semantica di \(TCTL\) rispetto a \(CTL\) è quindi negli operatori temporali, che devono essere interpretati tenendo conto del tempo trascorso. In particolare, la semantica di \(E\phi_1 U_I \phi_2\) e \(A\phi_1 U_I \phi_2\) è definita come segue:
+\begin{definition}{Semantica di \(E\phi_1 U_I \phi_2\) e \(A\phi_1 U_I \phi_2\)}
+  Sia \(M = \langle S,\ \Sigma\cup\set{\tau},\ \to,\ Init,\ AP,\ \lambda\rangle\) un transition system temporizzato e sia \(\pi = s_0 s_1 \ldots\) un percorso divergente in \(M\) con ritardi \(d_0, d_1, \ldots\). Allora:
+  \begin{itemize}
+    \item \(M, s_0 \models E\phi_1 U_I \phi_2\) se esiste un percorso divergente \(\pi = s_0 s_1 \ldots\) e un indice \(i\) tale che \(s_i + d \models \phi_2\), per qualche \(i \in \N\) e \(d \in [0,d_i]\) tale che \(\sum_{k=0}^{i-1} d_k + d \in I\), e \(\forall j \leq i\) vale \(s_j + d' \models \phi_1\lor \phi_2\) per ogni \(d' \in [0,d_j]\) con \(\sum_{k=0}^{j-1} d_k + d' \leq \sum_{k=0}^{i-1} d_k + d\);
+    \item \(M, s_0 \models A\phi_1 U_I \phi_2\) se per ogni percorso divergente \(\pi = s_0 s_1 \ldots\) esiste un indice \(i\) tale che \(s_i + d \models \phi_2\), per qualche \(i \in \N\) e \(d \in [0,d_i]\) tale che \(\sum_{k=0}^{i-1} d_k + d \in I\), e \(\forall j \leq i\) vale \(s_j + d' \models \phi_1\lor \phi_2\) per ogni \(d' \in [0,d_j]\) con \(\sum_{k=0}^{j-1} d_k + d' \leq \sum_{k=0}^{i-1} d_k + d\).
+  \end{itemize}
+\end{definition}
+
+Queste definizioni ricalcano la semantica di \(E\phi_1 U \phi_2\) e \(A\phi_1 U \phi_2\) vista in \(CTL\), con l'aggiunta di due dettagli fondamentali:
+\begin{itemize}
+  \item La soddisfazione non avviene più semplicemente in uno stato \(s_i\), ma in un istante \(s_i + d\) compreso nell'intervallo di tempo in cui il sistema resta in \(s_i\);
+  \item Non è richiesta più la soddisfazione di \(\phi_1\) in tutti gli stati \(s_j\) precedenti, bensì è richiesta la soddisfazione di \(\phi_1 \lor \phi_2\).
+\end{itemize}
+
+Questi due rilassamenti di vincoli sono fondamentali per far si che logica catturi esattamente le proprietà temporizzate che ci interessano. In particolare, queste modifiche risultano utili in presenza di intervalli \(I\) non allineati con gli istanti in cui il sistema cambia stato.
+
+Si consideri ad esempio una traccia in cui il sistema è in uno stato etichettato da \(\phi_1\) per \(1\) unità di tempo, per poi passare in uno stato etichettato da \(\phi_2\) per \(2\) unità di tempo. Intuitivamente, la formula \(E\phi_1 U_{[2,3]} \phi_2\) dovrebbe valere, in quanto nell'intervallo di tempo \([2,3]\) il sistema si trova in uno stato etichettato da \(\phi_2\), e prima che diventi vera \(\phi_2\) il sistema si trova in uno stato etichettato da \(\phi_1\). Tuttavia, se si richiedesse la semplice soddisfazione di \(\phi_1\), si vedrebbe questa stessa traccia non soddisfare la formula poiché nell'intervallo di tempo \([1,2]\) il sistema si trova in uno stato etichettato da \(\phi_2\), e dunque non soddisfa \(\phi_1\). La modifica della semantica permette dunque di catturare correttamente la proprietà desiderata.
+
+Veniamo infine al problema del model checking: data una formula \(\phi\) in \(TCTL\) e un automa temporizzato \(TA\), vogliamo verificare se \(TA \models \phi\). Chiaramente, come per \(CTL\), il problema equivale a verificare se \(TA, \ell \models \phi\), per ogni \(\ell \in Loc_0\) di \(TA\).
+
+Chiaramente, se tutti i vincoli temporali in \(\phi\) sono espressi dall'intervallo banale \([0,\infty[\), il problema si riduce al model checking di \(CTL\) sul region automaton di \(TA\).
+
+Per quanto riguarda invece la verifica di formule con vincoli temporali non banali, il problema fortunatamente si riduce al model checking di \(CTL\) modificando opportunamente l'automa temporizzato. Dato un automa temporizzato \(TA\) infatti, possiamo costruire un automa temporizzato \(TA\oplus z = \langle \Loc , \Loc_0, C \cup \set{z}, \Sigma, \to, Inv,AP,\lambda \rangle\) con \(z\) clock aggiuntivo che non compare in alcuna guardia o invariante di \(TA\) e che non viene mai resettato. In questo modo è possibile trasportare i vincoli temporali della formula \(\phi\) in \q{guardie} su \(z\), da considerarsi resettato all'inizio di ogni run. 
+
+Formalmente, si può vedere che:
+\begin{itemize}
+  \item \(TS_{TA},s\models E(\phi_1 U_I \phi_2) \iff TS_{TA\oplus z},s\models E((\phi_1\lor \phi_2) U_I (z \in I \land \phi_2))\)
+  \item \(TS_{TA},s\models A(\phi_1 U_I \phi_2) \iff TS_{TA\oplus z},s\models A((\phi_1\lor \phi_2) U_I (z \in I \land \phi_2))\)
+  \item \(TS_{TA},s\models EF_I \phi \iff TS_{TA\oplus z},s\models EF(z \in I \land \phi)\)
+  \item \(TS_{TA},s\models AG_I \phi \iff TS_{TA\oplus z},s\models AG(z \in I \to \phi)\)
+\end{itemize}
+
+Senza entrare troppo nei dettagli, è facile mostrare che \(\phi_2\) sia soddisfatta in un istante compreso in \(I\) con \(\phi_1\) sempre vera prima è equivalente a soddisfare \(\phi_2\) in uno stato in cui \(z\) è compreso in \(I\) e \(\phi_1\) o \(\phi_2\) sono sempre veri prima.
+
+Chiaramente, nella costruzione del region automaton di \(TA\oplus z\) va consideratra la presenza del clock \(z\) e le sue guardie, ma di fatto ciò aumenta solo di una dimensione lo spazio da partizionare in regioni. Tale aggiunta può essere fatta facilmente considerando \(z\) come un clock qualsiasi, con costante massima \(c_z = \sup(\bigcup_{I \in \phi} I)\), ovvero il massimo estremo superiore di tutti gli intervalli temporali presenti nella formula \(\phi\).
+
+\section{Cenni sugli automi ibridi}
+
+Il tempo non è l'unica grandezza continua nel mondo reale. Molti sistemi, infatti, integrano componenti fisiche e digitali, come i controllori digitali che governano sistemi fisici o i sistemi biologici, i quali mescolano tipicamente evoluzioni discrete e continue. Ad esempio, per ottenere un modello più preciso della sbarra nell'esempio del passaggio a livello, bisognerebbe considerare che il tempo necessario per abbassarla dipende dalla velocità del motore e dall'accelerazione gravitazionale. Poiché gli automi temporizzati possono solamente approssimare tali sistemi, sono necessari modelli più precisi per descriverli in modo accurato, noti come \keyword{Automi Ibridi}.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{_images/hybrid_automata_example.png}
+  \caption{Modello di automa ibrido.}
+\end{figure}
+
+\begin{definition}{Sintassi degli Automi Ibridi}
+
+  Un keyword{automa ibrido} è definito formalmente dai seguenti elementi costitutivi:
+  \begin{itemize}
+    \item Un insieme \(L\) di locazioni.
+    \item Un insieme \(E\) di archi.
+    \item Un insieme \(X\) di variabili \(k\)-continue, definite sullo spazio \(\R^k\).
+  \end{itemize}
+  
+  Per ogni locazione \(l \in L\), il modello specifica:
+  \begin{itemize}
+    \item \textbf{Stati iniziali}: definiti tramite una regione \(Init(l)\).
+    \item \textbf{Invariante}: definito tramite una regione \(Inv(l)\).
+    \item \textbf{Dinamica continua}: un'equazione differenziale che descrive il flusso \(\dot{X} \in Flow(l)(X)\) (ad esempio, \(\dot{x} = x^{-1}\)), la quale governa l'evoluzione delle variabili continue mentre il sistema permane nella locazione.
+  \end{itemize}
+  
+  Per ogni arco \(e \in E\) da una locazione \(l\) a una locazione \(l'\), si definiscono:
+  \begin{itemize}
+    \item \textbf{Guardia}: una regione \(Guard(e)\) in \(\R^k\) che la valutazione corrente deve soddisfare per abilitare la transizione.
+    \item \textbf{Relazione di aggiornamento}: indicata come \(J(X,X')\) su \(\R^k \times \R^k\), che determina i nuovi valori delle variabili a seguito del salto discreto.
+    \item \textbf{Etichette di sincronizzazione}: che trasportano le informazioni per la comunicazione.
+  \end{itemize}
+\end{definition}
+
+La semantica degli automi ibridi si fonda su uno spazio degli stati definito dal prodotto cartesiano \(L \times \R^k\), dove una generica regione è rappresentata da un sottoinsieme di \(\R^k\).
+
+Gli stati effettivi del sistema sono coppie \((l,x)\) tali per cui la funzione \(x: X \to \R\) soddisfa l'invariante \(Inv(l)\) della locazione corrente. L'inizializzazione del sistema è vincolata agli stati \((l,x)\) in cui la valutazione \(x\) soddisfa \(Init(l)\).
+
+L'evoluzione dinamica del sistema ammette due tipi distinti di transizioni di stato:
+\begin{itemize}
+  \item \textbf{Scambi discreti (Discrete switches)}: una transizione istantanea \((l,x) \xrightarrow{a} (l',x')\) può avvenire se esiste un arco \(e\) etichettato con \(a\) da \(l\) a \(l'\) tale che \(x\) soddisfi \(Guard(e)\) e il passaggio \((x,x')\) soddisfi la relazione di aggiornamento (indicata anche come \(Jump(e)\)).
+  \item \textbf{Flussi continui (Continuous flows)}: un'evoluzione temporale \((l,x) \xrightarrow{f} (l,x')\) è governata da una funzione continua \(f\) definita sull'intervallo temporale \([0, \delta]\) tale per cui \(f(0) = x\) e \(f(\delta) = x'\). Affinché il flusso sia valido, per l'intera durata dell'intervallo (\(\forall t \leq \delta\)), la funzione \(f(t)\) deve rispettare rigorosamente l'invariante \(Inv(l)\) e la sua derivata \(\dot{f}(t)\) deve conformarsi alla legge di flusso \(Flow(l)(f(t))\).
+\end{itemize}

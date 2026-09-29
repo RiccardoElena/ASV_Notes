@@ -1,0 +1,533 @@
+\chapter{Lezione 11/03}
+
+In una struttura di Kripke, la funzione L associa a ogni stato un modello proposizionale che rappresenta le proprietà atomiche vere in quello stato.
+Possiamo quindi definire un concetto di soddisfacibilità locale, ovvero in uno stato.
+
+
+Dobbiamo comunque avere dei sistemi per mappare i sistemi in grafi. Per sistemi complessi sarà necessario decomporre il sistema in buildibg block più semplici.
+I building block \q{atomici} sono i Program Graph, che sono definiti da un insieme di variabili \(\Var = \set{v_1,\ldots,v_k}\) con dominio \(D = \bigcup_{1,\ldots,k} D_i\), con \(D_i\) dominio di \(v_i\).
+
+In particolare un Program Graph è una sestupla \((\Loc,\Act,\Eff,\hookrightarrow , \Loc_0, g_0)\) dove:
+\begin{itemize}
+  \item \(\Loc\) è un insieme di locazioni o stati di controllo, (dominio del program counter)
+  \item \(\Act\) l'insieme delle azioni che modificano lo stato del programma
+  \item \(\Eff : \Act\times \Eval(\Var) \to \Eval(\Var)\) è una funzione
+  \item \(\hookrightarrow \subseteq \Loc \times \Cond(\Var) \times \Act \times \Loc\) è la relazione di transizione
+  \item \(\Loc_0 \subseteq \Loc\) è l'insieme delle locazioni iniziali
+  \item \(g_0 \in \Eval(\Var)\) è una condizione che le variaibili devono soddisfare all'inizio dell'esecuzione
+\end{itemize}
+La relazione di transizione \(\hookrightarrow\) è una relazione che collega due locazioni tramite una condizione sulle variabili, (in un certo senso collegando \q{temporalmente} locazioni o righe del programma),detta anche guardia ovvero la verifica di una certa proprietà sulle variabili, e un'azione.
+La guardia mi dice se è possibile eseguire la transizione, e l'azione mi dice come modificare le variabili quando eseguo la transizione.
+
+La funzione \(\Eff\) invece descrive la semantica delle azioni: prende in input un'azione e deve associare una trasformazione del valore delle variabili prima e dopo l'azione. In altre parole collega \q{temporalmente} stati delle variabili.
+Per fare ciò è necessario introdurre un concetto di valutazione delle variabili, e per farlo usiamo \(\Eval\), un insieme di funzioni che mappano ogni variabile al suo valore, rendendo \(\Eval\) l'insieme di tutte le possibili configurazioni delle variabili.
+
+\(\Act\) e \(\Cond\) sono definite sulla base del concetto di espressioni \(\Expr(\Var\cup D)\). Questa dipende dai domini delle variabili, se prendiamo ad esempio le espressioni aritmetiche abbiamo \(v+1\).
+Le condizioni sono dunque valutazioni tra espressioni del tipo \(\expr_1 \cdot \expr_2\), con \(\cdot\) dipendende dal dominio (per aritmetica \(=, \neq, <, > ecc\)), eventualmente anche con operatori logici.
+Le azioni su \(\Var\) è l'insieme degli assegnamenti, ovvero espressioni del tipo \(v := \expr\).
+
+\todo{Esempio vending machine.}
+
+Possiamo notare che i grafi sottostanti a questo e all'esempio precedente sono isomorfi, ma i due ogetti sono diversissimi, poiché il secondo sta descrivendo un LTS con stati infiniti (essendo il dominio delle variabili infinito).
+È possibile però \q{compilare} un ogetto del genere in una Kripke Structure, ma è necessaria la funzione \(\Eff\) per definire la semantica delle azioni.
+Questa compilazione di fatto \q{da semantica} a questa struttura.
+
+Per lo spazio degli stati questo equivale ad \(\Eval(\Var)\) (variabili esplicite) e \(\Loc\) (variabili implicite, ovvero il program counter).
+
+Formalmente una valutazione in \(\Eval\) è una funzione \(\eta: \Var \to D\), ognuna di questa può essere rappresentata con una tupla lunga col numero di variabile, che accoppiata con una locazione \(l\) rappresenta uno stato del sistema, e dunque un nodo del grafo orientato sottostante.
+
+Quindi nella Kripke Structure sottostante, \(S = \Loc \times \Eval(\Var)\).
+
+Col concentto di \(\Eval(\Var)\) definito possiamo parlare meglio di \(\Eff\). Data \(\eta \in \Eval(\Var)\) e un azione della forma \(a \overset{\text{def}}{=} v := \expr\), con \(\expr \in \Var \cup D\) allora l'effetto dell'azione è
+\[\Eff(a,\eta)=\eta[v\leftarrow \expr]\]
+con
+\[\eta[v\leftarrow \expr] = \eta'\]
+dove
+\[\eta' (x)= \begin{cases}
+    \expr   & \text{se } x = v  \\
+    \eta(x) & \text{altrimenti}
+  \end{cases}\]
+
+Questa definizione non è ben definita perché ci vuole un concectto di valutazione dell'espressione \(\expr\) in \(\Eval(\Var)\). In altre parole un \(\Val(\expr, \eta) \in D\), da definire per induzione strutturale sulla struttura delle espressioni.
+I casi base sono costanti e le variabili (valutate con \(\eta\)). Il resto dipende dalla semantica degli operatori.
+
+Quindi per essere precisi la definizione di \(\Eff\) è la seguente:
+\[\Eff(a,\eta)=\eta[v\leftarrow \Val(\expr, \eta)]\]
+con
+\[\eta[v\leftarrow \Val(\expr,\eta)] = \eta'\]
+dove
+\[\eta' (x)= \begin{cases}
+    \Val(\expr,\eta) & \text{se } x = v  \\
+    \eta(x)          & \text{altrimenti}
+  \end{cases}\]
+
+Per definire ora la funzione di transizione dovremmo definire quali stati sono collegati da una transizione basandoci su \(\hookrightarrow\) e \(\Eff\).
+
+In particolare definiamo la relazione di transizione \(\xrightarrow{} \subseteq S \times \Act \times S\) tale che:
+\begin{itemize}
+  \item Se \(l \xhookrightarrow{g:a} l' \) è nel \(PG\) e \(\eta \models g\) allora \(\angle{l,\eta} \xrightarrow{a} \angle{l',\eta'}\) è nella relazione di transizione, con \(\eta' = \Eff(a,\eta)\).
+\end{itemize}
+
+Gli stati iniziali sono definiti come \(S_0 = \set{\angle{l, \eta}[l \in \Loc_0 \land \eta \models g_0]}\)
+
+Infine per l'etichettatura, definiamo con \(AP = \Loc \cup \Cond(\Var)\) e \(L : S \to 2^{AP}\) tale che \(L(\angle{l,\eta}) = \set{l} \cup \set{g \in \Cond(\Var)}{\eta \models g}\).
+
+Fatto ciò, abbiamo definito il linguaggio per definire i componenti, ma questo è poco più di un programma sequenziale. Un po' di più perché da possibilità di scelte non deterministiche.
+Per sistemi complessi è però molto difficile specificarli per intero.
+
+Dunque l'approccio più comunque è quello di specificali tramite composizione di componenti più semplici, che interagiscono in modo sequenziale o concorrente.
+La concorrenza è modellabile in tantissimi modi diversi. Esempi da trascrizione.
+
+La composizione parallela sincrona è facile da definire. Dati \(TS_1, \ldots, TS_n\) sistemi a transizione tali che \(TS_i = (S_i, S_{0i}, A_i, R_i)\) con \(S_i\) disgiunti, allora la composizione parallela sincrona è il sistema a transizioni \(TS = (S,S_0,R,L)\) con:
+\begin{itemize}
+  \item \(S = S_1 \times \ldots \times S_n\)
+  \item \(S_0 = S_{01} \times \ldots \times S_{0n}\)
+  \item \(A = A_1 \cup \ldots \cup A_n\)
+  \item \(R \subseteq S \times A \times S\) è taòe che, dati \(\angle{s_1, \ldots, s_n}, \angle{s_1', \ldots, s_n'} \in S\) e \(\angle{a_1,\ldots, a_n} \in A\) contiene \(\angle{s_1,\ldots,s_n}\xrightarrow{\angle{a_1,\ldots,a_n}}\angle{s_1',\ldots,s_n'}\) se \(s_i \xrightarrow{a_i} s_i', \forall i \in \set{1,\ldots,n}\).
+\end{itemize}
+
+\chapter{Lezione 18/03}
+
+Se da un lato ci sono i modelli completamenti sincroni dall'altra ci sono quelli completamente asincroni, che generalizzano quelli in cui alcuni si sincronizzano e altri no.
+
+Per farlo in maniera semplice possiamo usare il modello di composizione sincrona ma aggiungendo ad ogni insieme di azioni locali una no operation \(-\) per permettere a ogni automa locale di effettuare un'azione vacua.
+
+Va ovviamente rilassata nella definizone della relazione di transizione globale il vincolo che ogni azione globale sia composta da azioni locali, e invece dire che ogni azione globale è composta da azioni locali o no operation, ma in questo caso lo stato locale di partenza e lo stato locale di arrivo devono essere uguali.
+
+Questo porta chiaramente ad essere raggiungibili stati che precedentemente poteva non esserlo. Questo modello però permette di esprimere sia comportamenti sincroni che asincroni che comportamenti intermedi, e dunque è più generale.
+
+Inoltre questo tipo di modello con asincronismo virtuale è esattamente come vengono gestiti nella pratica i processi concorrenti, infatti come sott'insieme di questo modello abbiamo la composizione asincrona con interleaving, in cui c'è composizione completamente asincrona e ogni azione globale è composta da una sola azione locale e no operation per gli altri stati in maniera non deterministca.
+
+Ovviamente in questo modello non è inficiata la raggiungibilità di stati, ma non vi è vero parallelismo.
+
+\todo{Esempio <ok,ok>, }
+
+Una formulazione equivalente del modello asincrono con interleaving più compatto è quella di avere come insieme delle azioni l'unione disgiunta degli insiemi di azioni locali, ad esempio avendo le azioni rappresentate come coppie \(\angle{i,a}\) con \(i\) indice dell'automa locale e \(a\) azione locale. Allora possiamo appropriamente riformulare la relazione di transizione come da slide.
+
+Questo è un introduzione al concetto di composizione sincrona e asincrona (con interleaving).
+
+Noi avevamo però dei Program Graph per descrivere i componenti, che poi venivano \q{compilati} in LTS. Abbiamo visto come fare composizione di LTS, ma per i program graph dobbiamo modellare la possibilità di poter condividere informazioni.
+
+Nel mondo degli LTS però non c'è il concetto di variabile. Quindi l'approccio di tradurre vari PG in LTS separatamente per poi comporli non è necessariamente corretto, poiché nel passaggio da PG a LTS si perde il concetto di variabile e dunque di condivisione di variaibli.
+
+Dunque questa fusione va fatta a livello di PG, ma allora la composizione va fatta a livello di PG, e dunque è necessario definire una composizione di PG.
+
+Interleaving Program Graph
+
+Dato un insieme di program graph, definiamo l'insieme delle variabili globali come l'unione di tutte le variabili dei PG (NON DISGIUNTA)\footnote{Si assume che se due variabili hanno lo stesso nome sono condivise, se non lo erano andavano disambiguate prima. Una definizione alternativa tiene conto di variabili non condivise con lo stesso nome ma è inutilmente più complesso}.
+
+L'insieme delle locazioni, come le locazioni iniziali sono il prodotto cartesiano. Per le azioni possiamo tranquillamente avere l'unione disgiunta. Per le guardie iniziali invece abbiamo la congiunzione di tutte le guardie iniziali.
+
+Dobbiamo dunque definire le transizioni, ma sono definite come negli LTS, mentre per \(\Eff\) è più complesso.
+
+Abbiamo a disposizione solo le \(\Eff_i: \Act_i \times \Eval(\Var_i)\to \Eval(\Var_i)\). Dobbiamo definire \(\Eff_i:\biguplus \Act_i \times \Eval(\bigcup\Var_i)\to \Eval(\bigcup\Var_i) \).
+
+Andiamo a definire le restrizioni delle \(\eta\), \(\eta_i\).
+
+Troppo veloce, guarda slide.
+
+Esempi mutua esclusione.
+
+C'è un problema di fairness. A noi non interessa come uno scheduler implementi la fairness, purché mi garantisca una certa fairness.
+
+Dobbiamo capire come introdurre dei vincoli di fairness, senza però inserire nel modello uno specifico scheduler.
+
+Per fare ciò quindi non possiamo andare a modificare l'LTS, piuttosto dobbiamo avere un filtro sulle possibili esecuzioni, avendo quindi un algoritmo di analisi che ignori le computazioni che non rispettano i vincoli di fairness.
+
+Ci sono tipi diversi vincoli di fairness:
+\begin{description}
+  \item[Fairness incondizionata:] ogni processo dev'essere schedulato infinitamente spesso.
+  \item[Fairness debole:] se un processo è continuamente abilitato, allora deve essere schedulato infinitamente spesso.
+  \item[Fairness forte:] se un processo è abilitato infinitamente spesso, allora deve essere schedulato infinitamente spesso.
+\end{description}
+
+La fairness incondizionata è troppo debole, poiché non garantisce che quando un processo viene schedulato sia abilitato a fare qualcosa. La fairness debole è più ragionevole, ma ancora non è sufficiente, poiché richiede che al processo è richiesto di essere continuamente abilitato, che è una richiesta molto forte.
+
+\chapter{Lezione 25/03}
+
+Un concetto a cui bisogna stare attenti durante la modellazione è quello dell'atomicità. Un'azione atomica si traduce banalmente in una transizione, ma ciò implica che si è modellato adeguatamente in modo che il sistema concreto possa trattare come atomico ogni cosa che è stato modellato con un unica transizione.
+
+Un tipico esempio è l'operazione di incremento, che potrebbe essere atomica come no, quindi in base al sistema concreto è possibile modellarlo con una transizione o meno.
+
+Approfondiremo più avanti.
+
+Esistono anche contesti di comunicazione con scambio di messaggi. Se stiamo modellando una singola macchina, questa è effettivamente implementata usando una stessa memoria, e quindi le variabili condivise sono equivalenti, ma se stiamo parlando di diverse macchine già è diverso.
+
+L'idea per modellare questo è usare dei simboli condivisi di comunicazione che etichettano le azioni che rappresentano l'invio o la ricezione di un messaggio.
+
+Quindi definisco \(Sync = A_1 \cap A_2\) insieme delle azioni sincronizzanti. Affinché uno dei due possa fare un azione in \(Sync\) c'è bisogno che entrambi la facciano, in modo che quell'azione sia in parallelismo reale.
+
+Tale modello è detto di sincronizzazione via handshake.
+
+La differenza sul \(TS\) composto è che l'insieme di azioni \(A \subset Sync \cup (A\cup\set{-}\setminus Sync)\times(A\cup\set{-}\setminus Sync)\) e la relazione di transizione è tale che \(\langle s_1,s_2\rangle \xrightarrow{a} \langle s_1',s_2'\rangle\) se \(a \in Sync\) e \(s_1 \xrightarrow{a} s_1'\) e \(s_2 \xrightarrow{a} s_2'\) oppure \(a = \langle a_1, a_2\rangle \in A\) e \(s_o\xrightarrow{a_1} s_i'\) per \(i \in \set{1,2}\) se \(a_i \neq -\) o % completa
+
+Un modo tipico è avere handshake con arbitro, in cui compongo oltre ai due processi anche un arbitro che gestisce la comunicazione, e dunque i processi non comunicano direttamente tra loro ma tramite l'arbitro.
+
+Per portarlo a livello di PG si parla di Channel system. Sono essenzialmente dei program graph, in cui le variabili sono tutte locali ma ho dei canali di comunicazione tra i processi.
+
+\chapter{Lezione 1/04}
+
+Vogliamo introdurre un linguaggio per descrivere sistemi che operano con tempo continuo.
+
+Supponiamo di voler progettare un controllore per un passaggio a livello.
+
+Questo sistema ha una parte digitale, che è quella del controllore, e una parte analogia che sono gli attuatori e i sensori.
+
+Possono essere rappresentate da questi transition system.
+\todo{Aggiungi immagini}
+
+Se usiamo il modello classico sarebbe semplicemente composizione asincrona con interleaving, ma questo porterebbe a dei comportamenti ammessi dal modello ma non desiderabili.
+
+\todo{Immagine computation tree}
+
+Quello che vorremmo e che il treno mandi il segnale di essere vicino sufficientemente prima che arrivi al passaggio a livello, e quindi è necessario poter specificare che le azioni impieghino un certo tempo per essere eseguite, che certe azioni possono essere abilitate solo dopo un certo tempo o che certe azioni devono impiegare al più un certo tempo per essere eseguite.
+
+\todo{Immagine con tempistiche}
+
+In questo modo, se vengono garantite queste tempistiche, allora il comportamento non desiderabile non è più ammesso, e dunque il modello è più preciso.
+
+\todo{Immagine con tempistiche e computation tree}
+
+\begin{note}{}
+  Nonostante abbiamo due vincoli su una transizione sincronizzante, è importante a livello di modellaizone che siano due e su sottomodelli diversi, piuttosto che accorparli in un unico vincolo.
+
+  Questo perché nella fase di modellazione è importante che ogni sottomodello si occupi di descrivere il sottocomponente specifico e le sue caratteristiche, e dunque è importante che ogni sottomodello si occupi solo dei vincoli del componente che sta modellando.
+
+  Il comportamento complessivo del sistema poi dev'essere corretto grazie a proprietà emergenti dalla composizione dei sottomodelli.
+\end{note}
+
+Andiamo a introdurre gli automi temporizzati, come estensione degli automi a stati finiti.
+
+Come per gli automi a pila, prendiamo un automa a stati finiti e aggiungiamo una struttura dati, in questo caso prendiamo un automa a stati finiti e aggiungiamo dei cronometri (o clock), che sono delle variabili i cui valori sono numeri reali non negativi, e che può essere scritto solo in un certo modo, ovvero possono essere resettati a zero o lasciati invariati, ma non possono essere assegnati a valori arbitrari.
+
+Possiamo vedere il clck matematicamente come una funzione \(C: \R^+ \to \R^+\) che è in funzione del tempo reale, tale che \(\frac{d x(t)}{t} = 1\).\footnote{L'importante peril valore di questa derivata è che sia una costante positiva uguale per tutti i clock, ovvero che tutti i clock crescano alla stessa velocità. In tal senso si può prendere tale costante come unità di misura del tempo, e dunque si può assumere che sia \(1\) senza perdita di generalità.} Le transizioni possono avere guardie, le quali possono essere vincoli sui clock. Per semplicità di trattazione, consideriamo solo guardie riguardo ai clock, nonostante in linea di principio le guardie viste in precedenza sono ancora ammesse. Come già detto, l'unica azione che le transazioni possono effettuare sul clock è resettarli a zero.
+
+\begin{note}{}
+  Questo modelo è aperto a molte estensioni utili in diverse situazioni, come ad esempio guardi che comprendono l'interazione tra diversi clock:
+  \begin{itemize}
+    \item vincoli triangolari, ad esempio \(x-y \leq c\). Questi vincoli non cambiano l'espressività dei modelli.
+    \item possibilità di vincoli con somma o prodotti come \(x+y \leq c\), questi invece aumentano l'espressività dei modelli e la complessita dei problemi di decisione.
+    \item possibilità di resettare un clock a un valore diverso da zero, ad esempio \(x := c\). Anche questo non aumenta l'espressività dei modelli o la complessità dei problemi di decisione.
+    \item possibilità di resettare un clock per farlo partire da un valore di un altro clock, ad esempio \(x := y\). Questo invece aumenta l'espressività dei modelli o la complessità dei problemi di decisione.
+  \end{itemize}
+
+  In generali i vincoli introdotti per i timed automata sono rilassabili per avere più succintezza, ma non espressività senza esplosione della complessità.
+\end{note}
+
+I vincoli sui clock \(\phi(X)\) sono:
+
+\[\phi ::= \top \mid x<c\mid x\leq c\mid x > c \mid x \geq c \mid \phi \land \phi\]
+
+Si noti che non è ammessa la negazione (per quello sono aggiunti tutti i possibili confronti di disuguaglianza) e che non è presente la disgiunzione, perché questa è modellata tramite più transizioni avente come guardie i diversi disgiunti che compongono la disgiunzione. Le costanti \(c\) sono invece di un dominio numerabile, ad esempio \(c \in \N\) o \(c \in \Q\), ma non è possibile avere \(c \in \R\) poiché questo porterebbe a problemi di rappresentazione e computazione.
+
+Un'automa temporizzato è quindi definito come
+\[TA = \langle\Sigma, \Loc, \Loc_0,C,\delta,F\rangle\]
+
+Dove \(\Sigma\) è l'alfabeto, \(\Loc\) è l'insieme delle locazioni, \(\Loc_0\) è l'insieme delle locazioni iniziali, \(C\) è l'insieme dei clock, \(\delta \subseteq \Loc \times \Sigma \times \phi(C) \times 2^C \times \Loc\) è l'insieme delle transizioni, e \(F\) è l'insieme delle locazioni finali. Da un punto di vista diagrammatico, una transizione è rappresentata come etichetta con \(t, \phi, a\), dove \(t\) è il trigger, ovvero il simbolo di alfabeto che deve essere letto per poter effettuare la transizione, \(\phi\) è la guardia sui clock che deve essere soddisfatta per poter effettuare la transizione, e \(a\) è l'azione che viene effettuata.
+
+\todo{Aggiungi immagine esempio interruttore}
+
+Questo modello manca ancora di qualcosa. Infatti ci permette di impedire che una transizione avvenga prima di un certo tempo o dopo, e che quindi sia abilitata in un certo intervallo di tempo, ma non ci permette di esprimere che una transizione debba avvenire per forza entro un certo tempo, ovvero che se è abilitata allora deve essere effettuata entro un certo tempo.
+
+Vediamo prima però la semantica, ovvero il transition system associato a un automa temporizzato.
+Lo stato è ovviamente una tupla \(\langle l, \nu\rangle\) con \(l \in \Loc\) e \(\nu: C \to \R^+\) che è una funzione di valutazione dei clock.
+
+Dobbiamo quindi definire la relazione di transizione tra stati, che può essere dovuta sia da un simbolo di alfabeto che dal passare del tempo. Quindi \(\Act = \Sigma \cup \R^+\), che porta ad avere due tipi di transizioni, quelle discrete etichettate con simboli di \(\Sigma\) da un \(\langle l,\nu \rangle\) a un \(\langle l',\nu' \rangle\), poiché è possibile azzerare alcuni clock e cambiano locazione, e quelle di passaggio del tempo etichettate con un \(d \in \R^+\) da un \(\langle l,\nu \rangle\) a un \(\langle l,\nu + d\rangle\), in cui non cambia la locazione ma i clock aumentano di \(d\).
+
+In particolare per le transizioni discrete, in \(\delta\) deve esserci una transizione \(l \xrightarrow{t, \phi, a} l'\) tale che \(t\) è il simbolo di alfabeto che viene letto, \(\nu\models\phi\), che dobbiamo definire, e un \(\Eff\) che cambia la valutazione, prendendo in input un insieme di clock da resettare \(\lambda\), e dunque \(\Eff(\lambda, \nu) = \nu[\lambda \to 0]\), dove per \(\nu[\lambda \to 0]\) si intende una nuova funzione \(\nu'\) tale che:
+\[\nu'(x) = \begin{cases}
+    0      & ,x \in \lambda      \\
+    \nu(x) & ,\text{ altrimenti}
+  \end{cases}\]
+
+Per \(\nu\models\phi\) è semplice, per le condizioni atomiche è sufficiente sostituire \(x\) con \(\nu(x)\) e verificare se la disuguaglianza è soddisfatta, mentre per le congiunzioni è necessario verificare che siano soddisfatte entrambe le formule.
+
+Per quelle di passaggio del tempo, invece, è necessario definire \(\Eff(d,\nu) = \nu + d\), dove per \(\nu + d\) si intende una nuova funzione \(\nu'\) tale che \(\nu'(x) = \nu(x)+d\), \(\forall x \in C\).
+
+\chapter{Lezione 15/04}
+
+In termini di teoria dei linguaggi questi automi ci permettono di esprimere linguaggi temporizzati, in cui gli elementi delle parole sono dette segnali, ovvero coppie di un simbolo di alfabeto e un istante di tempo in cui tale simbolo viene emesso. In tal senso i run di un automa temporizzato su una traccia temporizzata è una sequenza di transizione del transition system come in figura
+
+\todo{Vedi slide, aggiungi immagini}
+
+Ovviamente nei percorsi temporizzati per ogni percorso tra due transizioni discrete ci sono infiniti altri sottopercorsi che sezionano la transizione temporale in sotto transizioni con ritardi la cui somma è la stessa della transizione originale.
+
+In particolare per ogni transizione con ritardo \(d\), esiste una coppia di transizioni con ritardo \(d_1\) e \(d_2\) equivalente per ogni coppia tale che \(d=d_1+d_2\).
+
+Per questi automi è possibile avere transizioni discrete solo con stimoli esterni, per fare in modo di avere una transizione spontanea dobbiamo aggiungere le \(\tau-\)transizioni, ovvero aggiungere un simbolo di alfabeto \(\tau\) che indica una transizione che avviene senza stimolo esterno. A differenza delle \(\epsilon-\)transizioni negli automi a stati finiti, le \(\tau-\)transizioni aumentano il potere espressivo degli automi temporizzati.
+
+Questo lo possiamo vedere nell'automa temporizzato con \(\tau-\)transizioni sottostante.
+
+Nessun automa temporizzato senza \(\tau-\)transizioni può riconoscere lo stesso linguaggio di questo automa, perché la transazione spontanea azzera il clock, permettendo di accettare tutte le parole del tipo \((a,t_1)(a,t_2)\ldots(a,t_n)\ldots\) con \(t_i \in \N\). Questo perché a ogni istante di tempo intero il clock può essere azzerato, potendoli quindi scandire tutti. Non avendo la possibilità di azzerare il clock in maniera spontanea invece non sarebbe possibile scandire il clock, perché potrei solamente valutare che c'è un intero specifico di distanza fra due clock, ma non di azzerarli in modo da poter scandire tutti gli interi.
+
+Dobbiamo ancora capire come forzare l'avvenimento di una transizione. Queste \(\tau-\)transizioni per ora ci permettono solo di dare la possibilità che avvenga, non forzano l'automa a effettuarla.
+
+Per fare ciò, si introduce una funzione detta di invariante \(Inv: \Loc \to \Phi(C)\) che associa un vincolo sui clock a ogni locazione, la cui semantica è di limitare il tempo che è possibile trascorrere in una locazione, ovvero se \(Inv(l) = x \leq c\) allora è possibile rimanere in \(l\) solo per un tempo al più \(c\). Il senso è forzare che ogni percorso che non rispetti l'invariante termini, ovvero che ogni percorso che non la rispetta sia considerata un'esecuzione spuria del sistema.
+
+Ovviamente non è tutto rose e fiori, perché l'introduzione di questa invariante può portare all'interruzione del sistema, che in linea di principio può introdurre condizioni simili al deadlock, detta timelock, in cui il sistema deve evolvere perché sta per andare a incontro a una deadline dovuta a una invariante ma tutte le transizioni sono disabilitate e quindi non può fare niente.
+
+Dobbiamo aggiornare la semantica per introdurre questa invariante, in particolare inserendo transizioni di passaggio del tempo solo se tale passaggio soddisfa l'invariante, ovvero se \(\nu + d \models Inv(l)\). Per quando riguarda le transizioni discrete invece, è invece necessario assicurarsi che la valutazione del clock dopo l'effetto della transizione soddisfi l'invariante, ovvero che \(\nu' \models Inv(l')\).
+
+L'aggiunta delle invarianti ci permette quinidi di modellare le durate delle azioni, oltre che hai ritardi già espressi dalle guardie.
+
+Per quanto riguarda la composizione di automi temporizzati, avendo considerato il caso senza variabili, possiamo utilizzare il modello di sincronizzazione con handshaking, in cui le transizioni sincronizzanti sono quelle che hanno lo stesso simbolo di alfabeto, mentre le altre transizioni sono asincrone.
+
+Andiamo a vedere nel dettaglio qualche problema di modellazione che può avvenire negli automi temporizzati.
+
+Un primo problema è la time convergence, che è inevitabile, ma che può essere risolto in fase di verifica.
+Un secondo problema è quello del timelock, che è introdotto dalle invarianti, e ne abbiamo già parlato, ma approfondiremo.
+L'ultimo è quello di zenoness, in cui infinite azioni avvengono un intervallo di tempo finito, e questo può avvenire essendo che le transizioni discrete sono istantanee e in particolare quelle spontanee non necessitano di uno stimolo esterno. Questo è un problema perché ametterle porterebbe a un sistema con una velocità di esecuzione arbitrariamente alta.
+
+Andiamoli a definire nel dettaglio.
+
+Si ha time convergence quando esiste un percorso infinito il cui tempo converge verso un valore finito.
+
+Questo è facile vedere che possa avvenire, ad esempio con l'automa in figura.
+
+Chiamando il percorso \(\pi\) possiamo definire il tempo di esecuzione di \(\pi\) come
+\[ExecTime(\pi) = \sum_{i \geq 1} ExecTime(d_i) = \sum_{i \geq 1} \frac{1}{2^i} = 1\]
+
+Se \(ExecTime(\pi)<\infty\) allora \(\pi\) è un percorso convergente. Tali percorsi possono essere ignorati se il numero di transizioni discrete in \(\pi\) è finito, perché in tal caso è possibile accorpare le infinite transizioni temporali in un'unica transizione temporale con ritardo pari al limite della somma dei ritardi, e dunque non si perderebbe alcuna parola accettata dall'automa.
+
+Dato uno stato di partenza \(s\) ci interesseremo solo dell'insieme dei percorsi che partono da \(s\) e che sono divergenti, ovvero:
+\[Path_{div}(S) = \set{\pi}[\pi_0 = s \land ExecTime(\pi) =\infty]\]
+
+Definiamo invece un timelock come uno stato \(s\) tale che \(Path_{div}(s) = \emptyset\), ovvero non esiste alcun percorso divergente che parte da \(s\). Questo non vuol dire che da \(s\) non parta alcun percorso, o che il sistema non evolva, ma che tutti i percorsi che partono da \(s\) sono convergenti. Ad esempio, nell'automa in figura
+
+L'automa può evolvere se non in percorsi convergenti.
+
+Per quanto riguarda la zenoness, la situazione è più complessa. Un percorso \(\pi\) è zeno se \(ExecTime(\pi)<\infty\) e il numero di transizioni discrete in \(\pi\) è infinito. Un automa temporizzato è non-zeno se non ammette percorsi zeno, ovvero se ogni percorso con un numero infinito di transizioni discrete è divergente.
+
+Purtroppo la verifica di presenza di zenoness è un problema difficile, ma conosciamo una condizione sufficiente per la non-zenoness.
+
+In particolare, se in ogni ciclo semplice dell'automa temporizzato esiste un clock \(x\) che rispetta le seguenti proprietà:
+\begin{itemize}
+  \item \(x\) è resettato in almeno una transizione del ciclo
+  \item in ogni valutazione del ciclo, esiste un intero positivo \(c\) tale che \(x \geq c\) è una guardia di almeno una transizione del ciclo
+\end{itemize}
+allora l'automa temporizzato è non-zeno. Infatti ognuno di questi cicli richiede un tempo di esecuzione di almeno \(c\) per essere attraversato. Il percorso indotto da tale ciclo nell'LTS associato non è necessariamente un ciclo, perché gli stati possono essere diversi a causa della valutazione dei clock, ma considerando solo le locazioni, necessariamente dovrà contentere dei cicli. In particolare tali cicli devono essere attraversati un numero infinito di volte, essendo che il numero di cicli semplici è finito, e dunque il tempo di esecuzione del percorso è infinito, poiché sarà almeno \(c\) per ogni ciclo attraversato, e dunque il percorso non è zeno.
+
+\chapter{Lezione 22/04}
+
+Tool SPIN che usa Program Graph e LTL. Spin in realtà è più vicino a un transpiler, perchè dato un file con il modello non fa la verifica ma crea un file C che incorpora il modello e la proprietà da verificare con il verificatore, che va compilato e lanciato per avere il risultato della verifica. Spin permette anche la simulazione del modello, sia in maniera guidata dall'utente, che in maniera casuale, che guidata da una traccia di errore.
+
+Per specificare il modello in SPIN si usa un linguaggio di specifica detto Promela. Un modello in Promela è una collezione di \q{proctype} che sono prototipi di processo che vengono istanziati ed eseguiti in parallelo.
+
+\todo{inserire immagine di esempio}
+
+Ci sono diverse istruzioni nel linguaggio che sono considerate atomiche, ovvero che verranno eseguite senza interruzioni, e dunque mappate su una singola transizione nel transition system. I conditional statement e i repetition statement invece sono particolari poiché vogliamo modellare anche non determinismo. In particolare i costrutti "if" e "do" sono un elenco di guardie e azioni, e se più di una guardia è vera allora viene scelto non deterministicamente quale azione eseguire. L'unica differenza tra i due è che "if" viene eseguito una sola volta, mentre "do" viene eseguito finché non raggiunge un break o un goto.
+
+\todo{inserire immagine su if e do}
+
+Una differenza interessante da notare rispetto al C è che nel linguaggio C ogni istruzione è un espressione, ovvero ha un valore che posso assegnare a una variabile. In Promela invece ogni espressione è un istruzione, nel senso che un confronto booleano è un istruzione che è eseguibile se è vera e non eseguibile se è falsa. In particolare, la verifica per le condizioni è fatta sull'eseguibilità dell'istruzione, e quindi è possibile usare ogni istruzione come guardia, e non solo confronti booleani.
+
+Per le formule LTL invece, SPIN usa la sintassi modale per rappresentare gli operatori temporali, ovvero \(\square\) per \(G\), \(\diamond\) per \(F\), \(U\) per \(U\) e \(V\) per \(R\), con \(\square\) rappresentato come [] e \(\diamond\) rappresentato come <>. \todo{aggiungi listing in line}.
+
+Tipi standard più Channel e PID per i canali e i process ID. Approfondisci con slide.
+
+  [ESEMPI IN SPIN]
+
+\chapter{Lezione 29/04}
+
+ALTRI ESEMPI SU SPIN\@
+
+\chapter{Lezione 13/05}
+
+Per rappresentare efficientemente le tabelle di verità (funzioni booleane) passeremo per alberi di decisione, da cui potremo poi passare a grafi eliminando rindondanza arrivando ai BDD, ovvero Binary Decision Diagram, che sono dei DAG\@.
+
+Questa rappresentazione è fortemente legata alla forma normale ITF (if-then-else). Per questa forma normale serve introdurre un operatore booleano ternario della forma generale \(\phi \to \phi_1,\phi_2\) che intuitivamente rappresenta una formula che assume il valore di verità di \(\phi_1\) se \(\phi\) è vera e il valore di verità di \(\phi_2\) se \(\phi\) è falsa. Di conseguenza è equivalente a \((\phi \land \phi_1) \lor (\neg \phi \land \phi_2)\). A questo punto, la connessione con gli alberi di decisione è immediata, poiché se \(\phi\) è una variabile proposizionale, otteniamo l'operatore \(x\to \phi_1,\phi_2\) che si mappa nativamente in nodi di un albero di decisione con \(x\) che etichetta il nodo e \(\phi_1,\phi_2\) saranno i sottoalberi figli. A questo punto con anche \(\phi_1,\phi_2\) in forma normale ITF, possiamo ottenere un albero di decisione completo. Di conseguenza ogni albero di decisione può essere riformulata in una formula che usa solo l'operatore ternario appena visto, usando i simboli costanti \(1,0\) per rappresentare vero e falso.
+
+Dunque questo operatore può esprimere anche \(\land,\lor, \neg\). Ad esempio \(x \land y\) è equivalente a \(x \to y,0\), \(x \lor y\) è equivalente a \(x \to 1,y\) e \(\neg x\) è equivalente a \(x \to 0,1\).
+
+Anche se l'operatore è definito sulle formule, si può mostrare per induzione che ci si può ridurre sempre ad applicare l'operatore if-then-else a variabili proposizionali. I casi base infatti sono \(0\) e \(1\) che sono già in forma normale ITF\@, e \(x\) che è esprimibile come \(x\to 1,0\). Passando al caso induttivo, consideriamo la formula \(\phi_1 \to \phi_2,\phi_3\). Essendo che \(\phi_1\) è sottoformula, per ipotesi induttiva dev'esserci una \(x\) tale che \(\phi_1 = x \to \psi_1,\psi_2\). A questo punto, possiamo riscrivere \(\phi_1 \to \phi_2,\phi_3\) come \((x \to \psi_1,\psi_2) \to \phi_2,\phi_3\). Con una semplice analisi per casi possiamo vedere che questa formula equivale a \(x\to(\psi_1\to\phi_2,\phi_3),(\psi_2\to\phi_2,\phi_3)\), da cui abbiamo la tesi. Possiamo notare come questa nuova struttura sia molto più simile ad un albero di decisione, interpretando le formule come (sotto)-alberi, e le variabili come nodi.
+
+Data una funzione \(f\) sulle variabili booleane \(x_1,\dots,x_n\) possiamo definire il concetto di \keyword{cofattore positivo/negativo} rispetto a \(x_i\), ovvero \(f_{x_i = 1}(x_1, \ldots, x_{i-1}, 1, x_{i+1}, \ldots, x_n)\) e \(f_{x_i = 0}(x_1, \ldots, x_{i-1}, 0, x_{i+1}, \ldots, x_n)\). Shannon notò che ogni funzione booleana \(f\) che contiene una variabile \(x\) è rappresentabile come \((x\land f_x) \lor (\neg x \land f_{\overline{x}})\), con \(f_x\) e \(f_{\overline{x}}\) rispettivamente cofattori positivo e negativo di \(f\) rispsetto a \(x\). Chiaramente tale forma è analoga alla forma normale ITF.
+
+Passando ai BDD, questi sono dei DAG a radici finite con 1 nodo iniziale (senza archi entranti), 2 nodi terminali (senza archi uscenti e etichettati con 0,1) e tutti i nodi non terminali hanno esattamente (2 archi uscenti) chiamati arco basso (0) e arco alto (1).
+
+Ogni sequenza di bit corrisponde a un percorso in questo grafo dal nodo iniziale a nodi terminali. Questo ci permette di ridurre la ridondanza della rappresentazione dell'albero di decisione.
+
+Vediamo come identificare queste ridondanze e di ridurre gli alberi a BDD. Le idee sono
+\begin{itemize}
+  \item Condividere i nodi terminali uguali
+  \item Rimuovere test ridondanti, ovvero nodi che hanno due figli uguali (che sono stati uniti da altre regole) possono essere sostituiti col proprio figlio
+  \item Condividere i nodi non terminali uguali, ovvero se si hannno sottodiagrammi radicati in due nodi isomorfi è possibile preservarne uno solo rimpiazzando gli archi entranti in quello rimosso con archi entranti in quello preservato.
+\end{itemize}
+
+Aggiungere esempi grafici dalle slide.
+
+Il test di isomorfismo può sembrare complesso perché sembrerebbe che bisogni guardare l'intero sotto diagrammi, ma se le regole si applicano dal basso verso l'altro, il test di isomorfismo diventa locale, ovvero due nodi sono radice di sottodiagrammi isomorfi sono se hanno la stessa etichetta e hanno arco basso e arco alto che vanno rispettivamente negli stessi nodi. Questo è perché se i figli di un nodo erano isomorfi saranno già stati compattati da applicazioni precedenti della regola.
+
+Tale rappresentazione purtroppo non è ancora canonica, perché per la stessa funzione è possibile scegliere una qualsiasi variabile per etichettare il nodo iniziale, ottenendo BDD completamente diversi. Di conseguenza in linea di principio ogni ordinamento sui test porta a un grafo diverso. Dunque per la forma canonica sarà ottenuta fissando un ordinamento sulle variabili.
+A questo punto è possibile definire gli OBDD, ovvero ordered BDD, ovvero dei BDD in cui tutte le variabili compaiono nell'ordinamento e se \(i<j\) allora \(x_i\) appare prima di \(x_j\) in ogni percorso dal nodo iniziale a nodi terminali. In questo modo, con l'ordinamento fisso, è possibile mostrare che per ogni funzione booleana esiste un unico OBDD\@.
+
+Questo ci sarà molto utile perché vorrà dire che il test di uguaglianza tra insiemi possiamo ridurlo a un test di isomorfismo tra OBDD (che essendo canonici sono unici) che può essere fatto in tempo lineare sulle dimensioni dell'OBDD\@. In realtà l'eliminazoine della ridondanza è applicabile all'intera foresta di BDD per tutte le possibili funzioni, ammettendo più radici per creare un unico BDD che rappresenta tutte le funzioni. In questo modo due funzioni equivalenti faranno riferimento allo stesso ogetto, e di conseguenza la verifica di isomorfismo diventa costante, ovvero il test che l'ogetto relativo alle due funzioni abbia lo stesso identificativo (puntatore).
+
+L'ordine non è importante solo per la canonicità, ma anche per la dimensione del diagramma finale. Consideriamo infatti la funzione \(f(x_1,x_2,y_1,y_2) = 1 \iff x_1 = y_1 \land x_2 = y_2\). Se l'ordinamento è \(x_1,y_1,x_2,y_2\) allora il BDD avrà dimensione \(3 \cdots 2 +2  = 8\). In generale se la formula è \(\bigwedge_{i=1}^n x_i = y_i\) e l'ordinamento è \(x_1,y_1,x_2,y_2,\dots,x_n,y_n\) allora il BDD avrà dimensione \(3 \cdots n +2\) e quindi cresce linearmente. Se invece l'ordinamento fosse \(x_1,x_2,\ldots, x_n,y_i,y_2, \ldots y_n\) la dimensione sarà \(3\cdot 2^n-1\) e quindi esponenziale.
+
+Aggiungere esempi grafici per mostrare perché vale questa cosa. da slide.
+
+Sfortunatamente funzioni diverse hanno ordinamenti ottimali diversi. Inoltre decidere qual'è l'ordinamento ottimale è un problema NP-completo.
+
+Nella pratica vengono adottate euristiche, ma non c'è garanzia di ordinamenti che mantengono l'insieme dei nodi compatti.
+Per la costruzione di questi ROBDD (reduced OBDD) sarà sufficiente il seguete algoritmo
+
+AGGIUNGI DA SLIDE.
+
+Questi algoritmi garantiscsono che l'OBDD non contenga ridondanze.
+
+\chapter{Lezione 20/05}
+
+L'ultima volta ci siamo fermati a una possibile implementazione di OBDD che è molto vicina a quella che effettivamente si fa, in particolare si usano due tabelle, una che rappresentano un grafo e un altra per fare hashing delle triple per ottenere i nomi dei nodi, in modo da garantire l'unicità.
+
+Ora dobbiamo vedere come implementare le operazioni su questi OBDD, ovvero le operazioni insiemistiche (\(\cap, \cup, \overline{S}\)) e la preimmagine \(pre(P) = \den{EXP} = \set{s}[s\to t \land t \in \den{P} \text{ per qualche }t]\) che serve sia per \(EX\) che per iterarla nei punti fissi per \(EU\) e \(EG\). Quindi dati gli OBDD di due funzioni booleane \(f\) e \(g\) vorremmo calcolare l'OBDD per \(f \circ g\) con \(\circ \in \set{\cap, \cup, \overline{S}}\). Ricordiamo che avendo fissato un ordine sulle variabili abbiamo rappresentato le funzioni \(f\) come \((x_1 \land f_{x_1}) \lor (x_2 \land f_{\overline{x_1}})\). Se vogliamo quindi \(\cup\), ovvero \(\lor\) tra le funzioni abbiamo: 
+
+
+\begin{equation*}
+  f \lor g = \begin{aligned}
+    ((x_1 \land f_{x_1}) \lor (\neg x_1 \land f_{\overline{x_1}})) \lor ((x_1 \land g_{x_1}) \lor (\neg x_1 \land g_{\overline{x_1}})) = \\
+    x_1 \land (f_{x_1} \lor g_{x_1}) \lor \neg x_1 \land (f_{\overline{x_1}} \lor g_{\overline{x_1}})
+    \end{aligned}
+\end{equation*}
+
+Questo vale anche per \(\land\) e \(\neg\). 
+
+TODO: FAI I CONTI A CASA 
+
+Essendo che \(\neg f \equiv f \oplus 1\) possiamo esprimere tutti gli operatori con un unico algoritmo che è identico se non nei casi base.
+
+VEDI ALGORITMO DA SLIDE.
+
+Nota che nei casi in cui uno dei BDD dipende da una variabile da cui l'altro non dipende non fa entrambe le chiamate ricorsive ma solo quello che dipende perché tanto l'altro è invariato.
+
+Questo algoritmo di pase ha complessità \(\BigO(2^n)\) perché ripeto più volte le stesse chiamate ricorsive, ma posso risolvere con programmazione dinamica, ovvero mantenendo una cache o tabella dei risultati parziali già calcolati, in modo che per ogni tripla \(op,u,v\) la chiamata ricorsiva venga fatta una volta sola, mentre negli altri casi si andrà a vedere a tempo costante la look-up table. Fissato \(op\) è chiaro che quindi le chiamate saranno esattamente \(\BigO(\abs{f}\cdot \abs{g})\) e quindi la complessità totale sarà \(\BigO(\abs{f}\cdot \abs{g})\).
+
+Ora prendiamo ad esempio una funzione \(f(x_1,\ldots,x_n)\) e di voler calcolare i cofattori rispetto a una certa \(x_i\), ovvero calcolare la riduzione rispetto \(x_i\), denotata come \(f(x_1,\ldots,x_n)_{|_{x_i}}\) o \(f(x_1,\ldots,x_n)_{|_{\overline{x_i}}}\) che corrispondono rispettivamente a \(f(x_1,\ldots,x_{i-1}, 1, x_{i+1},\ldots,x_n)\) e \(f(x_1,\ldots,x_{i-1}, 0, x_{i+1},\ldots,x_n)\). Questo induce un altra possibile operazione sugli OBDD ovvero l'operazione di restrizione rispetto a un assegnamento, ovvero dato un OBDD \(f\) e un assegnamento \(\sigma\) a una parte delle variabili contenute in \(f\) di creare l'OBDD della riduzione di \(f\) rispetto alle variabili di \(\sigma\). Possiamo notare come anche in questo caso usando l'espansione di shannon nel caso in cui la variabile discriminante non sia nell'assegnamento, possiamo spingere l'operazione sui sottoalberi, mentre se è presente è sufficiente scegliere il ramo corrispondente all'assegnamento.
+
+Questo è in particolarmodo utile per le Quantified Bolean formulae, ovvero formule booleane quantificate, con semantica identica al prim'ordine su dominio booleano.
+
+Da un punto di vista funzionale \(\exists x_i:f(x_1, \ldots, x_n)\) è la funzione booleana che valuta a \(1\) se \(f(x_1, \ldots,x_n)\) valuta a \(1\) per qualche valore di \(x_i\). È quindi equivalente a \(f_{x_i} \lor f_{\overline{x_i}}\). Dualmente per \(\forall x, f(x_1, \ldots, x_n)\) sarà \(f_{x_i} \land f_{\overline{x_i}}\). A noi servirà in particolare \(\exists\) per la preimmagine, perché è intrinsecamente una proprietà esistenziale. In caso però di logica alternante, come nei giochi, la preimmagine può essere universale.
+
+[Discussione interessante sui collegamenti con SAT e VALIDITY e di come questo porti ad avere tempo di costruzione di OBDD esponenziale alle volte indipendentemente dall'ordinamento sulle variabili scelte.]
+
+Finalmente capiamo come risolvere il model checking usando OBDD. Ovviamente qui si parte da strutture di kripke in input, quindi dobbiamo capire come codificarla tramite OBDD, ovvero rappresentare la topologia del grafo sottostante mediante OBDD.
+
+Ora per insieme degli stati \(S\) basterà avere \(\lceil\log_2 \abs{S}\rceil\) variabili booleane in modo che ogni elemento dell'insieme sarà codificato in un numero in binario, e l'appartenenza sarà identificata tramite la funzione caratteristica, che da \(1\) se e solo se l'elemento appartiene a \(S\). Senza perdità di generalità possiamo assumere che se due stati hanno la stessa etichetta sono lo stesso stato. Di conseguenza sarà possibile costruire le funzioni caratteristiche per i singleton delle proposizioni atomiche e metterle in disgiunzione. In particolare per la variabile atomica \(p\) per rappresentare lo stato in cui è vera solo \(p_1\) basterà usare la formula \(p_1 \bigwedge_{i \neq 1} \neg P_i\) per ogni \(i\). Per la relazione invece abbiamo chiaramente \(R\subseteq S\times S\). Avendo già la rappresentazione degli stati tramite \(x_1, \ldots, x_{\log_2\abs{S}}\) variabili, mi è sufficiente raddoppiare le variabili ottenendo \(x_1', \ldots, x_{\log_2\abs{S}}'\) e avere un OBDD che dipenda da entrambe le sequenze di variabili, in modo che le prime rappresentano il primo elemento della coppia e il secondo la seconda.
+
+AGGIUNGI ESEMPI!
+
+A questo punto per l'ordine conviene mettere consecutive variabili e la loro primata, essendo strettamente correlate.
+
+Possiamo quindi costruire l'algoritmo tramite OBDD\@.
+
+Facciamo induttivamente:
+APPROFONDIRE DA SLIDE
+\[\den{x_i} = f_{x_i}(x_1, \ldots, x_{n}) = x_i\]
+
+Per gli operatori booleani basterà fare l'operatore booleano tra le funzioni delle sottoformule
+
+Ci manca la preimmagine, ovvero \(EX\phi\). In prima battuta mi serve l'insieme degli archi che terminano in \(\den{\phi}\). Ma per fare questo mi basta prendere \(f_{\phi}(x_1,\ldots,x_n)\) e trasformarlo in \(f_{\phi}(x_1', \ldots, x_n')\) in modo da interpretarlo come stati di arrivo, e poi fare l'intersezione con \(f_{R}\). Questo perché di fatto ogni OBDD può essere visto come su tutte le variabili, primate e non, semplicemente non dipenderà da quelle che non gli riguardano.
+
+Ora chiaramente a me serve ricavare solo gli archi di partenza quindi posso astrarre esistenzialmente con \(\exists x_1', \ldots,x_n'\). Quindi in generale \(\den{EX\phi}= \exists x_1',\ldots,x_n': (f_{\phi}(x_1,\ldots,x_n)\land f_{R}(x_1,x_1',\ldots,x_n,x_n'))\).\footnote{Si può fare anche in maniera molto più efficiente applicando la quantificazione esistenziale eagerly, ovvero spingendo la quantificazione esistenziale più in basso possibile, ovvero al primo momento in cui la variabile quantificata compare, in modo da ridurre la grandezza degli OBDD intermedi.}
+
+A questo punto per \(EU\) e \(EG\) basterà applicare gli algoritmi classici di punto fisso.
+
+È facile vedere che \(\abs{f_S}\leq 2^n\) con \(n\) numero di variabili, quindi \(\abs{f_S}\leq 2^{\log_2 \abs{S}} = \abs{S}\). Quindi la complessità è alla peggio uguale dell'algoritmo tramite etichettatura, ma in una buona parte dei casi la grandezza è meno che esponenziale, e quindi ci saranno tanti casi in cui si farà meglio.
+
+\chapter{Lezione 27/05}
+
+Riprendiamo il modello di automi temporizzati usati per modellare sistemi che lavorano a tempo reale. Quello che vorremmo fare è il verificare proprietà temporali su questi sistemi. Una prima proprietà semplice è REACHABILITY, ovvero verificare, dato in input un TA e uno stato di controllo, se dagli stati iniziali esista almeno un percorso fino allo stato obiettivo. Ogni stato abbiamo detto essere una coppia \((l,\nu)\) con \(l\in Loc\) e \(\nu: C \to \R\). Formalmente quindi il problema di reachability è: dato un TA \(A\) e uno stato di controllo \(l_f \in Loc\) esiste un run divergente tale che esiste un indice \(i\) per cui \(\pi = s_0 s_1 \ldots s_i \ldots\) con \(s_0 \in Loc_0\) e \(s_i = (l_f, \nu)\) per qualche \(\nu\)?
+
+Tale problema è decicibile finquando ci interessa solo la locazione. Se invece volessimo raggiungere uno stato specifico, ovvero una specifica coppia \((l_f,\nu_f)\) in input non è più decidibile.
+
+In ogni caso essendo il numero di stati infinito lo spazio di ricerca è infinito la raggiungibilità non è banale. Tipicamente l'esplorazione di uno spazio infinito è decidibile se lo spazio può essere partizionato in un numero finito di classi di equivalenza rilevanti per il problema d'interessse, ovvero tali che ogni elemento all'interno di una classe è equivalente per il problema considerato. Ad esempio per la raggiungibilità potrebbero essere le componenti fortemente connesse, che però sono potenzialmente infinite a loro volta.
+
+POTENZIALMENTE AGGIUNGERE IMMAGINE ESEMPIO
+
+Quello che ci serve è una proprietà più forte, perché ci serve una sorta di proprietà di similuazione, nel senso che ogni stato in una classe di equivalenza deve poter fare tutto ciò che fanno gli altri a livello di classi. Se uno stato in una classe \(C_1\) può andare in uno stato in \(C_2\) vorrei che ogni altro elemento di \(C_1\) vada in qualche modo in \(C_2\). Ovviamente essendo le locazioni finite la cosa importante è definire un'equivalenza tra le valutazioni \(\nu\). Tali classi di equivalenza sono dette \keyword{Regioni}. In un TA chiaramente i comportamenti sono determinati dalle invarianti e dai vincoli sui clock, i quali sono ovviamente finiti. Per la definizione della classe di equivalenza consideriamo i seguenti criteri:
+
+\begin{itemize} 
+  \item Due valutazioni di clock sono equivalenti se e solo se soddisfano gi stessi vincoli di clock
+  \item Due valutazioni equivalenti devono dar luogo a run simili
+  \item Devono esserci un numero finito di classi
+\end{itemize}
+
+Andiamo ad analizzare i vincoli di clock. Consideriamo \(x ~ c\) con \(c \in \N\) e \(~ \in \set{<,> =,\leq,\geq}\).
+Allora per \(x<c\), \(\nu(x)\models c\) se e solo se \(\nu(x)< c\) o, essendo intero, \(\lfloor \nu(x) \rfloor < c\). Per quelli di ugualianza possiamo contare la parte frazionaria, controllando che siano uguali le parti frazionarie. Quindi se ci fossero solo vincoli interi. Abbiamo però considerato vincoli nei razionali, ma possiamo sempre ricondurci agli interi moltiplicando per il minimo comune multiplo dei denominatori. 
+
+Consideriamo lo spazio euclideo in ficura che rappresenta lo spazio di tutte le valutazioni sui clock \(x\) e \(y\).
+
+AGGIUNGI IMMAGINE DA SLIDE!
+
+La regione in grigio sono proprio tutte le valutazioni equivalenti tra loro rispetto al vincolo indicato.
+
+Quindi l'equivalenza sta partizionando lo spazio continuo in riquadri interni aperti, che rappresentano i vincoli con sole disequazioni strette, i punti di intersezioni, unici intervalli chiusi, che rappresentano vincoli con solo relazioni di uguagianza e segmenti, sempre aperti topologicamente, che rappresentano vincoli con un uguaglianza e una disugualgianza. Quindi per un numero arbitrario di clock la partizione diventa su ipercubi. Questa prima decopoosizione rispetta il primo vincolo ma non sappiamo ancora se rispetta il generare run simili. Consideriamo i path più semplici dove passa solo il tempo, no transizione discrete, otteniamo quello che abbiamo ad immagine
+
+AGGIUNGI FOTO
+
+Come possiamo vedere punti della stessa classe vanno in classi diverse.
+
+Possiamo notare però che l'unica differenza è sulla parte frazionaria. In particolare possiamo notare che queste due valutazioni danno luogo a stati che hanno potenziali futuri diversi. Quello che è sufficiente però è tagliare i rettangoli usando la diagolane, che corrisponde ad avere la parte frazionaria uguale.
+
+Quindi per la partizione oltre a vedere il valore intero della valutazione e se il valore frazionario è zero o meno, ma anche se l'ordine delle parti frazionarie di tutti i clock sia uguale per tutte le valutazioni. Ovviamente la diagonale in se sarà una classe di equivalenza a sé stante, ovvero dove le parti frazionarie sono tutte uguali.
+
+Abbiamo quindi un partizionamento di questo tipo
+
+IMMAGINE TRIANGOLI
+
+Purtroppo però abbiamo ancora un numero infinito di classi di equivalenza. È però possibile risolvere facilmente questa cosa guardando la massima costante di confronto per ogni variabile, chiaramente tutte le classi che sono definite dall'avere quel clock maggiore della massima costante sono equivalenti perché l'automa non può distinguere tra quelle classi
+
+IMMAGINE TRIANGOLI E RIQUADRO ILLIMITATO x>3 y >3
+
+In particolare quelle in cui entrambi clock sforano la massima costante non sono più distinguibili, mentre quelle in cui solo uno sfora sono ancora distinguibili da altre ma non internamente perché non dipendono più dall'altro clock. Con quindi i clock \(x\) e \(y\) e massime costanti \(c_y\) e \(c_x\) abbiamo un primo partizionamento a triangolo come visto per la sottoregione \(x\leq c_x \land y \leq c_y\), una classe per ogni valore intero minore di \(y\) che assorbono tra loro tutti i casi \(x> c_x \land y \leq c_y\), ugualie per \(x\) e una classe unica per entrambi i clock sopra le rispettive costanti.
+
+Il conto complessivo delle regioni si dimostra che non supera
+\[\abs{C}! \cdot 2^{\abs{C}-1}\Pi_{x \in C} (2c_x+2)\]
+ con \(c_x\) massima costante presente nel TA in un vincolo per \(x\). Intuitivamente ogni regione può essere identificata da una tripla \(\langle I, \pi, D\rangle\) dove
+\begin{itemize}
+  \item \(I\) una famiglia di intervalli, con per ogni \(x \in C\) un  \(I_x \in \set{[0,0], ]0,1[, [1,1], ]1,2[\ldots,]c_x-1,c_x[,[c_x,c_x]}\)
+  \item \(\pi\) una permutazione dei clock che rappresenta l'ordine sulle parti frazionarie. Ovviamente \(\abs{\pi} = \abs{C}\).
+  \item \(D\subset C\) che ci indica tra quali clock della permutazione vale l'uguaglianza. In particolare se \(x\in D\) varrà l'uguaglianza tra \(x\) è il predecessore nell'ordinamento. Chiaramente \(\abs{D}\leq\abs{C}-1\).
+\end{itemize}
+
+Possiamo quindi vedere che il numero di permutazioni di \(C\) elementi è proprio \(\abs{C}\)!, il numero di sottinsiemi di un insieme di cardinalità \(\abs{C}-1\) è \(2^{\abs{C}-1}\) mentre il numero di intervalli che si forma è proprio la produttoria che abbimo visto nel calcolo, poiché per ogni clock \(x\) con costante massima \(c_x\) avremo che ogni \(n \in \N\) con \(n\leq c_x\) appare in esattamente due intervalli. Essendoci quindi \(c_x +1\) elementi avremo \(2c_x +2\) intervalli per clock.
+
+Avendo partizionato lo spazio delle valutazioni posso partizionare in modo finito lo spazio degli stati considerando come equivaleni stati con la stessa locazione e valutazioni equivalenti che rappresenterò con la regione. A questo punto dobbiamo andare a costruire l'automa definendo la relaizone di transizione. In particolare avrà la transizione \((l,R)\to(l',R')\) se per ogni \(\nu \in R\) esiste un \(\nu' \in R'\) tale che esista nel grafo originario \((l,\nu)\to (l,\nu')\).
+
+Dobbiamo quindi capire come si comporano le transizioni di reset. In particolare andiao a definire delle regioni di reset per ogni regione. Chiaramente questa dal punto di vista geometrico equivale a una proiezione sull'asse corrispondente al clock resettato. Chiaramente per più reset basta applicare più proiezioni di seguito. Questo ci permette di modellare facilmente le transizioni discrete.
+
+AMPLIA IL CONCETTO
+
+Definiamo invece le regioni successore di una regione come la prima regione che raggiungo facendo esclusivamente passare il tempo.
+Questo ci permette di definire le transizione di time-elapse.
+
+Possiamo quindi definire l'automa delle regioni come 
+
+\[RTS =\langle S,\Sigma\cup\set{\tau}, \to', Init, AP', L'\rangle\]
+
+Dove:
+
+\begin{itemize}
+  \item \(S = \set{\langle l,r\rangle}[l \in Loc, r \text{ regione}]\)
+  \item \(Init = \set{\langle l_0, r\rangle}[l_0 \in Loc_0, r \text{ regione con tutti i clock a } 0]\)
+  \item \(AP' = AP\cup \Phi(C)\) 
+  \item \(L'(\langle l,r\rangle) = L(l)\cup \set{\phi \in \Phi(C)}[r \models \phi]\)
+  \item \(\langle l,r\rangle \xrightarrow{\omega} \langle l',r'\rangle\) se \(l \xrightarrow{a,\lambda,r} l'\) con \(a = \omega\)
+\end{itemize}
+
+Chiaramente questo partizionamento giustifica il perché possiamo risolvere problemi di raggiungibilità solo se non pretendiamo una specifica valutazione, poiché l'informazione su di esse scompare nell'automa delle regioni. Possiamo comunque decidere raggiungibilità tra regioni, ovvero se è possibile raggiungere una qualsiasi valutazione che appartiene a una certa regione target.
+
+Inoltre è possibile definire anche un estensione delle logiche branching come CTL ad automi temporizzati con Timed CTL, definita come segue
+\[\phi ::= True\mid p \in AP\mid g \in \Phi(C)\mid \neg \phi\mid \phi_1\land\phi_2\mid \phi_1\lor\phi_2\mid E \phi_1 U_I \phi_2 \mid E G_I \phi\]
+dove \(I\) sono intervalli di tempo in cui dev'essere presente il testimone dell'\(U\) o del \(G\).
+
+La semantica di \(E \phi U_I \psi\) intuitivamente è che dev'esserci un \(\psi \in I\) e fino a che non lo raggiungo dev'esser vero \(\phi\). Formalmente 
+\(s\models E \phi_1 U_I \phi_2\) se esiste un percorso divergente \(\pi\in Paths_{div}(d)\) con \(\pi = s_0 \xrightarrow{d_0} s_1 \xrightarrow{d_1} s_2 \ldots\) con \(s_0 = s\) e
+\begin{itemize}
+  \item \(\sum_{j=0}^{i-1} (d_j )+ d \in I\) per qualche \(i\) tale che \(d \in [0,d_i]\) e \(s+d\models \phi_2\)
+  \item \(\forall j\leq i, s_j+d' \models \phi_1\lor \phi_2\) per ogni \(d' \in [0,d_j]\) con \(\sum_{k=0}^{j-1} d_k+d' \leq \sum_{k=0}^{i-1} d_k + d\)
+\end{itemize}
+
+Per fare model checking sarà sufficiente trasformare ogni intervallo presente in una formula \(U\) o \(F\) in una guardia su un nuovo clock per poi trasformare in CTL standard.
+
+GUARDA SLIDE PER DETTAGLI
